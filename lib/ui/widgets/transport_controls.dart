@@ -5,10 +5,13 @@
 import 'package:anytime/bloc/podcast/audio_bloc.dart';
 import 'package:anytime/bloc/podcast/episode_bloc.dart';
 import 'package:anytime/bloc/podcast/podcast_bloc.dart';
+import 'package:anytime/bloc/settings/settings_bloc.dart';
+import 'package:anytime/entities/app_settings.dart';
 import 'package:anytime/entities/downloadable.dart';
 import 'package:anytime/entities/episode.dart';
 import 'package:anytime/l10n/L.dart';
 import 'package:anytime/services/audio/audio_player_service.dart';
+import 'package:anytime/ui/podcast/now_playing.dart';
 import 'package:anytime/ui/widgets/download_button_widget.dart';
 import 'package:anytime/ui/widgets/play_pause_button_widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -30,14 +33,16 @@ class PlayControl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _audioBloc = Provider.of<AudioBloc>(context);
+    final _settingsBloc = Provider.of<SettingsBloc>(context);
 
     return StreamBuilder<PlayerControlState>(
-        stream: Rx.combineLatest2(_audioBloc.playingState, _audioBloc.nowPlaying,
-            (AudioState audioState, Episode episode) => PlayerControlState(audioState, episode)),
+        stream: Rx.combineLatest3(_audioBloc.playingState, _audioBloc.nowPlaying, _settingsBloc.settings,
+            (AudioState audioState, Episode episode, AppSettings settings) => PlayerControlState(audioState, episode, settings)),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final audioState = snapshot.data.audioState;
             final nowPlaying = snapshot.data.episode;
+            final autoOpenNowPlaying = snapshot.data.settings.autoOpenNowPlaying;
 
             if (episode.downloadState != DownloadState.downloading) {
               // If this episode is the one we are playing, allow the user
@@ -64,6 +69,12 @@ class PlayControl extends StatelessWidget {
                   return InkWell(
                     onTap: () {
                       _audioBloc.transitionState(TransitionState.play);
+                      if (autoOpenNowPlaying) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(builder: (context) => NowPlaying(), fullscreenDialog: false),
+                        );
+                      }
                     },
                     child: PlayPauseButton(
                       title: episode.title,
@@ -79,6 +90,12 @@ class PlayControl extends StatelessWidget {
               return InkWell(
                 onTap: () {
                   _audioBloc.play(episode);
+                  if (autoOpenNowPlaying) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(builder: (context) => NowPlaying(), fullscreenDialog: false),
+                    );
+                  }
                 },
                 child: PlayPauseButton(
                   title: episode.title,
@@ -138,10 +155,11 @@ class DownloadControl extends StatelessWidget {
   Widget build(BuildContext context) {
     final _audioBloc = Provider.of<AudioBloc>(context);
     final _podcastBloc = Provider.of<PodcastBloc>(context);
+    final _settingsBloc = Provider.of<SettingsBloc>(context);
 
     return StreamBuilder<PlayerControlState>(
-        stream: Rx.combineLatest2(_audioBloc.playingState, _audioBloc.nowPlaying,
-            (AudioState audioState, Episode episode) => PlayerControlState(audioState, episode)),
+        stream: Rx.combineLatest3(_audioBloc.playingState, _audioBloc.nowPlaying, _settingsBloc.settings,
+            (AudioState audioState, Episode episode, AppSettings settings) => PlayerControlState(audioState, episode, settings)),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final audioState = snapshot.data.audioState;
@@ -251,6 +269,7 @@ class DownloadControl extends StatelessWidget {
 class PlayerControlState {
   final AudioState audioState;
   final Episode episode;
+  final AppSettings settings;
 
-  PlayerControlState(this.audioState, this.episode);
+  PlayerControlState(this.audioState, this.episode, this.settings);
 }
