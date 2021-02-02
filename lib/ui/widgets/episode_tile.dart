@@ -111,8 +111,9 @@ class EpisodeTile extends StatelessWidget {
                   ),
                   onPressed: episode.downloaded
                       ? () {
-                          showPlatformDialog<void>(
+                          showDialog<void>(
                             context: context,
+                            useRootNavigator: false,
                             builder: (_) => BasicDialogAlert(
                               title: Text(
                                 L.of(context).delete_episode_title,
