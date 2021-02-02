@@ -65,6 +65,7 @@ class _SpeedSelectorWidgetState extends State<SpeedSelectorWidget> {
                 onPressed: () {
                   showDialog<void>(
                     context: context,
+                    useRootNavigator: false,
                     builder: (BuildContext context) {
                       return AlertDialog(
                           title: Text(
