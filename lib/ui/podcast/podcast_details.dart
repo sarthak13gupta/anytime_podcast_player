@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'package:anytime/bloc/podcast/podcast_bloc.dart';
-import 'package:anytime/core/chrome.dart';
 import 'package:anytime/entities/episode.dart';
 import 'package:anytime/entities/feed.dart';
 import 'package:anytime/entities/podcast.dart';
@@ -17,6 +16,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dialogs/flutter_dialogs.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
@@ -29,9 +29,8 @@ import 'package:provider/provider.dart';
 class PodcastDetails extends StatefulWidget {
   final Podcast podcast;
   final PodcastBloc _podcastBloc;
-  final bool _darkMode;
 
-  PodcastDetails(this.podcast, this._podcastBloc, this._darkMode);
+  PodcastDetails(this.podcast, this._podcastBloc);
 
   @override
   _PodcastDetailsState createState() => _PodcastDetailsState();
@@ -51,7 +50,6 @@ class _PodcastDetailsState extends State<PodcastDetails> {
     // Load the details of the Podcast specified in the URL
     log.fine('initState() - load feed');
     widget._podcastBloc.load(Feed(podcast: widget.podcast));
-    brightness = widget._darkMode ? Brightness.dark : Brightness.light;
 
     // We only want to display the podcast title when the toolbar is in a
     // collapsed state. Add a listener and set toollbarCollapsed variable
@@ -59,28 +57,12 @@ class _PodcastDetailsState extends State<PodcastDetails> {
     _sliverScrollController.addListener(() {
       if (!toolbarCollpased && _sliverScrollController.hasClients && _sliverScrollController.offset > (300 - kToolbarHeight)) {
         setState(() {
-          if (widget._darkMode) {
-            Chrome.transparentDark();
-            brightness = Brightness.light;
-          } else {
-            Chrome.transparentLight();
-            brightness = Brightness.light;
-          }
-
           toolbarCollpased = true;
         });
       } else if (toolbarCollpased &&
           _sliverScrollController.hasClients &&
           _sliverScrollController.offset < (300 - kToolbarHeight)) {
         setState(() {
-          if (widget._darkMode) {
-            Chrome.translucentDark();
-            brightness = Brightness.light;
-          } else {
-            Chrome.translucentLight();
-            brightness = Brightness.dark;
-          }
-
           toolbarCollpased = false;
         });
       }
@@ -101,30 +83,17 @@ class _PodcastDetailsState extends State<PodcastDetails> {
     ));
   }
 
-  void _setChrome({bool darkMode}) {
-    if (darkMode) {
-      Chrome.transparentDark();
-    } else {
-      Chrome.transparentLight();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final backgroundColour = Theme.of(context).backgroundColor;
-    final defaultBrightness = Theme.of(context).brightness;
     final _podcastBloc = Provider.of<PodcastBloc>(context);
-
-    brightness = toolbarCollpased ? defaultBrightness : Brightness.dark;
 
     return WillPopScope(
       onWillPop: () {
-        _setChrome(darkMode: widget._darkMode);
-
+        SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: Colors.transparent));
         return Future.value(true);
       },
       child: Scaffold(
-        backgroundColor: backgroundColour,
+        backgroundColor: Theme.of(context).backgroundColor,
         body: LiquidPullToRefresh(
           onRefresh: _handleRefresh,
           showChildOpacityTransition: false,
@@ -132,7 +101,12 @@ class _PodcastDetailsState extends State<PodcastDetails> {
             controller: _sliverScrollController,
             slivers: <Widget>[
               SliverAppBar(
-                brightness: brightness,
+                backwardsCompatibility: false,
+                systemOverlayStyle: SystemUiOverlayStyle(
+                  statusBarIconBrightness: Theme.of(context).brightness == Brightness.light ? Brightness.dark : Brightness.light,
+                  statusBarColor: Theme.of(context).appBarTheme.backgroundColor.withOpacity(toolbarCollpased ? 1.0 : 0.5),
+                ),
+                brightness: toolbarCollpased ? Theme.of(context).brightness : Brightness.dark,
                 title: AnimatedOpacity(
                   opacity: toolbarCollpased ? 1.0 : 0.0,
                   duration: Duration(milliseconds: 500),
@@ -140,23 +114,13 @@ class _PodcastDetailsState extends State<PodcastDetails> {
                 ),
                 leading: DecoratedIconButton(
                   icon: Icons.close,
-                  iconColour: toolbarCollpased && defaultBrightness == Brightness.light ? Colors.black : Colors.white,
+                  iconColour: toolbarCollpased && Theme.of(context).brightness == Brightness.light ? Colors.black : Colors.white,
                   decorationColour: toolbarCollpased ? Color(0x00000000) : Color(0x22000000),
                   onPressed: () {
-                    setState(() {
-                      // We need to switch brightness to light here. If we do not,
-                      // it will stay dark until the previous screen is rebuilt and
-                      // that results in the status bar being blank for a few
-                      // milliseconds which looks very odd.
-                      brightness = widget._darkMode ? Brightness.dark : Brightness.light;
-                    });
-
-                    _setChrome(darkMode: widget._darkMode);
-
+                    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: Colors.transparent));
                     Navigator.pop(context);
                   },
                 ),
-                backgroundColor: Theme.of(context).appBarTheme.color,
                 expandedHeight: 300.0,
                 floating: false,
                 pinned: true,
