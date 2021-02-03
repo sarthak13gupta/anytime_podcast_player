@@ -10,6 +10,7 @@ import 'package:anytime/ui/widgets/search_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dialogs/flutter_dialogs.dart';
 import 'package:provider/provider.dart';
 
@@ -94,6 +95,11 @@ class _SettingsState extends State<Settings> {
   Widget _buildAndroid(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backwardsCompatibility: false,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarIconBrightness: Theme.of(context).brightness == Brightness.light ? Brightness.dark : Brightness.light,
+          statusBarColor: Colors.transparent,
+        ),
         brightness: Theme.of(context).brightness,
         elevation: 0.0,
         title: Text(
