@@ -7,6 +7,7 @@ import 'package:anytime/bloc/search/search_state_event.dart';
 import 'package:anytime/l10n/L.dart';
 import 'package:anytime/ui/search/search_results.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class Search extends StatefulWidget {
@@ -55,6 +56,11 @@ class _SearchState extends State<Search> {
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
+            backwardsCompatibility: false,
+            systemOverlayStyle: SystemUiOverlayStyle(
+              statusBarIconBrightness: Theme.of(context).brightness == Brightness.light ? Brightness.dark : Brightness.light,
+              statusBarColor: Colors.transparent,
+            ),
             brightness: Theme.of(context).brightness,
             leading: IconButton(
               tooltip: L.of(context).search_back_button_label,

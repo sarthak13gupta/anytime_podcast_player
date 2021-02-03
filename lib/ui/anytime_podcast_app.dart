@@ -10,7 +10,6 @@ import 'package:anytime/bloc/podcast/podcast_bloc.dart';
 import 'package:anytime/bloc/search/search_bloc.dart';
 import 'package:anytime/bloc/settings/settings_bloc.dart';
 import 'package:anytime/bloc/ui/pager_bloc.dart';
-import 'package:anytime/core/chrome.dart';
 import 'package:anytime/core/environment.dart';
 import 'package:anytime/entities/podcast.dart';
 import 'package:anytime/l10n/L.dart';
@@ -95,23 +94,13 @@ class _AnytimePodcastAppState extends State<AnytimePodcastApp> {
         /// Only update the theme if it has changed.
         if (newTheme != theme) {
           theme = newTheme;
-
-          if (event.theme == 'dark') {
-            Chrome.transparentDark();
-          } else {
-            Chrome.transparentLight();
-          }
         }
       });
     });
 
     if (widget.mobileSettingsService.themeDarkMode) {
       theme = Themes.darkTheme().themeData;
-
-      Chrome.transparentDark();
     } else {
-      Chrome.transparentLight();
-
       theme = Themes.lightTheme().themeData;
     }
   }
@@ -256,6 +245,12 @@ class _AnytimeHomePageState extends State<AnytimeHomePage> with WidgetsBindingOb
                   visible: widget.topBarVisible,
                   sliver: SliverAppBar(
                     title: TitleWidget(),
+                    backwardsCompatibility: false,
+                    systemOverlayStyle: SystemUiOverlayStyle(
+                      statusBarIconBrightness:
+                          Theme.of(context).brightness == Brightness.light ? Brightness.dark : Brightness.light,
+                      statusBarColor: Colors.transparent,
+                    ),
                     brightness: brightness,
                     backgroundColor: backgroundColour,
                     floating: false,
@@ -357,8 +352,6 @@ class _AnytimeHomePageState extends State<AnytimeHomePage> with WidgetsBindingOb
     var _textFieldController = TextEditingController();
     var _podcastBloc = Provider.of<PodcastBloc>(context, listen: false);
     var url = '';
-    final _theme = Theme.of(context);
-    final darkMode = _theme.brightness == Brightness.dark;
 
     switch (choice) {
       case 'about':
@@ -416,8 +409,7 @@ class _AnytimeHomePageState extends State<AnytimeHomePage> with WidgetsBindingOb
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute<void>(
-                        builder: (context) => PodcastDetails(Podcast.fromUrl(url: url), _podcastBloc, darkMode)),
+                    MaterialPageRoute<void>(builder: (context) => PodcastDetails(Podcast.fromUrl(url: url), _podcastBloc)),
                   ).then((value) => Navigator.pop(context));
                 },
               ),

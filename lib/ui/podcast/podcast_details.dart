@@ -4,7 +4,6 @@
 
 import 'package:anytime/bloc/podcast/podcast_bloc.dart';
 import 'package:anytime/bloc/settings/settings_bloc.dart';
-import 'package:anytime/core/chrome.dart';
 import 'package:anytime/entities/episode.dart';
 import 'package:anytime/entities/feed.dart';
 import 'package:anytime/entities/podcast.dart';
@@ -22,6 +21,7 @@ import 'package:anytime/ui/widgets/podcast_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dialogs/flutter_dialogs.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -36,9 +36,8 @@ import 'package:url_launcher/url_launcher.dart';
 class PodcastDetails extends StatefulWidget {
   final Podcast podcast;
   final PodcastBloc _podcastBloc;
-  final bool _darkMode;
 
-  PodcastDetails(this.podcast, this._podcastBloc, this._darkMode);
+  PodcastDetails(this.podcast, this._podcastBloc);
 
   @override
   _PodcastDetailsState createState() => _PodcastDetailsState();
@@ -48,7 +47,7 @@ class _PodcastDetailsState extends State<PodcastDetails> {
   final log = Logger('PodcastDetails');
   final ScrollController _sliverScrollController = ScrollController();
   var brightness = Brightness.dark;
-
+  SystemUiOverlayStyle _systemOverlayStyle;
   bool toolbarCollpased = false;
 
   @override
@@ -58,42 +57,32 @@ class _PodcastDetailsState extends State<PodcastDetails> {
     // Load the details of the Podcast specified in the URL
     log.fine('initState() - load feed');
     widget._podcastBloc.load(Feed(podcast: widget.podcast));
-    brightness = widget._darkMode ? Brightness.dark : Brightness.light;
 
     // We only want to display the podcast title when the toolbar is in a
     // collapsed state. Add a listener and set toollbarCollapsed variable
     // as required. The text display property is then based on this boolean.
     _sliverScrollController.addListener(() {
-      if (!toolbarCollpased &&
-          _sliverScrollController.hasClients &&
-          _sliverScrollController.offset > (300 - kToolbarHeight)) {
+      if (!toolbarCollpased && _sliverScrollController.hasClients && _sliverScrollController.offset > (300 - kToolbarHeight)) {
         setState(() {
-          if (widget._darkMode) {
-            Chrome.transparentDark();
-            brightness = Brightness.light;
-          } else {
-            Chrome.transparentLight();
-            brightness = Brightness.light;
-          }
-
           toolbarCollpased = true;
         });
       } else if (toolbarCollpased &&
           _sliverScrollController.hasClients &&
           _sliverScrollController.offset < (300 - kToolbarHeight)) {
         setState(() {
-          if (widget._darkMode) {
-            Chrome.translucentDark();
-            brightness = Brightness.light;
-          } else {
-            Chrome.translucentLight();
-            brightness = Brightness.dark;
-          }
-
           toolbarCollpased = false;
         });
       }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    _systemOverlayStyle = SystemUiOverlayStyle(
+      statusBarIconBrightness: Theme.of(context).brightness == Brightness.light ? Brightness.dark : Brightness.light,
+      statusBarColor: Theme.of(context).appBarTheme.backgroundColor.withOpacity(toolbarCollpased ? 1.0 : 0.5),
+    );
+    super.didChangeDependencies();
   }
 
   @override
@@ -110,26 +99,22 @@ class _PodcastDetailsState extends State<PodcastDetails> {
     ));
   }
 
-  void _setChrome({bool darkMode}) {
-    if (darkMode) {
-      Chrome.transparentDark();
-    } else {
-      Chrome.transparentLight();
-    }
+  void _resetSystemOverlayStyle() {
+    setState(() {
+      _systemOverlayStyle = SystemUiOverlayStyle(
+        statusBarIconBrightness: Theme.of(context).brightness == Brightness.light ? Brightness.dark : Brightness.light,
+        statusBarColor: Colors.transparent,
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final defaultBrightness = Theme.of(context).brightness;
-    final _podcastBloc = Provider.of<PodcastBloc>(context, listen: false);
     final placeholderBuilder = PlaceholderBuilder.of(context);
-
-    brightness = toolbarCollpased ? defaultBrightness : Brightness.dark;
 
     return WillPopScope(
       onWillPop: () {
-        _setChrome(darkMode: widget._darkMode);
-
+        _resetSystemOverlayStyle();
         return Future.value(true);
       },
       child: Scaffold(
@@ -142,7 +127,9 @@ class _PodcastDetailsState extends State<PodcastDetails> {
             controller: _sliverScrollController,
             slivers: <Widget>[
               SliverAppBar(
-                brightness: brightness,
+                backwardsCompatibility: false,
+                systemOverlayStyle: _systemOverlayStyle,
+                brightness: toolbarCollpased ? Theme.of(context).brightness : Brightness.dark,
                 title: AnimatedOpacity(
                   opacity: toolbarCollpased ? 1.0 : 0.0,
                   duration: Duration(milliseconds: 500),
@@ -150,23 +137,13 @@ class _PodcastDetailsState extends State<PodcastDetails> {
                 ),
                 leading: DecoratedIconButton(
                   icon: Icons.close,
-                  iconColour: toolbarCollpased && defaultBrightness == Brightness.light ? Colors.black : Colors.white,
+                  iconColour: toolbarCollpased && Theme.of(context).brightness == Brightness.light ? Colors.black : Colors.white,
                   decorationColour: toolbarCollpased ? Color(0x00000000) : Color(0x22000000),
                   onPressed: () {
-                    setState(() {
-                      // We need to switch brightness to light here. If we do not,
-                      // it will stay dark until the previous screen is rebuilt and
-                      // that results in the status bar being blank for a few
-                      // milliseconds which looks very odd.
-                      brightness = widget._darkMode ? Brightness.dark : Brightness.light;
-                    });
-
-                    _setChrome(darkMode: widget._darkMode);
-
+                    _resetSystemOverlayStyle();
                     Navigator.pop(context);
                   },
                 ),
-                backgroundColor: Theme.of(context).appBarTheme.color,
                 expandedHeight: 300.0,
                 floating: false,
                 pinned: true,
@@ -178,7 +155,7 @@ class _PodcastDetailsState extends State<PodcastDetails> {
                   child: ExcludeSemantics(
                     child: StreamBuilder<BlocState<Podcast>>(
                         initialData: BlocEmptyState<Podcast>(),
-                        stream: _podcastBloc.details,
+                        stream: widget._podcastBloc.details,
                         builder: (context, snapshot) {
                           final state = snapshot.data;
                           var podcast = widget.podcast;
@@ -201,7 +178,7 @@ class _PodcastDetailsState extends State<PodcastDetails> {
               ),
               StreamBuilder<BlocState<Podcast>>(
                   initialData: BlocEmptyState<Podcast>(),
-                  stream: _podcastBloc.details,
+                  stream: widget._podcastBloc.details,
                   builder: (context, snapshot) {
                     final state = snapshot.data;
 
@@ -261,7 +238,7 @@ class _PodcastDetailsState extends State<PodcastDetails> {
                     );
                   }),
               StreamBuilder<List<Episode>>(
-                  stream: _podcastBloc.episodes,
+                  stream: widget._podcastBloc.episodes,
                   builder: (context, snapshot) {
                     return snapshot.hasData
                         ? SliverList(
@@ -308,8 +285,7 @@ class PodcastHeaderImage extends StatelessWidget {
     return PodcastImage(
       key: Key('details${podcast.imageUrl}'),
       url: podcast.imageUrl,
-      placeholder:
-          placeholderBuilder != null ? placeholderBuilder?.builder()(context) : DelayedCircularProgressIndicator(),
+      placeholder: placeholderBuilder != null ? placeholderBuilder?.builder()(context) : DelayedCircularProgressIndicator(),
       errorPlaceholder: placeholderBuilder != null
           ? placeholderBuilder?.errorBuilder()(context)
           : Image(image: AssetImage('assets/images/anytime-placeholder-logo.png')),
