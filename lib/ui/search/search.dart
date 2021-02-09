@@ -11,6 +11,10 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class Search extends StatefulWidget {
+  final String searchTerm;
+
+  Search({this.searchTerm});
+
   @override
   _SearchState createState() => _SearchState();
 }
@@ -29,6 +33,10 @@ class _SearchState extends State<Search> {
 
     _searchFocusNode = FocusNode();
     _searchController = TextEditingController();
+    if (widget.searchTerm != null) {
+      bloc.search(SearchTermEvent(widget.searchTerm));
+      _searchController.text = widget.searchTerm;
+    }
   }
 
   @override
@@ -61,7 +69,7 @@ class _SearchState extends State<Search> {
             title: TextField(
                 controller: _searchController,
                 focusNode: _searchFocusNode,
-                autofocus: true,
+                autofocus: widget.searchTerm != null ? false : true,
                 keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.search,
                 decoration: InputDecoration(
