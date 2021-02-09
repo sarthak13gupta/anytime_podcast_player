@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:anytime/services/podcast/podcast_index_rss.dart';
 import 'package:flutter/foundation.dart';
 import 'package:podcast_search/podcast_search.dart' as search;
 
@@ -17,6 +18,7 @@ class Podcast {
   final String imageUrl;
   final String thumbImageUrl;
   final String copyright;
+  final Value value;
   DateTime subscribedDate;
   List<Episode> episodes;
 
@@ -30,6 +32,7 @@ class Podcast {
     this.imageUrl,
     this.thumbImageUrl,
     this.copyright,
+    this.value,
     this.subscribedDate,
     this.episodes,
   }) {
@@ -42,9 +45,10 @@ class Podcast {
         link = item.feedUrl,
         title = item.trackName,
         description = '',
-        imageUrl = item.artworkUrl600 ?? item.artworkUrl100,
-        thumbImageUrl = item.artworkUrl60,
-        copyright = item.artistName;
+        imageUrl = item.artworkUrl600 ?? item.artworkUrl100 ?? item.artworkUrl,
+        thumbImageUrl = item.artworkUrl60 ?? item.artworkUrl,
+        copyright = item.artistName,
+        value = null;
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -56,6 +60,7 @@ class Podcast {
       'imageUrl': imageUrl ?? '',
       'thumbImageUrl': thumbImageUrl ?? '',
       'subscribedDate': subscribedDate?.millisecondsSinceEpoch.toString() ?? '',
+      'value': value?.toJson(),
     };
   }
 
@@ -65,6 +70,12 @@ class Podcast {
 
     if (sds.isNotEmpty && sds != 'null') {
       sd = DateTime.fromMicrosecondsSinceEpoch(int.parse(podcast['subscribedDate'] as String));
+    }
+
+    final valueJson = podcast['value'] as Map<String, dynamic>;
+    Value value;
+    if (valueJson != null) {
+      value = Value.fromJson(valueJson);
     }
 
     return Podcast(
@@ -78,6 +89,7 @@ class Podcast {
       imageUrl: podcast['imageUrl'] as String,
       thumbImageUrl: podcast['thumbImageUrl'] as String,
       subscribedDate: sd,
+      value: value,
     );
   }
 

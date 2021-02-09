@@ -11,6 +11,7 @@ import 'package:anytime/entities/downloadable.dart';
 import 'package:anytime/entities/episode.dart';
 import 'package:anytime/entities/podcast.dart';
 import 'package:anytime/repository/repository.dart';
+import 'package:anytime/services/podcast/podcast_index_rss.dart';
 import 'package:anytime/services/podcast/podcast_service.dart';
 import 'package:anytime/services/settings/settings_service.dart';
 import 'package:anytime/state/episode_state.dart';
@@ -94,6 +95,7 @@ class MobilePodcastService extends PodcastService {
       if (loadedPodcast.copyright != null) {
         copyright = loadedPodcast.copyright.replaceAll('\n', '').trim();
       }
+      final podcastIndexRss = PodcastIndexRssFeed.parse(loadedPodcast.feedContent);
 
       final existingEpisodes = await repository.findEpisodesByPodcastGuid(loadedPodcast.url);
 
@@ -106,6 +108,7 @@ class MobilePodcastService extends PodcastService {
         imageUrl: podcast.imageUrl ?? loadedPodcast.image,
         thumbImageUrl: podcast.thumbImageUrl ?? loadedPodcast.image,
         copyright: copyright,
+        value: podcastIndexRss.value,
         episodes: <Episode>[],
       );
 
