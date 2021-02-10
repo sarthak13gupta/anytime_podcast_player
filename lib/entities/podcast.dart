@@ -44,8 +44,8 @@ class Podcast {
         link = item.feedUrl,
         title = item.trackName,
         description = '',
-        imageUrl = item.artworkUrl600 ?? item.artworkUrl100,
-        thumbImageUrl = item.artworkUrl60,
+        imageUrl = item.artworkUrl600 ?? item.artworkUrl100 ?? item.artworkUrl,
+        thumbImageUrl = item.artworkUrl60 ?? item.artworkUrl,
         copyright = item.artistName;
 
   Map<String, dynamic> toMap() {
