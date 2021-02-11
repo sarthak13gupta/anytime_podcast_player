@@ -105,12 +105,12 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
                           child: NowPlayingDetails(title: snapshot.data.title, description: snapshot.data.description),
                           flex: 4,
                         ),
-                        SizedBox(
-                          height: 160.0,
-                          child: transportBuilder != null
-                              ? transportBuilder(context)
-                              : NowPlayingTransport(duration: duration),
-                        ),
+                        transportBuilder != null
+                            ? transportBuilder(context)
+                            : SizedBox(
+                                height: 160.0,
+                                child: NowPlayingTransport(duration: duration),
+                              ),
                       ],
                     ),
                   )
