@@ -417,3 +417,13 @@ class TitleWidget extends StatelessWidget {
     );
   }
 }
+
+class PlayerControlsBuilder {
+  final WidgetBuilder builder;
+
+  const PlayerControlsBuilder(this.builder);
+
+  Widget build(BuildContext context) {
+    return builder(context);
+  }
+}

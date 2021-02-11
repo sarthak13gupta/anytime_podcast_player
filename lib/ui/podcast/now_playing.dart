@@ -9,6 +9,7 @@ import 'package:anytime/bloc/podcast/audio_bloc.dart';
 import 'package:anytime/entities/episode.dart';
 import 'package:anytime/l10n/L.dart';
 import 'package:anytime/services/audio/audio_player_service.dart';
+import 'package:anytime/ui/anytime_podcast_app.dart';
 import 'package:anytime/ui/podcast/player_position_controls.dart';
 import 'package:anytime/ui/podcast/player_transport_controls.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -55,6 +56,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final audioBloc = Provider.of<AudioBloc>(context);
+    final playerBuilder = Provider.of<PlayerControlsBuilder>(context);
 
     return Scaffold(
       body: StreamBuilder<Episode>(
@@ -65,6 +67,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
             }
 
             var duration = snapshot.data == null ? 0 : snapshot.data.duration;
+            final nowPlayingTransport = playerBuilder?.build(context);
 
             return SafeArea(
               child: Stack(
@@ -95,19 +98,16 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
                         snapshot.data == null
                             ? Container()
                             : Expanded(
-                                child: NowPlayingHeader(
-                                    imageUrl: snapshot.data.imageUrl),
+                                child: NowPlayingHeader(imageUrl: snapshot.data.imageUrl),
                                 flex: 9,
                               ),
                         Expanded(
-                          child: NowPlayingDetails(
-                              title: snapshot.data.title,
-                              description: snapshot.data.description),
+                          child: NowPlayingDetails(title: snapshot.data.title, description: snapshot.data.description),
                           flex: 4,
                         ),
                         SizedBox(
                           height: 160.0,
-                          child: NowPlayingTransport(duration: duration),
+                          child: nowPlayingTransport ?? NowPlayingTransport(duration: duration),
                         ),
                       ],
                     ),
