@@ -67,7 +67,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
             }
 
             var duration = snapshot.data == null ? 0 : snapshot.data.duration;
-            final nowPlayingTransport = playerBuilder?.build(context);
+            final transportBuilder = playerBuilder?.builder(duration);
 
             return SafeArea(
               child: Stack(
@@ -107,7 +107,9 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
                         ),
                         SizedBox(
                           height: 160.0,
-                          child: nowPlayingTransport ?? NowPlayingTransport(duration: duration),
+                          child: transportBuilder != null
+                              ? transportBuilder(context)
+                              : NowPlayingTransport(duration: duration),
                         ),
                       ],
                     ),
