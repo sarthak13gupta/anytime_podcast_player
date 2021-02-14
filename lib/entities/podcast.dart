@@ -19,6 +19,7 @@ class Podcast {
   final String copyright;
   DateTime subscribedDate;
   List<Episode> episodes;
+  Map<String, dynamic> metadata;
 
   Podcast({
     @required this.guid,
@@ -32,6 +33,7 @@ class Podcast {
     this.copyright,
     this.subscribedDate,
     this.episodes,
+    this.metadata,
   }) {
     episodes ??= [];
   }
@@ -42,8 +44,8 @@ class Podcast {
         link = item.feedUrl,
         title = item.trackName,
         description = '',
-        imageUrl = item.artworkUrl600 ?? item.artworkUrl100,
-        thumbImageUrl = item.artworkUrl60,
+        imageUrl = item.artworkUrl600 ?? item.artworkUrl100 ?? item.artworkUrl,
+        thumbImageUrl = item.artworkUrl60 ?? item.artworkUrl,
         copyright = item.artistName;
 
   Map<String, dynamic> toMap() {
@@ -56,6 +58,7 @@ class Podcast {
       'imageUrl': imageUrl ?? '',
       'thumbImageUrl': thumbImageUrl ?? '',
       'subscribedDate': subscribedDate?.millisecondsSinceEpoch.toString() ?? '',
+      'metadata': metadata,
     };
   }
 
@@ -78,6 +81,7 @@ class Podcast {
       imageUrl: podcast['imageUrl'] as String,
       thumbImageUrl: podcast['thumbImageUrl'] as String,
       subscribedDate: sd,
+      metadata: podcast['metadata'] as Map<String, dynamic>,
     );
   }
 

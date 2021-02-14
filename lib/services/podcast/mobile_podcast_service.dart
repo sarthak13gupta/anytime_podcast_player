@@ -21,11 +21,13 @@ import 'package:podcast_search/podcast_search.dart' as psapi;
 
 class MobilePodcastService extends PodcastService {
   final _cache = _PodcastCache(maxItems: 10, expiration: Duration(minutes: 30));
+  final Future<Map<String, dynamic>> Function(String url) loadMetadata;
 
   MobilePodcastService({
     @required PodcastApi api,
     @required Repository repository,
     @required SettingsService settingsService,
+    this.loadMetadata,
   }) : super(api: api, repository: repository, settingsService: settingsService);
 
   @override
@@ -66,6 +68,7 @@ class MobilePodcastService extends PodcastService {
       var title = '';
       var description = '';
       var copyright = '';
+      Map<String, dynamic> metadata;
 
       if (!refresh) {
         loadedPodcast = _cache.item(podcast.url);
@@ -96,7 +99,9 @@ class MobilePodcastService extends PodcastService {
       }
 
       final existingEpisodes = await repository.findEpisodesByPodcastGuid(loadedPodcast.url);
-
+      if (loadMetadata != null) {
+        metadata = await loadMetadata(loadedPodcast.url);
+      }
       final pc = Podcast(
         guid: loadedPodcast.url,
         url: loadedPodcast.url,
@@ -107,6 +112,7 @@ class MobilePodcastService extends PodcastService {
         thumbImageUrl: podcast.thumbImageUrl ?? loadedPodcast.image,
         copyright: copyright,
         episodes: <Episode>[],
+        metadata: metadata,
       );
 
       /// We could be subscribed to this podcast already. Let's check.
@@ -164,6 +170,7 @@ class MobilePodcastService extends PodcastService {
               thumbImageUrl: pc.thumbImageUrl,
               duration: episode.duration?.inSeconds ?? 0,
               publicationDate: episode.publicationDate,
+              metadata: metadata,
             ));
           } else {
             pc.episodes.add(existingEpisode);

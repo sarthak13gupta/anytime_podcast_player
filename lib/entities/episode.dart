@@ -36,6 +36,7 @@ class Episode {
   int downloadPercentage;
   bool played;
   String _descriptionText;
+  Map<String, dynamic> metadata;
 
   Episode({
     @required this.guid,
@@ -60,6 +61,7 @@ class Episode {
     this.position = 0,
     this.downloadPercentage = 0,
     this.played = false,
+    this.metadata,
   });
 
   Map<String, dynamic> toMap() {
@@ -85,36 +87,37 @@ class Episode {
       'position': position.toString(),
       'downloadPercentage': downloadPercentage.toString(),
       'played': played ? 'true' : 'false',
+      'metadata': metadata,
     };
   }
 
   static Episode fromMap(int key, Map<String, dynamic> episode) {
     return Episode(
-      id: key,
-      guid: episode['guid'] as String,
-      pguid: episode['pguid'] as String,
-      downloadTaskId: episode['downloadTaskId'] as String,
-      filepath: episode['filepath'] as String,
-      filename: episode['filename'] as String,
-      downloadState: _determineState(episode['downloadState'] as int),
-      podcast: episode['podcast'] as String,
-      title: episode['title'] as String,
-      description: episode['description'] as String,
-      link: episode['link'] as String,
-      imageUrl: episode['imageUrl'] as String,
-      thumbImageUrl: episode['thumbImageUrl'] as String,
-      publicationDate: episode['publicationDate'] == 'null'
-          ? DateTime.now()
-          : DateTime.fromMillisecondsSinceEpoch(int.parse(episode['publicationDate'] as String)),
-      contentUrl: episode['contentUrl'] as String,
-      author: episode['author'] as String,
-      season: int.parse(episode['season'] as String ?? '0'),
-      episode: int.parse(episode['episode'] as String ?? '0'),
-      duration: int.parse(episode['duration'] as String ?? '0'),
-      position: int.parse(episode['position'] as String ?? '0'),
-      downloadPercentage: int.parse(episode['downloadPercentage'] as String ?? '0'),
-      played: episode['played'] == 'true' ? true : false,
-    );
+        id: key,
+        guid: episode['guid'] as String,
+        pguid: episode['pguid'] as String,
+        downloadTaskId: episode['downloadTaskId'] as String,
+        filepath: episode['filepath'] as String,
+        filename: episode['filename'] as String,
+        downloadState: _determineState(episode['downloadState'] as int),
+        podcast: episode['podcast'] as String,
+        title: episode['title'] as String,
+        description: episode['description'] as String,
+        link: episode['link'] as String,
+        imageUrl: episode['imageUrl'] as String,
+        thumbImageUrl: episode['thumbImageUrl'] as String,
+        publicationDate: episode['publicationDate'] == 'null'
+            ? DateTime.now()
+            : DateTime.fromMillisecondsSinceEpoch(int.parse(episode['publicationDate'] as String)),
+        contentUrl: episode['contentUrl'] as String,
+        author: episode['author'] as String,
+        season: int.parse(episode['season'] as String ?? '0'),
+        episode: int.parse(episode['episode'] as String ?? '0'),
+        duration: int.parse(episode['duration'] as String ?? '0'),
+        position: int.parse(episode['position'] as String ?? '0'),
+        downloadPercentage: int.parse(episode['downloadPercentage'] as String ?? '0'),
+        played: episode['played'] == 'true' ? true : false,
+        metadata: episode['metadata'] as Map<String, dynamic>);
   }
 
   static DownloadState _determineState(int index) {
@@ -147,7 +150,8 @@ class Episode {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is Episode && runtimeType == other.runtimeType && guid == other.guid && pguid == other.pguid;
+      identical(this, other) ||
+      other is Episode && runtimeType == other.runtimeType && guid == other.guid && pguid == other.pguid;
 
   @override
   int get hashCode => guid.hashCode ^ pguid.hashCode;

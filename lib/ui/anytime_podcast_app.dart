@@ -417,3 +417,7 @@ class TitleWidget extends StatelessWidget {
     );
   }
 }
+
+abstract class PlayerControlsBuilder {
+  WidgetBuilder builder(int duration);
+}
