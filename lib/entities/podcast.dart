@@ -47,6 +47,7 @@ class Podcast {
 
   /// One or more episodes for this podcast.
   List<Episode> episodes;
+  Map<String, dynamic> metadata;
 
   Podcast({
     @required this.guid,
@@ -61,6 +62,7 @@ class Podcast {
     this.subscribedDate,
     this.funding,
     this.episodes,
+    this.metadata,
   }) {
     episodes ??= [];
   }
@@ -87,6 +89,7 @@ class Podcast {
       'thumbImageUrl': thumbImageUrl ?? '',
       'subscribedDate': subscribedDate?.millisecondsSinceEpoch.toString() ?? '',
       'funding': (funding ?? <Funding>[]).map((funding) => funding.toMap())?.toList(growable: false),
+      'metadata': metadata,
     };
   }
 
@@ -119,6 +122,7 @@ class Podcast {
       thumbImageUrl: podcast['thumbImageUrl'] as String,
       funding: funding,
       subscribedDate: sd,
+      metadata: podcast['metadata'] as Map<String, dynamic>,
     );
   }
 
@@ -126,8 +130,7 @@ class Podcast {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Podcast && runtimeType == other.runtimeType && guid == other.guid && url == other.url;
+      identical(this, other) || other is Podcast && runtimeType == other.runtimeType && guid == other.guid && url == other.url;
 
   @override
   int get hashCode => guid.hashCode ^ url.hashCode;
