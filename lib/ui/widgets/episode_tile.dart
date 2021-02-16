@@ -6,8 +6,8 @@ import 'package:anytime/bloc/podcast/episode_bloc.dart';
 import 'package:anytime/entities/episode.dart';
 import 'package:anytime/l10n/L.dart';
 import 'package:anytime/ui/widgets/show_notes.dart';
+import 'package:anytime/ui/widgets/tile_image.dart';
 import 'package:anytime/ui/widgets/transport_controls.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -50,7 +50,7 @@ class EpisodeTile extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               softWrap: false,
               maxLines: 5,
-              style: Theme.of(context).textTheme.bodyText1.copyWith(fontSize: 16),
+              style: Theme.of(context).textTheme.bodyText1.copyWith(fontSize: 14, fontWeight: FontWeight.normal),
             ),
           ),
         ),
@@ -103,6 +103,7 @@ class EpisodeTile extends StatelessWidget {
                       Icon(
                         Icons.delete_outline,
                         color: Theme.of(context).buttonColor,
+                        size: 22,
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2.0),
@@ -112,6 +113,7 @@ class EpisodeTile extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Theme.of(context).buttonColor,
+                          fontWeight: FontWeight.normal,
                         ),
                       ),
                     ],
@@ -138,6 +140,7 @@ class EpisodeTile extends StatelessWidget {
                       Icon(
                         Icons.wysiwyg_outlined,
                         color: Theme.of(context).buttonColor,
+                        size: 22,
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2.0),
@@ -147,6 +150,7 @@ class EpisodeTile extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Theme.of(context).buttonColor,
+                          fontWeight: FontWeight.normal,
                         ),
                       ),
                     ],
@@ -167,6 +171,7 @@ class EpisodeTile extends StatelessWidget {
                       Icon(
                         Icons.bookmark_border_outlined,
                         color: Theme.of(context).buttonColor,
+                        size: 22,
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2.0),
@@ -176,6 +181,7 @@ class EpisodeTile extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Theme.of(context).buttonColor,
+                          fontWeight: FontWeight.normal,
                         ),
                       ),
                     ],
@@ -200,31 +206,9 @@ class EpisodeTile extends StatelessWidget {
         children: <Widget>[
           Opacity(
             opacity: episode.played ? 0.5 : 1.0,
-            child: CachedNetworkImage(
-              imageUrl: episode.thumbImageUrl ?? episode.imageUrl,
-              width: 56,
-              placeholder: (context, url) {
-                return Container(
-                  constraints: BoxConstraints.expand(height: 56, width: 56),
-                  child: Placeholder(
-                    color: Colors.grey,
-                    strokeWidth: 1,
-                    fallbackWidth: 56,
-                    fallbackHeight: 56,
-                  ),
-                );
-              },
-              errorWidget: (_, __, dynamic ___) {
-                return Container(
-                  constraints: BoxConstraints.expand(height: 56, width: 56),
-                  child: Placeholder(
-                    color: Colors.grey,
-                    strokeWidth: 1,
-                    fallbackWidth: 56,
-                    fallbackHeight: 56,
-                  ),
-                );
-              },
+            child: TileImage(
+              url: episode.thumbImageUrl ?? episode.imageUrl,
+              size: 56.0,
             ),
           ),
           Container(
@@ -245,7 +229,7 @@ class EpisodeTile extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           maxLines: 2,
           softWrap: false,
-          style: textTheme.bodyText2.copyWith(fontWeight: FontWeight.bold),
+          style: textTheme.bodyText2.copyWith(fontWeight: FontWeight.normal),
         ),
       ),
     );

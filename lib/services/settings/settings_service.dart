@@ -20,4 +20,16 @@ abstract class SettingsService {
   set playbackSpeed(double playbackSpeed);
 
   double get playbackSpeed;
+
+  set searchProvider(String provider);
+
+  String get searchProvider;
+
+  set externalLinkConsent(bool consent);
+
+  bool get externalLinkConsent;
+
+  set autoOpenNowPlaying(bool autoOpenNowPlaying);
+
+  bool get autoOpenNowPlaying;
 }
