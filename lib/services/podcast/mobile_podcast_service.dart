@@ -25,11 +25,13 @@ import 'package:podcast_search/podcast_search.dart' as psapi;
 class MobilePodcastService extends PodcastService {
   final log = Logger('MobilePodcastService');
   final _cache = _PodcastCache(maxItems: 10, expiration: Duration(minutes: 30));
+  final Future<Map<String, dynamic>> Function(String url) loadMetadata;
 
   MobilePodcastService({
     @required PodcastApi api,
     @required Repository repository,
     @required SettingsService settingsService,
+    this.loadMetadata,
   }) : super(api: api, repository: repository, settingsService: settingsService);
 
   @override
@@ -71,9 +73,7 @@ class MobilePodcastService extends PodcastService {
       var title = '';
       var description = '';
       var copyright = '';
-      var imageUrl = podcast.imageUrl;
-      var thumbImageUrl = podcast.thumbImageUrl;
-      var previousImageUrl = '';
+      Map<String, dynamic> metadata;
 
       if (!refresh) {
         loadedPodcast = _cache.item(podcast.url);
@@ -122,6 +122,9 @@ class MobilePodcastService extends PodcastService {
 
       loadedPodcast.funding?.forEach((f) => funding.add(Funding(url: f.url, value: f.value)));
 
+      if (loadMetadata != null) {
+        metadata = await loadMetadata(loadedPodcast.url);
+      }
       final pc = Podcast(
         guid: loadedPodcast.url,
         url: loadedPodcast.url,
@@ -134,6 +137,7 @@ class MobilePodcastService extends PodcastService {
         copyright: copyright,
         funding: funding,
         episodes: <Episode>[],
+        metadata: metadata,
       );
 
       /// We could be subscribed to this podcast already. Let's check.
@@ -181,6 +185,7 @@ class MobilePodcastService extends PodcastService {
               publicationDate: episode.publicationDate,
               chaptersUrl: episode.chapters?.url,
               chapters: <Chapter>[],
+              metadata: metadata,
             ));
           } else {
             pc.episodes.add(existingEpisode);
@@ -261,8 +266,7 @@ class MobilePodcastService extends PodcastService {
     await repository.saveEpisode(episode);
 
     if (await hasStoragePermission()) {
-      final filepath =
-          episode.filepath == null || episode.filepath.isEmpty ? await getStorageDirectory() : episode.filepath;
+      final filepath = episode.filepath == null || episode.filepath.isEmpty ? await getStorageDirectory() : episode.filepath;
       final filename = join(filepath, episode.filename);
 
       var f = File.fromUri(Uri.file(filename));

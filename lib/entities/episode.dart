@@ -100,6 +100,7 @@ class Episode {
 
   /// Current chapter we are listening to if this episode has chapters.  Transient.
   Chapter currentChapter;
+  Map<String, dynamic> metadata;
 
   /// Set to true if chapter data is currently being loaded.
   bool chaptersLoading = false;
@@ -130,6 +131,7 @@ class Episode {
     this.chaptersUrl,
     this.chapters,
     this.lastUpdated,
+    this.metadata,
   });
 
   Map<String, dynamic> toMap() {
@@ -158,6 +160,7 @@ class Episode {
       'chaptersUrl': chaptersUrl,
       'chapters': (chapters ?? <Chapter>[]).map((chapter) => chapter.toMap())?.toList(growable: false),
       'lastUpdated': lastUpdated?.millisecondsSinceEpoch.toString() ?? '',
+      'metadata': metadata,
     };
   }
 
@@ -204,6 +207,7 @@ class Episode {
       lastUpdated: episode['lastUpdated'] == null || episode['lastUpdated'] == 'null'
           ? DateTime.now()
           : DateTime.fromMillisecondsSinceEpoch(int.parse(episode['lastUpdated'] as String)),
+      metadata: episode['metadata'] as Map<String, dynamic>,
     );
   }
 
