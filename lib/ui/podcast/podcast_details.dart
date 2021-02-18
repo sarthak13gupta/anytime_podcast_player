@@ -98,7 +98,7 @@ class _PodcastDetailsState extends State<PodcastDetails> {
     ));
   }
 
-  _resetSystemOverlayStyle() {
+  void _resetSystemOverlayStyle() {
     setState(() {
       _systemOverlayStyle = SystemUiOverlayStyle(
         statusBarIconBrightness: Theme.of(context).brightness == Brightness.light ? Brightness.dark : Brightness.light,
