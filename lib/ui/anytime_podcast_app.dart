@@ -171,8 +171,9 @@ class AnytimeHomePage extends StatefulWidget {
   final String title;
   final bool topBarVisible;
   final bool inlineSearch;
+  final String noSubscriptionsMessage;
 
-  AnytimeHomePage({this.title, this.topBarVisible = true, this.inlineSearch = false});
+  AnytimeHomePage({this.title, this.topBarVisible = true, this.inlineSearch = false, this.noSubscriptionsMessage});
 
   @override
   _AnytimeHomePageState createState() => _AnytimeHomePageState();
@@ -327,7 +328,7 @@ class _AnytimeHomePageState extends State<AnytimeHomePage> with WidgetsBindingOb
 
   Widget _fragment(int index, EpisodeBloc searchBloc) {
     if (index == 0) {
-      return Library();
+      return Library(noSubscriptionsMessage: widget.noSubscriptionsMessage);
     } else if (index == 1) {
       return Discovery(inlineSearch: widget.inlineSearch);
     } else {
