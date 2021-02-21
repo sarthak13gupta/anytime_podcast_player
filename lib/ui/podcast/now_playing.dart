@@ -112,7 +112,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
                     ? transportBuilder(context)
                     : SizedBox(
                         height: 140.0,
-                        child: NowPlayingTransport(duration: duration),
+                        child: NowPlayingTransport(),
                       ),
               ));
         });
@@ -220,7 +220,7 @@ class EpisodeTabBarViewWithChapters extends StatelessWidget {
 
     return TabBarView(
       children: [
-        ChapterSelectorWidget(
+        ChapterSelector(
           episode: episode,
           chapter: episode.chapters[0],
         ),
@@ -278,6 +278,8 @@ class NowPlayingHeader extends StatelessWidget {
                         return Container(
                           constraints: BoxConstraints.expand(),
                           child: Placeholder(
+                            fallbackHeight: 360,
+                            fallbackWidth: 360,
                             color: Colors.grey,
                             strokeWidth: 1,
                           ),
@@ -287,6 +289,8 @@ class NowPlayingHeader extends StatelessWidget {
                         return Container(
                           constraints: BoxConstraints.expand(),
                           child: Placeholder(
+                            fallbackHeight: 360,
+                            fallbackWidth: 360,
                             color: Colors.grey,
                             strokeWidth: 1,
                           ),
@@ -372,10 +376,6 @@ class NowPlayingDetails extends StatelessWidget {
 }
 
 class NowPlayingTransport extends StatelessWidget {
-  final int duration;
-
-  const NowPlayingTransport({@required this.duration});
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -383,9 +383,7 @@ class NowPlayingTransport extends StatelessWidget {
         Divider(
           height: 0.0,
         ),
-        PlayerPositionControls(
-          duration: duration,
-        ),
+        PlayerPositionControls(),
         PlayerTransportControls(),
       ],
     );

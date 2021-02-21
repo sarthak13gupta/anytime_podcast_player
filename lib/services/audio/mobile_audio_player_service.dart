@@ -35,16 +35,16 @@ class MobileAudioPlayerService extends AudioPlayerService {
   final PodcastService podcastService;
   final Color androidNotificationColor;
   double _playbackSpeed;
-
   Episode _episode;
 
-  StreamSubscription<dynamic> _positionSubscription;
+  /// Subscription to the position ticker.
+  StreamSubscription<int> _positionSubscription;
 
   /// Stream showing our current playing state.
   final BehaviorSubject<AudioState> _playingState = BehaviorSubject<AudioState>.seeded(AudioState.none);
 
   /// Ticks whilst playing. Updates our current position within an episode.
-  final _durationTicker = Stream<int>.periodic(Duration(milliseconds: 250)).asBroadcastStream();
+  final _durationTicker = Stream<int>.periodic(Duration(milliseconds: 500)).asBroadcastStream();
 
   /// Stream for the current position of the playing track.
   final BehaviorSubject<PositionState> _playPosition = BehaviorSubject<PositionState>();
@@ -70,7 +70,7 @@ class MobileAudioPlayerService extends AudioPlayerService {
 
       var trackDetails = <String>[];
 
-      var download = false;
+      var streaming = true;
       var startPosition = 0;
       var uri = episode.contentUrl;
 
@@ -89,24 +89,26 @@ class MobileAudioPlayerService extends AudioPlayerService {
 
           uri = downloadFile;
 
-          download = true;
+          streaming = false;
 
           episode.position = savedEpisode.position;
 
-          startPosition = download && resume ? savedEpisode.position : 0;
+          startPosition = !streaming && resume ? savedEpisode.position : 0;
         } else {
           throw Exception('Insufficient storage permissions');
         }
       }
 
       // If we are streaming try and let the user know as soon as possible.
-      if (!download) {
+      if (streaming) {
         await _playingState.add(AudioState.buffering);
       }
 
       // If we are currently playing a track - save the position of the current
       // track before switching to the next.
       var currentState = AudioService.playbackState?.processingState ?? AudioProcessingState.none;
+
+      log.fine('Current playback state is $currentState');
 
       if (currentState == AudioProcessingState.ready) {
         await _savePosition();
@@ -121,6 +123,7 @@ class MobileAudioPlayerService extends AudioPlayerService {
         startPosition.toString(),
         episode.id == null ? '0' : episode.id.toString(),
         _playbackSpeed.toString(),
+        episode.duration?.toString() ?? '0',
       ];
 
       // Store reference
@@ -134,12 +137,21 @@ class MobileAudioPlayerService extends AudioPlayerService {
       }
 
       await AudioService.customAction('track', trackDetails);
-      await AudioService.play();
 
-      // If we are streaming and this episode has chapters we
-      // should fetch them now.
-      if (!download && _episode.hasChapters) {
-        _episode.chapters = await podcastService.loadChaptersByUrl(url: _episode.chaptersUrl);
+      try {
+        await AudioService.play();
+
+        // If we are streaming and this episode has chapters we should fetch them now.
+        if (streaming && _episode.hasChapters) {
+          _episode.chapters = await podcastService.loadChaptersByUrl(url: _episode.chaptersUrl);
+        }
+      } catch (e) {
+        log.fine('Error during playback');
+        log.fine(e.toString());
+
+        await _playingState.add(AudioState.error);
+        await _playingState.add(AudioState.stopped);
+        await AudioService.stop();
       }
     }
   }
@@ -161,9 +173,7 @@ class MobileAudioPlayerService extends AudioPlayerService {
   @override
   Future<void> seek({int position}) async {
     var duration = _episode == null ? 0 : _episode.duration;
-
     var complete = position > 0 ? (duration / position) * 100 : 0;
-
     var seconds = Duration(seconds: position);
 
     _updateChapter(seconds.inSeconds, duration);
@@ -178,37 +188,34 @@ class MobileAudioPlayerService extends AudioPlayerService {
     await AudioService.stop();
   }
 
+  /// When resuming from a paused state we first need to reconnect to the [AudioService].
+  /// Next we need to restore the state of either the current playing episode or the last
+  /// played episode. We do this in one of three ways. If Anytime has only been placed in
+  /// the background when we resume [_episode] may still be valid and we can continue as
+  /// normal. If not, we check to see if the [AudioService] has a current media item and,
+  /// if so, we restore [_episode] that way. Failing that, we look to see if we have a
+  /// persisted state file and use that to re-fetch the episode.
   @override
   Future<Episode> resume() async {
     await AudioService.connect();
 
-    if (_episode != null) {
+    if (_episode == null) {
+      if (AudioService.currentMediaItem == null) {
+        await _updateEpisodeFromSavedState();
+      } else {
+        _episode = await repository.findEpisodeById(int.parse(AudioService.currentMediaItem.id));
+      }
+    } else {
       var playbackState = await AudioService.playbackState;
 
       final basicState = playbackState?.processingState ?? AudioProcessingState.none;
 
       // If we have no state we'll have to assume we stopped whilst suspended.
       if (basicState == AudioProcessingState.none) {
-        var persistedState = await PersistentState.fetchState();
-
-        await _updateEpisodeState(persistedState);
+        await _updateEpisodeFromSavedState();
         await _playingState.add(AudioState.stopped);
       } else {
         await _startTicker();
-      }
-    } else {
-      if (AudioService.currentMediaItem == null) {
-        var persistedState = await PersistentState.fetchState();
-
-        if (persistedState != null && persistedState.episodeId != 0) {
-          _episode = await repository.findEpisodeById(persistedState.episodeId);
-
-          if (_episode != null) {
-            await _updateEpisodeState(persistedState);
-          }
-        }
-      } else {
-        _episode = await repository.findEpisodeById(int.parse(AudioService.currentMediaItem.id));
       }
     }
 
@@ -220,15 +227,27 @@ class MobileAudioPlayerService extends AudioPlayerService {
   @override
   Future<void> setPlaybackSpeed(double speed) => AudioService.setSpeed(speed);
 
-  Future _updateEpisodeState(Persistable persistedState) async {
-    if (persistedState.state == LastState.completed) {
-      _episode.position = 0;
-      _episode.played = true;
-    } else {
-      _episode.position = persistedState.position;
-    }
+  /// This method opens a saved state file. If it exists we fetch the episode ID from
+  /// the saved state and fetch it from the database. If the last updated value of the
+  /// saved state is later than the episode last updated date, we update the episode
+  /// properties from the saved state.
+  Future<void> _updateEpisodeFromSavedState() async {
+    var persistedState = await PersistentState.fetchState();
 
-    await repository.saveEpisode(_episode);
+    if (persistedState != null) {
+      _episode = await repository.findEpisodeById(persistedState.episodeId);
+
+      if (_episode != null && persistedState.lastUpdated.isAfter(_episode?.lastUpdated)) {
+        if (persistedState.state == LastState.completed) {
+          _episode.position = 0;
+          _episode.played = true;
+        } else {
+          _episode.position = persistedState.position;
+        }
+
+        await repository.saveEpisode(_episode);
+      }
+    }
   }
 
   @override
@@ -290,17 +309,14 @@ class MobileAudioPlayerService extends AudioPlayerService {
     var playbackState = await AudioService.playbackState;
 
     if (playbackState != null) {
-      var duration = _episode == null ? 0 : _episode.duration;
+      var currentMediaItem = AudioService.currentMediaItem;
+      var duration = currentMediaItem?.duration ?? Duration(seconds: 1);
+      var position = playbackState?.currentPosition;
+      var complete = position.inSeconds > 0 ? (duration.inSeconds / position.inSeconds) * 100 : 0;
 
-      if (duration > 0) {
-        var position = playbackState?.currentPosition;
+      _updateChapter(position.inSeconds, duration.inSeconds);
 
-        var complete = position.inSeconds > 0 ? (duration / position.inSeconds) * 100 : 0;
-
-        _updateChapter(position.inSeconds, duration);
-
-        _playPosition.add(PositionState(position, Duration(seconds: _episode.duration), complete.toInt(), _episode));
-      }
+      _playPosition.add(PositionState(position, duration, complete.toInt(), _episode));
     }
   }
 

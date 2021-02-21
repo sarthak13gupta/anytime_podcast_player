@@ -39,6 +39,7 @@ class Episode {
   String chaptersUrl;
   String _descriptionText;
   List<Chapter> chapters;
+  DateTime lastUpdated;
 
   // Index of the currently playing chapter it available. Transient.
   int chapterIndex;
@@ -71,6 +72,7 @@ class Episode {
     this.chaptersUrl,
     this.chapters,
     this.metadata,
+    this.lastUpdated,
   });
 
   Map<String, dynamic> toMap() {
@@ -99,6 +101,7 @@ class Episode {
       'chaptersUrl': chaptersUrl,
       'chapters': (chapters ?? <Chapter>[]).map((chapter) => chapter.toMap())?.toList(growable: false),
       'metadata': metadata,
+      'lastUpdated': lastUpdated?.millisecondsSinceEpoch.toString() ?? '',
     };
   }
 
@@ -116,33 +119,37 @@ class Episode {
     }
 
     return Episode(
-        id: key,
-        guid: episode['guid'] as String,
-        pguid: episode['pguid'] as String,
-        downloadTaskId: episode['downloadTaskId'] as String,
-        filepath: episode['filepath'] as String,
-        filename: episode['filename'] as String,
-        downloadState: _determineState(episode['downloadState'] as int),
-        podcast: episode['podcast'] as String,
-        title: episode['title'] as String,
-        description: episode['description'] as String,
-        link: episode['link'] as String,
-        imageUrl: episode['imageUrl'] as String,
-        thumbImageUrl: episode['thumbImageUrl'] as String,
-        publicationDate: episode['publicationDate'] == 'null'
-            ? DateTime.now()
-            : DateTime.fromMillisecondsSinceEpoch(int.parse(episode['publicationDate'] as String)),
-        contentUrl: episode['contentUrl'] as String,
-        author: episode['author'] as String,
-        season: int.parse(episode['season'] as String ?? '0'),
-        episode: int.parse(episode['episode'] as String ?? '0'),
-        duration: int.parse(episode['duration'] as String ?? '0'),
-        position: int.parse(episode['position'] as String ?? '0'),
-        downloadPercentage: int.parse(episode['downloadPercentage'] as String ?? '0'),
-        played: episode['played'] == 'true' ? true : false,
-        chaptersUrl: episode['chaptersUrl'] as String,
-        chapters: chapters,
-        metadata: episode['metadata'] as Map<String, dynamic>);
+      id: key,
+      guid: episode['guid'] as String,
+      pguid: episode['pguid'] as String,
+      downloadTaskId: episode['downloadTaskId'] as String,
+      filepath: episode['filepath'] as String,
+      filename: episode['filename'] as String,
+      downloadState: _determineState(episode['downloadState'] as int),
+      podcast: episode['podcast'] as String,
+      title: episode['title'] as String,
+      description: episode['description'] as String,
+      link: episode['link'] as String,
+      imageUrl: episode['imageUrl'] as String,
+      thumbImageUrl: episode['thumbImageUrl'] as String,
+      publicationDate: episode['publicationDate'] == null
+          ? DateTime.now()
+          : DateTime.fromMillisecondsSinceEpoch(int.parse(episode['publicationDate'] as String)),
+      contentUrl: episode['contentUrl'] as String,
+      author: episode['author'] as String,
+      season: int.parse(episode['season'] as String ?? '0'),
+      episode: int.parse(episode['episode'] as String ?? '0'),
+      duration: int.parse(episode['duration'] as String ?? '0'),
+      position: int.parse(episode['position'] as String ?? '0'),
+      downloadPercentage: int.parse(episode['downloadPercentage'] as String ?? '0'),
+      played: episode['played'] == 'true' ? true : false,
+      chaptersUrl: episode['chaptersUrl'] as String,
+      chapters: chapters,
+      metadata: episode['metadata'] as Map<String, dynamic>,
+      lastUpdated: episode['lastUpdated'] == null || episode['lastUpdated'] == 'null'
+          ? DateTime.now()
+          : DateTime.fromMillisecondsSinceEpoch(int.parse(episode['lastUpdated'] as String)),
+    );
   }
 
   static DownloadState _determineState(int index) {

@@ -24,7 +24,10 @@ class MiniPlayer extends StatelessWidget {
     return StreamBuilder<AudioState>(
         stream: audioBloc.playingState,
         builder: (context, snapshot) {
-          return (snapshot.hasData && !(snapshot.data == AudioState.stopped || snapshot.data == AudioState.none))
+          return (snapshot.hasData &&
+                  !(snapshot.data == AudioState.stopped ||
+                      snapshot.data == AudioState.none ||
+                      snapshot.data == AudioState.error))
               ? _MiniPlayerBuilder()
               : const SizedBox(
                   height: 0.0,
@@ -114,10 +117,7 @@ class _MiniPlayerBuilderState extends State<_MiniPlayerBuilder> with SingleTicke
                                   return Image(image: AssetImage('assets/images/anytime-placeholder-logo.png'));
                                 },
                                 errorWidget: (_, __, dynamic ___) {
-                                  return Placeholder(
-                                    color: Colors.grey,
-                                    strokeWidth: 1,
-                                  );
+                                  return Image(image: AssetImage('assets/images/anytime-placeholder-logo.png'));
                                 },
                               )
                             : Container(),
