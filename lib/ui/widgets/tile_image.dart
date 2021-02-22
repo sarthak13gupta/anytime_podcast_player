@@ -5,6 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:optimized_cached_image/widgets.dart';
 
+import 'placeholder_builder.dart';
+
 class TileImage extends StatelessWidget {
   const TileImage({
     Key key,
@@ -20,21 +22,28 @@ class TileImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final placeholderBuilder = PlaceholderBuilder.of(context);
+
     return SizedBox(
-        height: size,
-        width: size,
-        child: OptimizedCacheImage(
-          useScaleCacheManager: true,
-          imageUrl: url,
-          filterQuality: FilterQuality.low,
-          width: 120,
-          height: 120,
-          placeholder: (context, url) {
-            return Image(image: AssetImage('assets/images/anytime-placeholder-logo.png'));
-          },
-          errorWidget: (_, __, dynamic ___) {
-            return Image(image: AssetImage('assets/images/anytime-placeholder-logo.png'));
-          },
-        ));
+      height: size,
+      width: size,
+      child: OptimizedCacheImage(
+        useScaleCacheManager: true,
+        imageUrl: url,
+        filterQuality: FilterQuality.low,
+        width: 120,
+        height: 120,
+        placeholder: (context, url) {
+          return placeholderBuilder != null
+              ? placeholderBuilder?.builder()(context)
+              : Image(image: AssetImage('assets/images/anytime-placeholder-logo.png'));
+        },
+        errorWidget: (_, __, dynamic ___) {
+          return placeholderBuilder != null
+              ? placeholderBuilder?.errorBuilder()(context)
+              : Image(image: AssetImage('assets/images/anytime-placeholder-logo.png'));
+        },
+      ),
+    );
   }
 }
