@@ -26,9 +26,7 @@ class MiniPlayer extends StatelessWidget {
         stream: audioBloc.playingState,
         builder: (context, snapshot) {
           return (snapshot.hasData &&
-                  !(snapshot.data == AudioState.stopped ||
-                      snapshot.data == AudioState.none ||
-                      snapshot.data == AudioState.error))
+                  !(snapshot.data == AudioState.stopped || snapshot.data == AudioState.none || snapshot.data == AudioState.error))
               ? _MiniPlayerBuilder()
               : const SizedBox(
                   height: 0.0,
@@ -162,8 +160,7 @@ class _MiniPlayerBuilderState extends State<_MiniPlayerBuilder> with SingleTicke
                                 return TextButton(
                                   style: TextButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                                    shape: CircleBorder(
-                                        side: BorderSide(color: Theme.of(context).backgroundColor, width: 0.0)),
+                                    shape: CircleBorder(side: BorderSide(color: Theme.of(context).backgroundColor, width: 0.0)),
                                   ),
                                   onPressed: () {
                                     if (playing) {
