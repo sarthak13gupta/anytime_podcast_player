@@ -12,6 +12,7 @@ import 'package:anytime/ui/podcast/chapter_selector.dart';
 import 'package:anytime/ui/podcast/dot_decoration.dart';
 import 'package:anytime/ui/podcast/player_position_controls.dart';
 import 'package:anytime/ui/podcast/player_transport_controls.dart';
+import 'package:anytime/ui/widgets/placeholder_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -257,6 +258,7 @@ class NowPlayingHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final audioBloc = Provider.of<AudioBloc>(context);
+    final placeholderBuilder = PlaceholderBuilder.of(context);
 
     return StreamBuilder<AudioState>(
         stream: audioBloc.playingState,
@@ -275,25 +277,29 @@ class NowPlayingHeader extends StatelessWidget {
                       height: 360,
                       imageUrl: imageUrl,
                       placeholder: (context, url) {
-                        return Container(
-                          constraints: BoxConstraints.expand(),
-                          child: Placeholder(
-                            fallbackHeight: 360,
-                            fallbackWidth: 360,
-                            color: Colors.grey,
-                            strokeWidth: 1,
-                          ),
-                        );
+                        return placeholderBuilder != null
+                            ? placeholderBuilder?.builder()(context)
+                            : Container(
+                                constraints: BoxConstraints.expand(),
+                                child: Placeholder(
+                                  fallbackHeight: 360,
+                                  fallbackWidth: 360,
+                                  color: Colors.grey,
+                                  strokeWidth: 1,
+                                ),
+                              );
                       },
                       errorWidget: (_, __, dynamic ___) {
                         return Container(
                           constraints: BoxConstraints.expand(),
-                          child: Placeholder(
-                            fallbackHeight: 360,
-                            fallbackWidth: 360,
-                            color: Colors.grey,
-                            strokeWidth: 1,
-                          ),
+                          child: placeholderBuilder != null
+                              ? placeholderBuilder?.builder()(context)
+                              : Placeholder(
+                                  fallbackHeight: 360,
+                                  fallbackWidth: 360,
+                                  color: Colors.grey,
+                                  strokeWidth: 1,
+                                ),
                         );
                       },
                     ),

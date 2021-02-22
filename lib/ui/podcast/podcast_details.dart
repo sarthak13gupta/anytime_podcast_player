@@ -13,6 +13,7 @@ import 'package:anytime/ui/podcast/funding_menu.dart';
 import 'package:anytime/ui/podcast/podcast_context_menu.dart';
 import 'package:anytime/ui/widgets/decorated_icon_button.dart';
 import 'package:anytime/ui/widgets/episode_tile.dart';
+import 'package:anytime/ui/widgets/placeholder_builder.dart';
 import 'package:anytime/ui/widgets/platform_progress_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -61,9 +62,7 @@ class _PodcastDetailsState extends State<PodcastDetails> {
     // collapsed state. Add a listener and set toollbarCollapsed variable
     // as required. The text display property is then based on this boolean.
     _sliverScrollController.addListener(() {
-      if (!toolbarCollpased &&
-          _sliverScrollController.hasClients &&
-          _sliverScrollController.offset > (300 - kToolbarHeight)) {
+      if (!toolbarCollpased && _sliverScrollController.hasClients && _sliverScrollController.offset > (300 - kToolbarHeight)) {
         setState(() {
           if (widget._darkMode) {
             Chrome.transparentDark();
@@ -123,6 +122,7 @@ class _PodcastDetailsState extends State<PodcastDetails> {
 
     brightness = toolbarCollpased ? defaultBrightness : Brightness.dark;
 
+    final placeholderBuilder = PlaceholderBuilder.of(context);
     return WillPopScope(
       onWillPop: () {
         _setChrome(darkMode: widget._darkMode);
@@ -175,16 +175,20 @@ class _PodcastDetailsState extends State<PodcastDetails> {
                       imageUrl: widget.podcast.imageUrl,
                       fit: BoxFit.fitWidth,
                       placeholder: (context, url) {
-                        return Placeholder(
-                          color: Colors.grey,
-                          strokeWidth: 1,
-                        );
+                        return placeholderBuilder != null
+                            ? placeholderBuilder?.builder()(context)
+                            : Placeholder(
+                                color: Colors.grey,
+                                strokeWidth: 1,
+                              );
                       },
                       errorWidget: (_, __, dynamic ___) {
-                        return Placeholder(
-                          color: Colors.grey,
-                          strokeWidth: 1,
-                        );
+                        return placeholderBuilder != null
+                            ? placeholderBuilder?.errorBuilder()(context)
+                            : Placeholder(
+                                color: Theme.of(context).errorColor,
+                                strokeWidth: 1,
+                              );
                       },
                     ),
                   ),
