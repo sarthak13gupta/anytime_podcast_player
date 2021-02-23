@@ -11,6 +11,7 @@ class SearchBar extends StatefulWidget {
 
 class _SearchBarState extends State<SearchBar> {
   TextEditingController _searchController;
+  FocusNode _searchFocusNode;
 
   @override
   void initState() {
@@ -19,6 +20,15 @@ class _SearchBarState extends State<SearchBar> {
     _searchController.addListener(() {
       setState(() {});
     });
+    _searchFocusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _searchFocusNode.dispose();
+    _searchController.dispose();
+
+    super.dispose();
   }
 
   @override
@@ -26,6 +36,7 @@ class _SearchBarState extends State<SearchBar> {
     return ListTile(
       title: TextField(
         controller: _searchController,
+        focusNode: _searchFocusNode,
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.search,
         decoration: InputDecoration(hintText: L.of(context).search_for_podcasts_hint, border: InputBorder.none),
@@ -37,12 +48,14 @@ class _SearchBarState extends State<SearchBar> {
       ),
       trailing: IconButton(
           tooltip: L.of(context).clear_search_button_label,
-          icon: Icon(_searchController.text.isEmpty ? Icons.search : Icons.clear),
+          icon: Icon(_searchController.text.isEmpty && !_searchFocusNode.hasFocus ? Icons.search : Icons.clear),
           onPressed: _searchController.text.isEmpty
-              ? () {}
+              ? () {
+                  FocusScope.of(context).requestFocus(FocusNode());
+                }
               : () {
                   _searchController.clear();
-                  FocusScope.of(context).requestFocus(FocusNode());
+                  FocusScope.of(context).requestFocus(_searchFocusNode);
                 }),
     );
   }
