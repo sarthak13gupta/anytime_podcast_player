@@ -73,7 +73,6 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
           return DefaultTabController(
               key: Key(snapshot.data.guid),
               length: snapshot.data.chaptersAreLoaded ? 3 : 2,
-              initialIndex: snapshot.data.chaptersAreLoaded ? 1 : 0,
               child: Scaffold(
                 appBar: AppBar(
                   brightness: Theme.of(context).brightness,
@@ -165,13 +164,13 @@ class EpisodeTabBarWithChapters extends StatelessWidget {
         Tab(
           child: Align(
             alignment: Alignment.center,
-            child: Text(L.of(context).chapters_label),
+            child: Text(L.of(context).episode_label),
           ),
         ),
         Tab(
           child: Align(
             alignment: Alignment.center,
-            child: Text(L.of(context).episode_label),
+            child: Text(L.of(context).chapters_label),
           ),
         ),
         Tab(
