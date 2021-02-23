@@ -85,7 +85,8 @@ class _ChapterSelectorState extends State<ChapterSelector> {
               audioBloc.transitionPosition(chapter.startTime.toDouble());
             },
             selected: chapterSelected,
-            selectedTileColor: Theme.of(context).brightness == Brightness.light ? Colors.orange : Colors.grey[800],
+            selectedTileColor:
+                Theme.of(context).brightness == Brightness.light ? Theme.of(context).buttonColor : Colors.grey[800],
             leading: Padding(
               padding: const EdgeInsets.all(4.0),
               child: Text(
