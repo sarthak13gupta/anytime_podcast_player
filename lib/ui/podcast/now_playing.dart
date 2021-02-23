@@ -71,6 +71,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
           final transportBuilder = playerBuilder?.builder(duration);
 
           return DefaultTabController(
+              key: Key(snapshot.data.guid),
               length: snapshot.data.chaptersAreLoaded ? 3 : 2,
               initialIndex: snapshot.data.chaptersAreLoaded ? 1 : 0,
               child: Scaffold(
