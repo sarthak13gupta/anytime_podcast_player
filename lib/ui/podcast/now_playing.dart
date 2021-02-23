@@ -221,10 +221,6 @@ class EpisodeTabBarViewWithChapters extends StatelessWidget {
 
     return TabBarView(
       children: [
-        ChapterSelector(
-          episode: episode,
-          chapter: episode.chapters[0],
-        ),
         StreamBuilder<PositionState>(
             stream: audioBloc.playPosition,
             builder: (context, snapshot) {
@@ -236,6 +232,10 @@ class EpisodeTabBarViewWithChapters extends StatelessWidget {
                 subTitle: e.currentChapter == null ? '' : e.currentChapter.title,
               );
             }),
+        ChapterSelector(
+          episode: episode,
+          chapter: episode.chapters[0],
+        ),
         NowPlayingDetails(title: episode.title, description: episode.description),
       ],
     );
