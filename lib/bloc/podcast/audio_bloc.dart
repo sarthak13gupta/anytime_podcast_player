@@ -96,8 +96,8 @@ class AudioBloc extends Bloc {
   /// Setup a listener for episode requests and then connect to the
   /// underlying audio service.
   void _handleEpisodeRequests() async {
-    _play.listen((episode) {
-      audioPlayerService.playEpisode(episode: episode, resume: true);
+    _play.listen((episode) async {
+      await audioPlayerService.playEpisode(episode: episode, resume: true);
       _nowPlaying.add(episode);
     });
   }
