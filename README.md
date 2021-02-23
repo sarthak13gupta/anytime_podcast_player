@@ -8,7 +8,7 @@ This is the official repository for the Anytime Podcast Player - the simple Podc
 
 ## Getting Started
 
-Anytime is currently in *Beta* - so please expect bugs! Only Android is supposed at the moment,
+Anytime is currently in *Beta* - so please expect bugs! Only Android is supported at the moment,
 but an iOS version is in the works.
 
 #### Testers
@@ -48,6 +48,24 @@ Or build:
 flutter build apk
 ```
 
+#### Search Engines
+
+Anytime can search for podcasts via iTunes and has Beta support for PodcastIndex. To use PodcastIndex, first create
+an account at [https://podcastindex.org](https://podcastindex.org). This will generate the required key
+and secret. To enable searching with PodcastIndex in AnyTime, pass the key and secret as runtime arguments:
+
+```
+flutter run --dart-define=PINDEX_KEY=mykey --dart-define=PINDEX_SECRET=mysecret
+```
+
+If running from Android Studio, add the following to the command line arguments section:
+
+```
+-t lib/main.dart --dart-define=PINDEX_KEY=mykey --dart-define=PINDEX_SECRET=mysecret
+```
+
+Ensure there are is only a single space between each argument. I have found that an additional space between any
+of the arguments will prevent them from being passed into Flutter correctly.
 
 ## Built With
 

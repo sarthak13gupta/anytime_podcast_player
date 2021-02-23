@@ -9,9 +9,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-/// This widget allows the user to change the playback speed.
-/// Selecting the playback speed icon will open a dailog box
-/// showing the speed options available.
+/// This widget allows the user to change the playback speed. Selecting the playback
+/// speed icon will open a dialog box showing the speed options available.
 class SpeedSelectorWidget extends StatefulWidget {
   final ValueChanged<double> onChanged;
 
@@ -47,7 +46,7 @@ class _SpeedSelectorWidgetState extends State<SpeedSelectorWidget> {
               Text(' ',
                   style: TextStyle(
                     fontSize: 12.0,
-                    color: Theme.of(context).primaryColor,
+                    color: Theme.of(context).buttonColor,
                   )),
               IconButton(
                 constraints: const BoxConstraints(
@@ -61,37 +60,41 @@ class _SpeedSelectorWidgetState extends State<SpeedSelectorWidget> {
                 icon: Icon(
                   Icons.speed,
                   size: 24.0,
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).buttonColor,
                 ),
                 onPressed: () {
                   showDialog<void>(
                     context: context,
                     builder: (BuildContext context) {
-                      return AlertDialog(content: StatefulBuilder(
-                        builder: (BuildContext context, StateSetter setState) {
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: List<Widget>.generate(speeds.length, (int index) {
-                              return RadioListTile<double>(
-                                title: Text('x${speeds[index]}'),
-                                value: speeds[index],
-                                groupValue: snapshot.data.playbackSpeed,
-                                onChanged: (double value) {
-                                  setState(() {
-                                    settingsBloc.setPlaybackSpeed(value);
+                      return AlertDialog(
+                          title: Text(
+                            L.of(context).playback_speed_label,
+                          ),
+                          content: StatefulBuilder(
+                            builder: (BuildContext context, StateSetter setState) {
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: List<Widget>.generate(speeds.length, (int index) {
+                                  return RadioListTile<double>(
+                                    title: Text('x${speeds[index]}'),
+                                    value: speeds[index],
+                                    groupValue: snapshot.data.playbackSpeed,
+                                    onChanged: (double value) {
+                                      setState(() {
+                                        settingsBloc.setPlaybackSpeed(value);
 
-                                    if (widget.onChanged != null) {
-                                      widget.onChanged(value);
-                                    }
+                                        if (widget.onChanged != null) {
+                                          widget.onChanged(value);
+                                        }
 
-                                    Navigator.pop(context);
-                                  });
-                                },
+                                        Navigator.pop(context);
+                                      });
+                                    },
+                                  );
+                                }),
                               );
-                            }),
-                          );
-                        },
-                      ));
+                            },
+                          ));
                     },
                   );
                 },
@@ -102,7 +105,7 @@ class _SpeedSelectorWidgetState extends State<SpeedSelectorWidget> {
                   'x${snapshot.data.playbackSpeed}',
                   style: TextStyle(
                     fontSize: 12.0,
-                    color: Theme.of(context).primaryColor,
+                    color: Theme.of(context).buttonColor,
                   ),
                 ),
               ),

@@ -9,19 +9,23 @@ import 'package:anytime/entities/feed.dart';
 import 'package:anytime/entities/podcast.dart';
 import 'package:anytime/l10n/L.dart';
 import 'package:anytime/state/bloc_state.dart';
+import 'package:anytime/ui/podcast/funding_menu.dart';
 import 'package:anytime/ui/podcast/podcast_context_menu.dart';
 import 'package:anytime/ui/widgets/decorated_icon_button.dart';
 import 'package:anytime/ui/widgets/episode_tile.dart';
 import 'package:anytime/ui/widgets/platform_progress_indicator.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dialogs/flutter_dialogs.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_html/style.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:logging/logging.dart';
+import 'package:optimized_cached_image/optimized_cached_image.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// This Widget takes a search result and builds a list of currently available
 /// podcasts. From here a user can option to subscribe/unsubscribe or play a
@@ -57,7 +61,9 @@ class _PodcastDetailsState extends State<PodcastDetails> {
     // collapsed state. Add a listener and set toollbarCollapsed variable
     // as required. The text display property is then based on this boolean.
     _sliverScrollController.addListener(() {
-      if (!toolbarCollpased && _sliverScrollController.hasClients && _sliverScrollController.offset > (300 - kToolbarHeight)) {
+      if (!toolbarCollpased &&
+          _sliverScrollController.hasClients &&
+          _sliverScrollController.offset > (300 - kToolbarHeight)) {
         setState(() {
           if (widget._darkMode) {
             Chrome.transparentDark();
@@ -165,29 +171,19 @@ class _PodcastDetailsState extends State<PodcastDetails> {
                     background: Hero(
                   tag: '${widget.podcast.imageUrl}:${widget.podcast.link}',
                   child: ExcludeSemantics(
-                    child: CachedNetworkImage(
+                    child: OptimizedCacheImage(
                       imageUrl: widget.podcast.imageUrl,
                       fit: BoxFit.fitWidth,
                       placeholder: (context, url) {
-                        return Container(
-                          constraints: BoxConstraints.expand(height: 60, width: 60),
-                          child: Placeholder(
-                            color: Colors.grey,
-                            strokeWidth: 1,
-                            fallbackWidth: 60,
-                            fallbackHeight: 60,
-                          ),
+                        return Placeholder(
+                          color: Colors.grey,
+                          strokeWidth: 1,
                         );
                       },
                       errorWidget: (_, __, dynamic ___) {
-                        return Container(
-                          constraints: BoxConstraints.expand(height: 60, width: 60),
-                          child: Placeholder(
-                            color: Colors.grey,
-                            strokeWidth: 1,
-                            fallbackWidth: 60,
-                            fallbackHeight: 60,
-                          ),
+                        return Placeholder(
+                          color: Colors.grey,
+                          strokeWidth: 1,
                         );
                       },
                     ),
@@ -258,13 +254,17 @@ class _PodcastDetailsState extends State<PodcastDetails> {
                   builder: (context, snapshot) {
                     return snapshot.hasData
                         ? SliverList(
-                            delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-                            return EpisodeTile(
-                              episode: snapshot.data[index],
-                              download: true,
-                              play: true,
-                            );
-                          }, childCount: snapshot.data.length))
+                            delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                              return EpisodeTile(
+                                episode: snapshot.data[index],
+                                download: true,
+                                play: true,
+                              );
+                            },
+                            childCount: snapshot.data.length,
+                            addAutomaticKeepAlives: false,
+                          ))
                         : SliverToBoxAdapter(child: Container());
                   }),
             ],
@@ -285,29 +285,34 @@ class PodcastTitle extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
+      padding: const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 0.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(podcast.title ?? '', style: textTheme.headline6),
           Padding(
-            padding: EdgeInsets.only(top: 4.0),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(podcast.title ?? '', style: textTheme.headline6),
           ),
-          Text(podcast.copyright ?? '', style: textTheme.caption),
           Padding(
-            padding: EdgeInsets.only(top: 16.0),
+            padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
+            child: Text(podcast.copyright ?? '', style: textTheme.caption),
           ),
-          Text(podcast.description ?? '', style: textTheme.bodyText1),
+          Html(
+            data: podcast.description ?? '',
+            style: {'html': Style(fontWeight: textTheme.bodyText1.fontWeight)},
+            onLinkTap: (url) => canLaunch(url).then((value) => launch(url)),
+          ),
           Padding(
-            padding: EdgeInsets.only(top: 16.0),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              SubscriptionButton(podcast),
-              PodcastContextMenu(podcast),
-            ],
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                SubscriptionButton(podcast),
+                PodcastContextMenu(podcast),
+                FundingMenu(podcast.funding),
+              ],
+            ),
           )
         ],
       ),

@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:anytime/bloc/bloc.dart';
 import 'package:anytime/entities/downloadable.dart';
 import 'package:anytime/entities/episode.dart';
 import 'package:anytime/entities/feed.dart';
@@ -25,7 +26,7 @@ enum PodcastEvent {
 /// The BLoC provides access to the details of a given Podcast. It takes a feed
 /// URL and creates a [Podcast] instance for the URL. It also listen and handles
 /// requests to download episodes.
-class PodcastBloc {
+class PodcastBloc extends Bloc {
   final log = Logger('PodcastBloc');
   final PodcastService podcastService;
   final AudioPlayerService audioPlayerService;
@@ -107,9 +108,10 @@ class PodcastBloc {
         _episodesStream.add(_episodes);
 
         _podcastStream.sink.add(BlocPopulatedState<Podcast>(_podcast));
-      } on Exception {
+      } catch (e) {
         // For now we'll assume a network error as this is the most likely.
         _podcastStream.sink.add(BlocErrorState<Podcast>());
+        log.fine('Error loading podcast', e);
       }
     });
   }
@@ -127,6 +129,16 @@ class PodcastBloc {
 
       // Update the stream.
       _episodesStream.add(_episodes);
+
+      // If this episode contains chapter, fetch them first.
+      if (episode.hasChapters && episode.chaptersAreNotLoaded) {
+        log.fine('This episode has some chapters! Let us load them: ${episode.chaptersUrl}');
+        var chapters = await podcastService.loadChaptersByUrl(url: episode.chaptersUrl);
+
+        e.chapters = chapters;
+
+        await podcastService.saveEpisode(e);
+      }
 
       var result = await downloadService.downloadEpisode(e);
 
@@ -220,6 +232,12 @@ class PodcastBloc {
     });
   }
 
+  @override
+  void detach() {
+    downloadService.dispose();
+  }
+
+  @override
   void dispose() {
     _podcastFeed.close();
     _downloadEpisode.close();
@@ -228,6 +246,8 @@ class PodcastBloc {
     _episodesStream.close();
     _podcastEvent.close();
     MobileDownloadService.downloadProgress.close();
+    downloadService.dispose();
+    super.dispose();
   }
 
   /// Sink to load a podcast.

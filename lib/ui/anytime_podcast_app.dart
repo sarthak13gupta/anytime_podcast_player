@@ -11,13 +11,14 @@ import 'package:anytime/bloc/search/search_bloc.dart';
 import 'package:anytime/bloc/settings/settings_bloc.dart';
 import 'package:anytime/bloc/ui/pager_bloc.dart';
 import 'package:anytime/core/chrome.dart';
+import 'package:anytime/core/environment.dart';
 import 'package:anytime/l10n/L.dart';
 import 'package:anytime/repository/repository.dart';
 import 'package:anytime/repository/sembast/sembast_repository.dart';
 import 'package:anytime/services/audio/audio_player_service.dart';
 import 'package:anytime/services/audio/mobile_audio_player_service.dart';
-import 'package:anytime/services/download/download_manager.dart';
 import 'package:anytime/services/download/download_service.dart';
+import 'package:anytime/services/download/mobile_download_manager.dart';
 import 'package:anytime/services/download/mobile_download_service.dart';
 import 'package:anytime/services/podcast/mobile_podcast_service.dart';
 import 'package:anytime/services/podcast/podcast_service.dart';
@@ -45,9 +46,6 @@ var theme = Themes.lightTheme().themeData;
 /// download and stream episodes and view the latest podcast charts.
 // ignore: must_be_immutable
 class AnytimePodcastApp extends StatefulWidget {
-  static String applicationVersion = '0.1.4';
-  static String applicationBuildNumber = '23';
-
   final Repository repository;
   final MobilePodcastApi podcastApi;
   DownloadService downloadService;
@@ -59,10 +57,14 @@ class AnytimePodcastApp extends StatefulWidget {
   AnytimePodcastApp(this.mobileSettingsService)
       : repository = SembastRepository(),
         podcastApi = MobilePodcastApi() {
-    downloadService = MobileDownloadService(repository: repository, downloadManager: FlutterDownloaderManager());
+    downloadService = MobileDownloadService(repository: repository, downloadManager: MobileDownloaderManager());
     podcastService =
         MobilePodcastService(api: podcastApi, repository: repository, settingsService: mobileSettingsService);
-    audioPlayerService = MobileAudioPlayerService(repository: repository, settingsService: mobileSettingsService);
+    audioPlayerService = MobileAudioPlayerService(
+      repository: repository,
+      settingsService: mobileSettingsService,
+      podcastService: podcastService,
+    );
     settingsBloc = SettingsBloc(mobileSettingsService);
   }
 
@@ -200,6 +202,8 @@ class _AnytimeHomePageState extends State<AnytimeHomePage> with WidgetsBindingOb
     WidgetsBinding.instance.addObserver(this);
 
     audioBloc.transitionLifecycleState(LifecyleState.resume);
+
+    Environment.loadEnvironment();
   }
 
   @override
@@ -213,6 +217,7 @@ class _AnytimeHomePageState extends State<AnytimeHomePage> with WidgetsBindingOb
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     final audioBloc = Provider.of<AudioBloc>(context, listen: false);
+
     switch (state) {
       case AppLifecycleState.resumed:
         audioBloc.transitionLifecycleState(LifecyleState.resume);
@@ -238,7 +243,6 @@ class _AnytimeHomePageState extends State<AnytimeHomePage> with WidgetsBindingOb
         children: <Widget>[
           Expanded(
             child: CustomScrollView(
-              // physics: NeverScrollableScrollPhysics(),
               slivers: <Widget>[
                 SliverVisibility(
                   visible: widget.topBarVisible,
@@ -265,14 +269,13 @@ class _AnytimeHomePageState extends State<AnytimeHomePage> with WidgetsBindingOb
                         onSelected: _menuSelect,
                         icon: Icon(
                           Icons.more_vert,
-                          // color: Theme.of(context).buttonColor,
                         ),
                         itemBuilder: (BuildContext context) {
                           return <PopupMenuEntry<String>>[
                             PopupMenuItem<String>(
                               textStyle: Theme.of(context).textTheme.subtitle1,
                               value: 'settings',
-                              child: Text('Settings'), //TODO: FIX
+                              child: Text(L.of(context).settings_label),
                             ),
                             PopupMenuItem<String>(
                               textStyle: Theme.of(context).textTheme.subtitle1,
@@ -304,6 +307,8 @@ class _AnytimeHomePageState extends State<AnytimeHomePage> with WidgetsBindingOb
               type: BottomNavigationBarType.fixed,
               backgroundColor: Theme.of(context).bottomAppBarColor,
               selectedIconTheme: Theme.of(context).iconTheme,
+              selectedItemColor: Theme.of(context).iconTheme.color,
+              unselectedItemColor: Theme.of(context).disabledColor,
               currentIndex: snapshot.data,
               onTap: pager.changePage,
               items: <BottomNavigationBarItem>[
@@ -341,8 +346,7 @@ class _AnytimeHomePageState extends State<AnytimeHomePage> with WidgetsBindingOb
         showAboutDialog(
             context: context,
             applicationName: 'Anytime Podcast Player',
-            applicationVersion:
-                'v${AnytimePodcastApp.applicationVersion} Beta build ${AnytimePodcastApp.applicationBuildNumber}',
+            applicationVersion: 'v${Environment.projectVersion} Beta',
             applicationIcon: Image.asset(
               'assets/images/anytime-logo-s.png',
               width: 52.0,
@@ -353,7 +357,7 @@ class _AnytimeHomePageState extends State<AnytimeHomePage> with WidgetsBindingOb
               GestureDetector(
                   child: Text(
                     'anytime@amugofjava.me.uk',
-                    style: TextStyle(decoration: TextDecoration.underline, color: Colors.orange),
+                    style: TextStyle(decoration: TextDecoration.underline, color: Theme.of(context).buttonColor),
                   ),
                   onTap: () {
                     _launchEmail();
