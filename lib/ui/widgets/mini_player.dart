@@ -140,14 +140,14 @@ class _MiniPlayerBuilderState extends State<_MiniPlayerBuilder> with SingleTicke
                                 Text(
                                   snapshot.data?.title ?? '',
                                   overflow: TextOverflow.ellipsis,
-                                  style: textTheme.bodyText2,
+                                  style: textTheme.subtitle1,
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 4.0),
                                   child: Text(
                                     snapshot.data?.author ?? '',
                                     overflow: TextOverflow.ellipsis,
-                                    style: textTheme.caption,
+                                    style: textTheme.bodyText1,
                                   ),
                                 ),
                               ],
@@ -169,7 +169,7 @@ class _MiniPlayerBuilderState extends State<_MiniPlayerBuilder> with SingleTicke
                                       _play(audioBloc);
                                     }
                                   },
-                                  shape: CircleBorder(side: BorderSide(color: Theme.of(context).backgroundColor, width: 0.0)),
+                                  shape: CircleBorder(side: BorderSide(color: Theme.of(context).bottomAppBarColor, width: 0.0)),
                                   child: AnimatedIcon(
                                     size: 48.0,
                                     icon: AnimatedIcons.play_pause,
