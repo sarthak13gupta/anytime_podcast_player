@@ -218,7 +218,7 @@ class MobilePodcastService extends PodcastService {
 
   @override
   Future<List<Chapter>> loadChaptersByUrl({@required String url}) async {
-    var c = await psapi.Podcast.loadChaptersByUrl(url: url);
+    var c = await api.loadChapters(url);
     var chapters = <Chapter>[];
 
     if (c != null) {
@@ -261,7 +261,8 @@ class MobilePodcastService extends PodcastService {
     await repository.saveEpisode(episode);
 
     if (await hasStoragePermission()) {
-      final filepath = episode.filepath == null || episode.filepath.isEmpty ? await getStorageDirectory() : episode.filepath;
+      final filepath =
+          episode.filepath == null || episode.filepath.isEmpty ? await getStorageDirectory() : episode.filepath;
       final filename = join(filepath, episode.filename);
 
       var f = File.fromUri(Uri.file(filename));
