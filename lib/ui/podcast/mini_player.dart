@@ -137,14 +137,14 @@ class _MiniPlayerBuilderState extends State<_MiniPlayerBuilder> with SingleTicke
                                 Text(
                                   snapshot.data?.title ?? '',
                                   overflow: TextOverflow.ellipsis,
-                                  style: textTheme.bodyText2,
+                                  style: textTheme.subtitle1,
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 4.0),
                                   child: Text(
                                     snapshot.data?.author ?? '',
                                     overflow: TextOverflow.ellipsis,
-                                    style: textTheme.caption,
+                                    style: textTheme.bodyText1,
                                   ),
                                 ),
                               ],
