@@ -202,8 +202,9 @@ class AnytimeHomePage extends StatefulWidget {
   final String title;
   final String noSubscriptionsMessage;
   final bool topBarVisible;
+  final bool inlineSearch;
 
-  AnytimeHomePage({this.title,  this.noSubscriptionsMessage, this.topBarVisible = true});
+  AnytimeHomePage({this.title,  this.noSubscriptionsMessage, this.topBarVisible = true, this.inlineSearch = false});
 
   @override
   _AnytimeHomePageState createState() => _AnytimeHomePageState();
@@ -329,7 +330,7 @@ class _AnytimeHomePageState extends State<AnytimeHomePage> {
     if (index == 0) {
       return Library(noSubscriptionsMessage: widget.noSubscriptionsMessage);
     } else if (index == 1) {
-      return Discovery();
+      return Discovery(inlineSearch: widget.inlineSearch);
     } else {
       return Downloads();
     }
