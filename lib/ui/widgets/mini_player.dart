@@ -64,7 +64,7 @@ class _MiniPlayerBuilderState extends State<_MiniPlayerBuilder> with SingleTicke
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).accentTextTheme;
+    final textTheme = Theme.of(context).textTheme;
     final audioBloc = Provider.of<AudioBloc>(context, listen: false);
 
     return Dismissible(
