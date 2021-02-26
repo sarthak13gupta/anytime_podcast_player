@@ -25,7 +25,6 @@ class ShowNotes extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
         body: CustomScrollView(controller: _sliverScrollController, slivers: <Widget>[
           SliverAppBar(
             backwardsCompatibility: false,
