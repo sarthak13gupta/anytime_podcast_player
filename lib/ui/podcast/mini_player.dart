@@ -97,8 +97,8 @@ class _MiniPlayerBuilderState extends State<_MiniPlayerBuilder> with SingleTicke
           decoration: BoxDecoration(
               color: Theme.of(context).backgroundColor,
               border: Border(
-                top: Divider.createBorderSide(context, width: 1.0, color: Theme.of(context).dividerColor),
-                bottom: Divider.createBorderSide(context, width: 0.0, color: Theme.of(context).dividerColor),
+                top: Divider.createBorderSide(context, width: 0.5, color: Theme.of(context).dividerColor),
+                bottom: Divider.createBorderSide(context, width: 0.5, color: Theme.of(context).dividerColor),
               )),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -137,21 +137,22 @@ class _MiniPlayerBuilderState extends State<_MiniPlayerBuilder> with SingleTicke
                                 Text(
                                   snapshot.data?.title ?? '',
                                   overflow: TextOverflow.ellipsis,
-                                  style: textTheme.subtitle1,
+                                  style: textTheme.bodyText1.copyWith(height: 1.22, fontSize: 14),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 4.0),
                                   child: Text(
                                     snapshot.data?.author ?? '',
                                     overflow: TextOverflow.ellipsis,
-                                    style: textTheme.bodyText1,
+                                    style: textTheme.subtitle1.copyWith(letterSpacing: 0.25, height: 1.22, fontSize: 12.3),
                                   ),
                                 ),
                               ],
                             )),
-                        SizedBox(
-                          height: 64.0,
-                          width: 64.0,
+                        Container(
+                          height: 56.0,
+                          width: 56.0,
+                          padding: EdgeInsets.only(right: 16),
                           child: StreamBuilder<AudioState>(
                               stream: audioBloc.playingState,
                               builder: (context, snapshot) {
@@ -170,9 +171,9 @@ class _MiniPlayerBuilderState extends State<_MiniPlayerBuilder> with SingleTicke
                                     }
                                   },
                                   child: AnimatedIcon(
-                                    size: 48.0,
+                                    size: 24.0,
                                     icon: AnimatedIcons.play_pause,
-                                    color: Theme.of(context).iconTheme.color,
+                                    color: Colors.white,
                                     progress: _playPauseController,
                                   ),
                                 );
