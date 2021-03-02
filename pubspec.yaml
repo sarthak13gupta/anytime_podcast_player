@@ -32,6 +32,7 @@ dependencies:
   sembast: ^3.0.2
   shared_preferences: ^2.0.4
   url_launcher: ^6.0.3
+  flutter_svg: ^0.20.0-nullsafety.3
 
   flutter:
     sdk: flutter
@@ -56,6 +57,7 @@ flutter:
     - assets/images/anytime-logo.png
     - assets/images/anytime-logo-s.png
     - assets/images/anytime-placeholder-logo.png
+    - assets/icons/
 
   fonts:
     - family: SpaceMonoRegular
