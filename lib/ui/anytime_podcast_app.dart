@@ -38,6 +38,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dialogs/flutter_dialogs.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -313,6 +314,8 @@ class _AnytimeHomePageState extends State<AnytimeHomePage> {
           stream: pager.currentPage,
           initialData: 0,
           builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+            var selectedItemColor = Theme.of(context).iconTheme.color;
+            var unselectedItemColor = HSLColor.fromColor(Theme.of(context).bottomAppBarColor).withLightness(0.8).toColor();
             return BottomNavigationBar(
               type: BottomNavigationBarType.fixed,
               backgroundColor: Theme.of(context).bottomAppBarColor,
@@ -323,15 +326,18 @@ class _AnytimeHomePageState extends State<AnytimeHomePage> {
               onTap: pager.changePage,
               items: <BottomNavigationBarItem>[
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.library_music),
+                  icon: SvgPicture.asset('assets/icons/library.svg', color: unselectedItemColor, height: 24, width: 24),
+                  activeIcon: SvgPicture.asset('assets/icons/library.svg', color: selectedItemColor, height: 32, width: 32),
                   label: L.of(context).library,
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.explore),
+                  icon: SvgPicture.asset('assets/icons/discovery.svg', color: unselectedItemColor, height: 24, width: 24),
+                  activeIcon: SvgPicture.asset('assets/icons/discovery.svg', color: selectedItemColor, height: 32, width: 32),
                   label: L.of(context).discover,
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.file_download),
+                  icon: SvgPicture.asset('assets/icons/download.svg', color: unselectedItemColor, height: 24, width: 24),
+                  activeIcon: SvgPicture.asset('assets/icons/download.svg', color: selectedItemColor, height: 32, width: 32),
                   label: L.of(context).downloads,
                 ),
               ],
