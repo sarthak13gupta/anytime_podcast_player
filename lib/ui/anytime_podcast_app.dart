@@ -307,13 +307,13 @@ class _AnytimeHomePageState extends State<AnytimeHomePage> {
           initialData: 0,
           builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
             var selectedItemColor = Theme.of(context).iconTheme.color;
-            var unselectedItemColor = HSLColor.fromColor(Theme.of(context).bottomAppBarColor).withLightness(0.8).toColor();
+            var unselectedItemColor = HSLColor.fromColor(Theme.of(context).bottomAppBarColor).withLightness(0.85).toColor();
             return BottomNavigationBar(
               type: BottomNavigationBarType.fixed,
               backgroundColor: Theme.of(context).bottomAppBarColor,
               selectedIconTheme: Theme.of(context).iconTheme,
               selectedItemColor: Theme.of(context).iconTheme.color,
-              unselectedItemColor: HSLColor.fromColor(Theme.of(context).bottomAppBarColor).withLightness(0.8).toColor(),
+              unselectedItemColor: HSLColor.fromColor(Theme.of(context).bottomAppBarColor).withLightness(0.85).toColor(),
               currentIndex: snapshot.data,
               onTap: pager.changePage,
               items: <BottomNavigationBarItem>[
