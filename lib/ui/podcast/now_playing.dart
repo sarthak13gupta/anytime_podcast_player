@@ -40,7 +40,6 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
 
     final audioBloc = Provider.of<AudioBloc>(context, listen: false);
 
@@ -54,7 +53,6 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     playingStateSubscription.cancel();
     super.dispose();
   }
