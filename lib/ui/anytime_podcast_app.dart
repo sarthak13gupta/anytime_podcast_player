@@ -214,7 +214,7 @@ class AnytimeHomePage extends StatefulWidget {
   final bool topBarVisible;
   final bool inlineSearch;
 
-  AnytimeHomePage({this.title,  this.noSubscriptionsMessage, this.topBarVisible = true, this.inlineSearch = false});
+  AnytimeHomePage({this.title, this.noSubscriptionsMessage, this.topBarVisible = true, this.inlineSearch = false});
 
   @override
   _AnytimeHomePageState createState() => _AnytimeHomePageState();
@@ -310,39 +310,42 @@ class _AnytimeHomePageState extends State<AnytimeHomePage> {
           MiniPlayer(),
         ],
       ),
-      bottomNavigationBar: StreamBuilder<int>(
-          stream: pager.currentPage,
-          initialData: 0,
-          builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-            var selectedItemColor = Theme.of(context).iconTheme.color;
-            var unselectedItemColor = HSLColor.fromColor(Theme.of(context).bottomAppBarColor).withLightness(0.8).toColor();
-            return BottomNavigationBar(
-              type: BottomNavigationBarType.fixed,
-              backgroundColor: Theme.of(context).bottomAppBarColor,
-              selectedIconTheme: Theme.of(context).iconTheme,
-              selectedItemColor: Theme.of(context).iconTheme.color,
-              unselectedItemColor: HSLColor.fromColor(Theme.of(context).bottomAppBarColor).withLightness(0.8).toColor(),
-              currentIndex: snapshot.data,
-              onTap: pager.changePage,
-              items: <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: SvgPicture.asset('assets/icons/library.svg', color: unselectedItemColor, height: 24, width: 24),
-                  activeIcon: SvgPicture.asset('assets/icons/library.svg', color: selectedItemColor, height: 32, width: 32),
-                  label: L.of(context).library,
-                ),
-                BottomNavigationBarItem(
-                  icon: SvgPicture.asset('assets/icons/discovery.svg', color: unselectedItemColor, height: 24, width: 24),
-                  activeIcon: SvgPicture.asset('assets/icons/discovery.svg', color: selectedItemColor, height: 32, width: 32),
-                  label: L.of(context).discover,
-                ),
-                BottomNavigationBarItem(
-                  icon: SvgPicture.asset('assets/icons/download.svg', color: unselectedItemColor, height: 24, width: 24),
-                  activeIcon: SvgPicture.asset('assets/icons/download.svg', color: selectedItemColor, height: 32, width: 32),
-                  label: L.of(context).downloads,
-                ),
-              ],
-            );
-          }),
+      bottomNavigationBar: SizedBox(
+        height: 64,
+        child: StreamBuilder<int>(
+            stream: pager.currentPage,
+            initialData: 0,
+            builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+              var selectedItemColor = Theme.of(context).iconTheme.color;
+              var unselectedItemColor = HSLColor.fromColor(Theme.of(context).bottomAppBarColor).withLightness(0.85).toColor();
+              return BottomNavigationBar(
+                type: BottomNavigationBarType.fixed,
+                backgroundColor: Theme.of(context).bottomAppBarColor,
+                selectedIconTheme: Theme.of(context).iconTheme,
+                selectedItemColor: Theme.of(context).iconTheme.color,
+                unselectedItemColor: HSLColor.fromColor(Theme.of(context).bottomAppBarColor).withLightness(0.85).toColor(),
+                currentIndex: snapshot.data,
+                onTap: pager.changePage,
+                items: <BottomNavigationBarItem>[
+                  BottomNavigationBarItem(
+                    icon: SvgPicture.asset('assets/icons/library.svg', color: unselectedItemColor, height: 24, width: 24),
+                    activeIcon: SvgPicture.asset('assets/icons/library.svg', color: selectedItemColor, height: 32, width: 32),
+                    label: L.of(context).library,
+                  ),
+                  BottomNavigationBarItem(
+                    icon: SvgPicture.asset('assets/icons/discovery.svg', color: unselectedItemColor, height: 24, width: 24),
+                    activeIcon: SvgPicture.asset('assets/icons/discovery.svg', color: selectedItemColor, height: 32, width: 32),
+                    label: L.of(context).discover,
+                  ),
+                  BottomNavigationBarItem(
+                    icon: SvgPicture.asset('assets/icons/download.svg', color: unselectedItemColor, height: 24, width: 24),
+                    activeIcon: SvgPicture.asset('assets/icons/download.svg', color: selectedItemColor, height: 32, width: 32),
+                    label: L.of(context).downloads,
+                  ),
+                ],
+              );
+            }),
+      ),
     );
   }
 
