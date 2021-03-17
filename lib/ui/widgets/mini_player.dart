@@ -100,6 +100,7 @@ class _MiniPlayerBuilderState extends State<_MiniPlayerBuilder> with SingleTicke
                 bottom: Divider.createBorderSide(context, width: 0.5, color: Theme.of(context).dividerColor),
               )),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               StreamBuilder<Episode>(
