@@ -137,7 +137,9 @@ class _PodcastDetailsState extends State<PodcastDetails> {
                 ),
                 leading: DecoratedIconButton(
                   icon: Icons.close,
-                  iconColour: toolbarCollpased && Theme.of(context).brightness == Brightness.light ? Colors.black : Colors.white,
+                  iconColour: toolbarCollpased && Theme.of(context).brightness == Brightness.light
+                      ? Theme.of(context).appBarTheme.foregroundColor
+                      : Colors.white,
                   decorationColour: toolbarCollpased ? Color(0x00000000) : Color(0x22000000),
                   onPressed: () {
                     _resetSystemOverlayStyle();
