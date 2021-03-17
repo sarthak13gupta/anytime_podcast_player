@@ -64,7 +64,7 @@ class _MiniPlayerBuilderState extends State<_MiniPlayerBuilder> with SingleTicke
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).accentTextTheme;
+    final textTheme = Theme.of(context).textTheme;
     final audioBloc = Provider.of<AudioBloc>(context, listen: false);
     final width = MediaQuery.of(context).size.width;
 
@@ -152,7 +152,7 @@ class _MiniPlayerBuilderState extends State<_MiniPlayerBuilder> with SingleTicke
                                 ),
                               ],
                             )),
-                        SizedBox(
+                        Container(
                           height: 56.0,
                           width: 56.0,
                           padding: EdgeInsets.only(right: 16),

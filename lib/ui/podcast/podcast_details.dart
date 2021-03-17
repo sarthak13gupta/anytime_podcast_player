@@ -120,7 +120,6 @@ class _PodcastDetailsState extends State<PodcastDetails> {
         return Future.value(true);
       },
       child: Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
         body: LiquidPullToRefresh(
           onRefresh: _handleRefresh,
           showChildOpacityTransition: false,
