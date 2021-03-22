@@ -381,9 +381,11 @@ class NowPlayingHeaderWithChapters extends StatelessWidget {
     final chapterTitle = chapter?.title ?? '';
     final chapterUrl = chapter?.url ?? '';
 
+    print("now playing header episode = " + title + " " + chapterTitle);
     return StreamBuilder<Episode>(
         stream: audioBloc.nowPlaying,
         builder: (context, statesnap) {
+          print("now playing header builder episode = " + title + " " + imageUrl);
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
