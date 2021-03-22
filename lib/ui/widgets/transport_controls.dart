@@ -240,38 +240,72 @@ class DownloadControl extends StatelessWidget {
 
   Future<void> _showCancelDialog(BuildContext context) {
     final _episodeBloc = Provider.of<EpisodeBloc>(context, listen: false);
-
-    return showDialog<void>(
-      context: context,
-      useRootNavigator: false,
-      builder: (_) => BasicDialogAlert(
-        title: Text(
-          L.of(context).stop_download_title,
+    final settings = Provider.of<SettingsBloc>(context, listen: false).currentSettings;
+    if (settings.useMaterialDesign) {
+      return showDialog<void>(
+        context: context,
+        useRootNavigator: false,
+        builder: (_) => AlertDialog(
+          title: Text(
+            L.of(context).stop_download_title,
+          ),
+          content: Text(L.of(context).stop_download_confirmation),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(
+                L.of(context).cancel_button_label,
+                style: TextStyle(color: Theme.of(context).buttonColor),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                _episodeBloc.deleteDownload(episode);
+                Navigator.pop(context);
+              },
+              child: Text(
+                L.of(context).stop_download_button_label,
+                style: TextStyle(color: Theme.of(context).buttonColor),
+              ),
+            ),
+          ],
         ),
-        content: Text(L.of(context).stop_download_confirmation),
-        actions: <Widget>[
-          BasicDialogAction(
-            title: Text(
-              L.of(context).cancel_button_label,
-              style: TextStyle(color: Theme.of(context).buttonColor),
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
+      );
+    } else {
+      return showDialog<void>(
+        context: context,
+        useRootNavigator: false,
+        builder: (_) => BasicDialogAlert(
+          title: Text(
+            L.of(context).stop_download_title,
           ),
-          BasicDialogAction(
-            title: Text(
-              L.of(context).stop_download_button_label,
-              style: TextStyle(color: Theme.of(context).buttonColor),
+          content: Text(L.of(context).stop_download_confirmation),
+          actions: <Widget>[
+            BasicDialogAction(
+              title: Text(
+                L.of(context).cancel_button_label,
+                style: TextStyle(color: Theme.of(context).buttonColor),
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
             ),
-            onPressed: () {
-              _episodeBloc.deleteDownload(episode);
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      ),
-    );
+            BasicDialogAction(
+              title: Text(
+                L.of(context).stop_download_button_label,
+                style: TextStyle(color: Theme.of(context).buttonColor),
+              ),
+              onPressed: () {
+                _episodeBloc.deleteDownload(episode);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      );
+    }
   }
 }
 
