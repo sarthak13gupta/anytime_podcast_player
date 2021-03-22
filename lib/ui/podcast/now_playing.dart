@@ -71,7 +71,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
     return StreamBuilder<Episode>(
         stream: audioBloc.nowPlaying,
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+          if (!snapshot.hasData || snapshot.data == null) {
             return Container();
           }
 
