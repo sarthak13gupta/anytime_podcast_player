@@ -66,11 +66,10 @@ class _SettingsState extends State<Settings> {
                   onChanged: (value) => sdcard
                       ? setState(() {
                           if (value) {
-                            _showStorageDialog(enableExternalStorage: true);
+                            _showStorageDialog(enableExternalStorage: true, useMaterialDesign: snapshot.data.useMaterialDesign);
                           } else {
-                            _showStorageDialog(enableExternalStorage: false);
+                            _showStorageDialog(enableExternalStorage: false, useMaterialDesign: snapshot.data.useMaterialDesign);
                           }
-
                           settingsBloc.storeDownloadonSDCard(value);
                         })
                       : null,
@@ -114,31 +113,54 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  void _showStorageDialog({@required bool enableExternalStorage}) {
-    showDialog<void>(
-      context: context,
-      useRootNavigator: false,
-      builder: (_) => BasicDialogAlert(
-        title: Text(L.of(context).settings_download_switch_label),
-        content: Text(
-          enableExternalStorage
-              ? L.of(context).settings_download_switch_card
-              : L.of(context).settings_download_switch_internal,
-        ),
-        actions: <Widget>[
-          BasicDialogAction(
-            title: Text(L.of(context).ok_button_label),
-            onPressed: () {
-              Navigator.pop(context);
-            },
+  void _showStorageDialog({@required bool enableExternalStorage, bool useMaterialDesign}) {
+    if (useMaterialDesign) {
+      showDialog<void>(
+        context: context,
+        useRootNavigator: false,
+        builder: (_) => AlertDialog(
+          title: Text(L.of(context).settings_download_switch_label),
+          content: Text(
+            enableExternalStorage ? L.of(context).settings_download_switch_card : L.of(context).settings_download_switch_internal,
           ),
-        ],
-      ),
-    );
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(L.of(context).ok_button_label),
+            ),
+          ],
+        ),
+      );
+    } else {
+      showDialog<void>(
+        context: context,
+        useRootNavigator: false,
+        builder: (_) => BasicDialogAlert(
+          title: Text(L.of(context).settings_download_switch_label),
+          content: Text(
+            enableExternalStorage ? L.of(context).settings_download_switch_card : L.of(context).settings_download_switch_internal,
+          ),
+          actions: <Widget>[
+            BasicDialogAction(
+              title: Text(L.of(context).ok_button_label),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   @override
   Widget build(context) {
+    var settings = Provider.of<SettingsBloc>(context).currentSettings;
+    if (settings.useMaterialDesign) {
+      return _buildAndroid(context);
+    }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return _buildAndroid(context);

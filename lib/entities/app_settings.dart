@@ -32,6 +32,7 @@ class AppSettings {
 
   /// If true the funding link icon will appear (if the podcast supports it).
   final bool showFunding;
+  final bool useMaterialDesign;
 
   AppSettings({
     @required this.theme,
@@ -43,6 +44,7 @@ class AppSettings {
     @required this.externalLinkConsent,
     @required this.autoOpenNowPlaying,
     @required this.showFunding,
+    @required this.useMaterialDesign,
   });
 
   AppSettings.sensibleDefaults()
@@ -54,5 +56,6 @@ class AppSettings {
         searchProviders = <SearchProvider>[],
         externalLinkConsent = false,
         autoOpenNowPlaying = false,
-        showFunding = true;
+        showFunding = true,
+        useMaterialDesign = false;
 }

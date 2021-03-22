@@ -329,9 +329,9 @@ class PodcastTitle extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                SubscriptionButton(podcast),
-                PodcastContextMenu(podcast),
-                settings.showFunding ? FundingMenu(podcast.funding) : Container(),
+                SubscriptionButton(podcast, useMaterialDesign: settings.useMaterialDesign),
+                PodcastContextMenu(podcast, useMaterialDesign: settings.useMaterialDesign),
+                settings.showFunding ? FundingMenu(podcast.funding, useMaterialDesign: settings.useMaterialDesign) : Container(),
               ],
             ),
           )
@@ -343,8 +343,9 @@ class PodcastTitle extends StatelessWidget {
 
 class SubscriptionButton extends StatelessWidget {
   final Podcast podcast;
+  final bool useMaterialDesign;
 
-  SubscriptionButton(this.podcast);
+  SubscriptionButton(this.podcast, {this.useMaterialDesign});
 
   @override
   Widget build(BuildContext context) {
@@ -370,33 +371,63 @@ class SubscriptionButton extends StatelessWidget {
                       ),
                       label: Text(L.of(context).unsubscribe_label),
                       onPressed: () {
-                        showDialog<void>(
-                          context: context,
-                          useRootNavigator: false,
-                          builder: (_) => BasicDialogAlert(
-                            title: Text(L.of(context).unsubscribe_label),
-                            content: Text(L.of(context).unsubscribe_message),
-                            actions: <Widget>[
-                              BasicDialogAction(
-                                title: Text(
-                                  L.of(context).cancel_button_label,
+                        if (useMaterialDesign) {
+                          showDialog<void>(
+                            context: context,
+                            useRootNavigator: false,
+                            builder: (_) => AlertDialog(
+                              title: Text(L.of(context).unsubscribe_label),
+                              content: Text(L.of(context).unsubscribe_message),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text(
+                                    L.of(context).cancel_button_label,
+                                  ),
                                 ),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                              ),
-                              BasicDialogAction(
-                                title: Text(L.of(context).unsubscribe_button_label),
-                                onPressed: () {
-                                  bloc.podcastEvent(PodcastEvent.unsubscribe);
+                                TextButton(
+                                  onPressed: () {
+                                    bloc.podcastEvent(PodcastEvent.unsubscribe);
 
-                                  Navigator.pop(context);
-                                  Navigator.pop(context);
-                                },
-                              ),
-                            ],
-                          ),
-                        );
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text(L.of(context).unsubscribe_button_label),
+                                ),
+                              ],
+                            ),
+                          );
+                        } else {
+                          showDialog<void>(
+                            context: context,
+                            useRootNavigator: false,
+                            builder: (_) => BasicDialogAlert(
+                              title: Text(L.of(context).unsubscribe_label),
+                              content: Text(L.of(context).unsubscribe_message),
+                              actions: <Widget>[
+                                BasicDialogAction(
+                                  title: Text(
+                                    L.of(context).cancel_button_label,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                                BasicDialogAction(
+                                  title: Text(L.of(context).unsubscribe_button_label),
+                                  onPressed: () {
+                                    bloc.podcastEvent(PodcastEvent.unsubscribe);
+
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        }
                       },
                     )
                   : OutlinedButton.icon(
