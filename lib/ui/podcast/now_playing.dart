@@ -78,6 +78,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
           var duration = snapshot.data == null ? 0 : snapshot.data.duration;
           final transportBuilder = playerBuilder?.builder(duration);
 
+          print("now playing episode = " + snapshot.data.title + " " + snapshot.data.guid);
           return DefaultTabController(
               key: ValueKey(snapshot.data.guid),
               length: snapshot.data.hasChapters ? 3 : 2,
@@ -283,9 +284,11 @@ class NowPlayingHeader extends StatelessWidget {
     final audioBloc = Provider.of<AudioBloc>(context, listen: false);
     final placeholderBuilder = PlaceholderBuilder.of(context);
 
+    print("now playing header episode = " + title + " " + imageUrl);
     return StreamBuilder<Episode>(
         stream: audioBloc.nowPlaying,
         builder: (context, statesnap) {
+          print("now playing header in builder episode = " + title + " " + imageUrl);
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
