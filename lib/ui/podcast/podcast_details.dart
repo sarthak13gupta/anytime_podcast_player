@@ -160,15 +160,11 @@ class _PodcastDetailsState extends State<PodcastDetails> {
                           final state = snapshot.data;
                           var podcast = widget.podcast;
 
-                          // print('DEF: Image is ${podcast?.imageUrl}');
-
                           if (state is BlocLoadingState<Podcast>) {
-                            // print('LOL: Image is ${state.data.imageUrl}');
                             podcast = state.data;
                           }
 
                           if (state is BlocPopulatedState<Podcast>) {
-                            // print('POP: Image is ${state.results.imageUrl}');
                             podcast = state.results;
                           }
 

@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:anytime/bloc/podcast/audio_bloc.dart';
+import 'package:anytime/entities/chapter.dart';
 import 'package:anytime/entities/episode.dart';
 import 'package:anytime/l10n/L.dart';
 import 'package:anytime/services/audio/audio_player_service.dart';
@@ -242,13 +243,20 @@ class EpisodeTabBarViewWithChapters extends StatelessWidget {
             stream: audioBloc.chapterEvent,
             builder: (context, snapshot) {
               final e = snapshot.hasData ? snapshot.data : episode;
-              return NowPlayingHeader(
-                imageUrl: e.positionalImageUrl,
-                title: e.title,
-                description: e.description,
-                subTitle: e.currentChapter == null ? '' : e.currentChapter.title,
-                textGroup: textGroup,
-              );
+              return e.hasChapters
+                  ? NowPlayingHeaderWithChapters(
+                      imageUrl: e.positionalImageUrl,
+                      title: e.title,
+                      description: e.description,
+                      textGroup: textGroup,
+                      chapter: e.currentChapter,
+                    )
+                  : NowPlayingHeader(
+                      imageUrl: e.positionalImageUrl,
+                      title: e.title,
+                      description: e.description,
+                      textGroup: textGroup,
+                    );
             }),
         NowPlayingDetails(title: episode.title, description: episode.description),
       ],
@@ -260,7 +268,6 @@ class NowPlayingHeader extends StatelessWidget {
   final String imageUrl;
   final String title;
   final String description;
-  final String subTitle;
   final AutoSizeGroup textGroup;
 
   const NowPlayingHeader({
@@ -268,94 +275,224 @@ class NowPlayingHeader extends StatelessWidget {
     @required this.title,
     @required this.description,
     @required this.textGroup,
-    this.subTitle,
   });
 
   @override
   Widget build(BuildContext context) {
+    final audioBloc = Provider.of<AudioBloc>(context, listen: false);
     final placeholderBuilder = PlaceholderBuilder.of(context);
 
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 7,
-            child: OptimizedCacheImage(
-              useScaleCacheManager: true,
-              width: 360,
-              height: 360,
-              imageUrl: imageUrl,
-              placeholder: (context, url) {
-                return placeholderBuilder != null ? placeholderBuilder?.builder()(context) : DelayedCircularProgressIndicator();
-              },
-              errorWidget: (_, __, dynamic ___) {
-                return Container(
-                  constraints: BoxConstraints.expand(),
-                  child: placeholderBuilder != null
-                      ? placeholderBuilder?.errorBuilder()(context)
-                      : Placeholder(
-                          fallbackHeight: 360,
-                          fallbackWidth: 360,
-                          color: Colors.grey,
-                          strokeWidth: 1,
+    return StreamBuilder<Episode>(
+        stream: audioBloc.nowPlaying,
+        builder: (context, statesnap) {
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 7,
+                  child: OptimizedCacheImage(
+                    useScaleCacheManager: true,
+                    width: 360,
+                    height: 360,
+                    imageUrl: imageUrl,
+                    placeholder: (context, url) {
+                      return placeholderBuilder != null
+                          ? placeholderBuilder?.builder()(context)
+                          : DelayedCircularProgressIndicator();
+                    },
+                    errorWidget: (_, __, dynamic ___) {
+                      return Container(
+                        constraints: BoxConstraints.expand(),
+                        child: placeholderBuilder != null
+                            ? placeholderBuilder?.errorBuilder()(context)
+                            : Placeholder(
+                                fallbackHeight: 360,
+                                fallbackWidth: 360,
+                                color: Colors.grey,
+                                strokeWidth: 1,
+                              ),
+                      );
+                    },
+                  ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      top: 16.0,
+                      bottom: 0.0,
+                      left: 16.0,
+                      right: 16.0,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: AutoSizeText(
+                            title ?? '',
+                            group: textGroup,
+                            textAlign: TextAlign.center,
+                            minFontSize: 12.0,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0,
+                            ),
+                            maxLines: 3,
+                          ),
                         ),
-                );
-              },
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Padding(
-              padding: const EdgeInsets.only(
-                top: 16.0,
-                bottom: 0.0,
-                left: 16.0,
-                right: 16.0,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: AutoSizeText(
-                      title ?? '',
-                      group: textGroup,
-                      textAlign: TextAlign.center,
-                      minFontSize: 12.0,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20.0,
-                      ),
-                      maxLines: 3,
+                      ],
                     ),
                   ),
-                  Expanded(
-                    flex: 1,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(0.0, 4.0, 0.0, 0.0),
-                      child: AutoSizeText(
-                        subTitle ?? '',
-                        group: textGroup,
-                        minFontSize: 10.0,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          fontSize: 16.0,
+                ),
+              ],
+            ),
+          );
+        });
+  }
+}
+
+class NowPlayingHeaderWithChapters extends StatelessWidget {
+  final String imageUrl;
+  final String title;
+  final String description;
+  final Chapter chapter;
+  final AutoSizeGroup textGroup;
+
+  const NowPlayingHeaderWithChapters({
+    @required this.imageUrl,
+    @required this.title,
+    @required this.description,
+    @required this.textGroup,
+    @required this.chapter,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final audioBloc = Provider.of<AudioBloc>(context, listen: false);
+    final placeholderBuilder = PlaceholderBuilder.of(context);
+    final chapterTitle = chapter?.title ?? '';
+    final chapterUrl = chapter?.url ?? '';
+
+    return StreamBuilder<Episode>(
+        stream: audioBloc.nowPlaying,
+        builder: (context, statesnap) {
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 7,
+                  child: OptimizedCacheImage(
+                    useScaleCacheManager: true,
+                    width: 360,
+                    height: 360,
+                    imageUrl: imageUrl,
+                    placeholder: (context, url) {
+                      return placeholderBuilder != null
+                          ? placeholderBuilder?.builder()(context)
+                          : DelayedCircularProgressIndicator();
+                    },
+                    errorWidget: (_, __, dynamic ___) {
+                      return Container(
+                        constraints: BoxConstraints.expand(),
+                        child: placeholderBuilder != null
+                            ? placeholderBuilder?.errorBuilder()(context)
+                            : Placeholder(
+                                fallbackHeight: 360,
+                                fallbackWidth: 360,
+                                color: Colors.grey,
+                                strokeWidth: 1,
+                              ),
+                      );
+                    },
+                  ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      top: 16.0,
+                      bottom: 0.0,
+                      left: 16.0,
+                      right: 16.0,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: AutoSizeText(
+                            title ?? '',
+                            group: textGroup,
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.ellipsis,
+                            minFontSize: 12.0,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0,
+                            ),
+                            maxLines: 3,
+                          ),
                         ),
-                        maxLines: 2,
-                      ),
+                        Expanded(
+                          flex: 1,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(0.0, 4.0, 0.0, 0.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Flexible(
+                                  child: AutoSizeText(
+                                    chapterTitle ?? '',
+                                    group: textGroup,
+                                    minFontSize: 10.0,
+                                    textAlign: TextAlign.center,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.normal,
+                                      fontSize: 16.0,
+                                    ),
+                                    maxLines: 2,
+                                  ),
+                                ),
+                                chapterUrl.isEmpty
+                                    ? SizedBox(
+                                        height: 0,
+                                        width: 0,
+                                      )
+                                    : IconButton(
+                                        icon: Icon(Icons.link),
+                                        color: Theme.of(context).primaryIconTheme.color,
+                                        onPressed: () {
+                                          _chapterLink(chapterUrl);
+                                        }),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-    );
+          );
+        });
+  }
+
+  void _chapterLink(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }
 

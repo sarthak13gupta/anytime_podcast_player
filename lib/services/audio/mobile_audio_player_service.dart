@@ -171,7 +171,7 @@ class MobileAudioPlayerService extends AudioPlayerService {
           _episode.chapters = await podcastService.loadChaptersByUrl(url: _episode.chaptersUrl);
           _episode.chaptersLoading = false;
 
-          await repository.saveEpisode(_episode);
+          _episode = await repository.saveEpisode(_episode);
           await _onUpdatePosition();
         }
       } catch (e) {
@@ -449,7 +449,7 @@ class MobileAudioPlayerService extends AudioPlayerService {
       if (currentPosition != _episode.position) {
         _episode.position = currentPosition;
 
-        await repository.saveEpisode(_episode);
+        _episode = await repository.saveEpisode(_episode);
       }
     } else {
       log.fine(' - Cannot save position as episode is null');
@@ -479,7 +479,9 @@ class MobileAudioPlayerService extends AudioPlayerService {
   }
 
   void _updateChapter(int seconds, int duration) {
-    if (_episode.hasChapters && _episode.chaptersAreLoaded) {
+    if (_episode == null) {
+      log.fine('Warning. Attempting to update chapter information on a null _episode');
+    } else if (_episode.hasChapters && _episode.chaptersAreLoaded) {
       final chapters = _episode.chapters;
 
       // What is our current chapter?
