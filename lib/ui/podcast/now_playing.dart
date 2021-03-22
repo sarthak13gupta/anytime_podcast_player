@@ -273,96 +273,89 @@ class NowPlayingHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final audioBloc = Provider.of<AudioBloc>(context, listen: false);
     final placeholderBuilder = PlaceholderBuilder.of(context);
 
-    return StreamBuilder<Episode>(
-        stream: audioBloc.nowPlaying,
-        builder: (context, statesnap) {
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 7,
-                  child: OptimizedCacheImage(
-                    useScaleCacheManager: true,
-                    width: 360,
-                    height: 360,
-                    imageUrl: imageUrl,
-                    placeholder: (context, url) {
-                      return placeholderBuilder != null
-                          ? placeholderBuilder?.builder()(context)
-                          : DelayedCircularProgressIndicator();
-                    },
-                    errorWidget: (_, __, dynamic ___) {
-                      return Container(
-                        constraints: BoxConstraints.expand(),
-                        child: placeholderBuilder != null
-                            ? placeholderBuilder?.errorBuilder()(context)
-                            : Placeholder(
-                                fallbackHeight: 360,
-                                fallbackWidth: 360,
-                                color: Colors.grey,
-                                strokeWidth: 1,
-                              ),
-                      );
-                    },
-                  ),
-                ),
-                Expanded(
-                  flex: 3,
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      top: 16.0,
-                      bottom: 0.0,
-                      left: 16.0,
-                      right: 16.0,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: AutoSizeText(
-                            title ?? '',
-                            group: textGroup,
-                            textAlign: TextAlign.center,
-                            minFontSize: 12.0,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20.0,
-                            ),
-                            maxLines: 3,
-                          ),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 7,
+            child: OptimizedCacheImage(
+              useScaleCacheManager: true,
+              width: 360,
+              height: 360,
+              imageUrl: imageUrl,
+              placeholder: (context, url) {
+                return placeholderBuilder != null ? placeholderBuilder?.builder()(context) : DelayedCircularProgressIndicator();
+              },
+              errorWidget: (_, __, dynamic ___) {
+                return Container(
+                  constraints: BoxConstraints.expand(),
+                  child: placeholderBuilder != null
+                      ? placeholderBuilder?.errorBuilder()(context)
+                      : Placeholder(
+                          fallbackHeight: 360,
+                          fallbackWidth: 360,
+                          color: Colors.grey,
+                          strokeWidth: 1,
                         ),
-                        Expanded(
-                          flex: 1,
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(0.0, 4.0, 0.0, 0.0),
-                            child: AutoSizeText(
-                              subTitle ?? '',
-                              group: textGroup,
-                              minFontSize: 10.0,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontWeight: FontWeight.normal,
-                                fontSize: 16.0,
-                              ),
-                              maxLines: 2,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+                );
+              },
             ),
-          );
-        });
+          ),
+          Expanded(
+            flex: 3,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                top: 16.0,
+                bottom: 0.0,
+                left: 16.0,
+                right: 16.0,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: AutoSizeText(
+                      title ?? '',
+                      group: textGroup,
+                      textAlign: TextAlign.center,
+                      minFontSize: 12.0,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.0,
+                      ),
+                      maxLines: 3,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(0.0, 4.0, 0.0, 0.0),
+                      child: AutoSizeText(
+                        subTitle ?? '',
+                        group: textGroup,
+                        minFontSize: 10.0,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 16.0,
+                        ),
+                        maxLines: 2,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
