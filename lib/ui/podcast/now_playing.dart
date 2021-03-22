@@ -244,7 +244,7 @@ class EpisodeTabBarViewWithChapters extends StatelessWidget {
         StreamBuilder<Episode>(
             stream: audioBloc.chapterEvent,
             builder: (context, snapshot) {
-              final e = snapshot.hasData ? snapshot.data : episode;
+              final e = snapshot.hasData && snapshot.data.guid == episode.guid ? snapshot.data : episode;
               return e.hasChapters
                   ? NowPlayingHeaderWithChapters(
                       imageUrl: e.positionalImageUrl,
