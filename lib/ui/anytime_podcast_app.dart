@@ -319,6 +319,7 @@ class _AnytimeHomePageState extends State<AnytimeHomePage> {
               var selectedItemColor = Theme.of(context).iconTheme.color;
               var unselectedItemColor = HSLColor.fromColor(Theme.of(context).bottomAppBarColor).withLightness(0.85).toColor();
               return BottomNavigationBar(
+                elevation: Theme.of(context).bottomAppBarTheme.elevation,
                 type: BottomNavigationBarType.fixed,
                 backgroundColor: Theme.of(context).bottomAppBarColor,
                 selectedIconTheme: Theme.of(context).iconTheme,
