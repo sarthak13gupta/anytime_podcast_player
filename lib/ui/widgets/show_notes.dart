@@ -29,14 +29,13 @@ class ShowNotes extends StatelessWidget {
       SliverAppBar(
         backwardsCompatibility: false,
         systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarIconBrightness:
-              Theme.of(context).brightness == Brightness.light ? Brightness.dark : Brightness.light,
+          statusBarIconBrightness: Theme.of(context).brightness == Brightness.light ? Brightness.dark : Brightness.light,
           statusBarColor: Colors.transparent,
         ),
         brightness: Theme.of(context).brightness,
         title: Text(episode.podcast),
         floating: false,
-        iconTheme: Theme.of(context).iconTheme.copyWith(color: Theme.of(context).appBarTheme.foregroundColor),
+        iconTheme: Theme.of(context).iconTheme.copyWith(color: Theme.of(context).primaryIconTheme.color),
         pinned: true,
         snap: false,
       ),
