@@ -34,6 +34,7 @@ class ShowNotes extends StatelessWidget {
         ),
         brightness: Theme.of(context).brightness,
         title: Text(episode.podcast),
+        titleTextStyle: Theme.of(context).appBarTheme.titleTextStyle,
         floating: false,
         iconTheme: Theme.of(context).iconTheme.copyWith(color: Theme.of(context).primaryIconTheme.color),
         pinned: true,
