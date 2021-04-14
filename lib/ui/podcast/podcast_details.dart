@@ -316,6 +316,7 @@ class PodcastTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final settings = Provider.of<SettingsBloc>(context).currentSettings;
+    final sharePodcastButtonBuilder = SharePodcastButtonBuilder.of(context);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 0.0),
@@ -344,6 +345,7 @@ class PodcastTitle extends StatelessWidget {
                 SubscriptionButton(podcast, useMaterialDesign: settings.useMaterialDesign),
                 PodcastContextMenu(podcast, useMaterialDesign: settings.useMaterialDesign),
                 settings.showFunding ? FundingMenu(podcast.funding, useMaterialDesign: settings.useMaterialDesign) : Container(),
+                sharePodcastButtonBuilder != null ? sharePodcastButtonBuilder?.builder(podcast.url)(context) : Container(),
               ],
             ),
           )
@@ -455,5 +457,26 @@ class SubscriptionButton extends StatelessWidget {
           }
           return Container();
         });
+  }
+}
+
+class SharePodcastButtonBuilder extends InheritedWidget {
+  final WidgetBuilder Function(String podcastURL) builder;
+
+  SharePodcastButtonBuilder({
+    Key key,
+    @required this.builder,
+    @required Widget child,
+  })  : assert(builder != null),
+        assert(child != null),
+        super(key: key, child: child);
+
+  static SharePodcastButtonBuilder of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<SharePodcastButtonBuilder>();
+  }
+
+  @override
+  bool updateShouldNotify(SharePodcastButtonBuilder oldWidget) {
+    return builder != oldWidget.builder;
   }
 }
