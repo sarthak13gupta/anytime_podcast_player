@@ -213,8 +213,10 @@ class AnytimeHomePage extends StatefulWidget {
   final String noSubscriptionsMessage;
   final bool topBarVisible;
   final bool inlineSearch;
+  final String podcastURL;
 
-  AnytimeHomePage({this.title, this.noSubscriptionsMessage, this.topBarVisible = true, this.inlineSearch = false});
+  AnytimeHomePage(
+      {this.title, this.noSubscriptionsMessage, this.topBarVisible = true, this.inlineSearch = false, this.podcastURL});
 
   @override
   _AnytimeHomePageState createState() => _AnytimeHomePageState();
@@ -228,6 +230,22 @@ class _AnytimeHomePageState extends State<AnytimeHomePage> {
   void initState() {
     super.initState();
     Environment.loadEnvironment();
+  }
+
+  @override
+  void didUpdateWidget(covariant AnytimeHomePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.podcastURL != widget.podcastURL) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.push(
+          context,
+          MaterialPageRoute<void>(builder: (context) =>
+              PodcastDetails(
+                  Podcast.fromUrl(url: widget.podcastURL),
+                  Provider.of<PodcastBloc>(context, listen: false))),
+        );
+      });
+    }
   }
 
   @override
