@@ -26,6 +26,7 @@ import 'package:anytime/services/settings/mobile_settings_service.dart';
 import 'package:anytime/ui/library/discovery.dart';
 import 'package:anytime/ui/library/downloads.dart';
 import 'package:anytime/ui/library/library.dart';
+import 'package:anytime/ui/podcast/now_playing.dart';
 import 'package:anytime/ui/podcast/podcast_details.dart';
 import 'package:anytime/ui/search/search.dart';
 import 'package:anytime/ui/settings/settings.dart';
@@ -214,9 +215,15 @@ class AnytimeHomePage extends StatefulWidget {
   final bool topBarVisible;
   final bool inlineSearch;
   final String podcastURL;
+  final String episodeID;
 
   AnytimeHomePage(
-      {this.title, this.noSubscriptionsMessage, this.topBarVisible = true, this.inlineSearch = false, this.podcastURL});
+      {this.title,
+      this.noSubscriptionsMessage,
+      this.topBarVisible = true,
+      this.inlineSearch = true,
+      this.podcastURL,
+      this.episodeID});
 
   @override
   _AnytimeHomePageState createState() => _AnytimeHomePageState();
@@ -237,13 +244,26 @@ class _AnytimeHomePageState extends State<AnytimeHomePage> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.podcastURL != widget.podcastURL) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.push(
-          context,
-          MaterialPageRoute<void>(builder: (context) =>
-              PodcastDetails(
-                  Podcast.fromUrl(url: widget.podcastURL),
-                  Provider.of<PodcastBloc>(context, listen: false))),
-        );
+        if (widget.episodeID != null) {
+          final audioBloc = Provider.of<AudioBloc>(context, listen: false);
+          var episode =
+              Podcast.fromUrl(url: widget.podcastURL).episodes.firstWhere((episode) => episode.guid == widget.episodeID);
+          audioBloc.play(episode);
+          final settings = Provider.of<SettingsBloc>(context).currentSettings;
+          if (settings.autoOpenNowPlaying) {
+            Navigator.push(
+              context,
+              MaterialPageRoute<void>(builder: (context) => NowPlaying(), fullscreenDialog: false),
+            );
+          }
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute<void>(
+                builder: (context) =>
+                    PodcastDetails(Podcast.fromUrl(url: widget.podcastURL), Provider.of<PodcastBloc>(context, listen: false))),
+          );
+        }
       });
     }
   }
