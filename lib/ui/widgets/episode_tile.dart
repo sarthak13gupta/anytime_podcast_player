@@ -21,11 +21,13 @@ import 'package:provider/provider.dart';
 /// expanded to present addition information about the episode and further
 /// controls.
 class EpisodeTile extends StatelessWidget {
+  final String podcastURL;
   final Episode episode;
   final bool download;
   final bool play;
 
   const EpisodeTile({
+    this.podcastURL,
     @required this.episode,
     @required this.download,
     @required this.play,
@@ -36,6 +38,7 @@ class EpisodeTile extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final bloc = Provider.of<EpisodeBloc>(context);
     final settings = Provider.of<SettingsBloc>(context, listen: false).currentSettings;
+    final shareEpisodeButtonBuilder = ShareEpisodeButtonBuilder.of(context);
 
     return ExpansionTile(
       key: Key('PT${episode.guid}'),
@@ -274,6 +277,7 @@ class EpisodeTile extends StatelessWidget {
                   ),
                 ),
               ),
+              shareEpisodeButtonBuilder != null ? shareEpisodeButtonBuilder?.builder(podcastURL, episode.guid)(context) : Container(),
             ],
           ),
         ),
@@ -370,5 +374,26 @@ class EpisodeSubtitle extends StatelessWidget {
         style: textTheme.caption,
       ),
     );
+  }
+}
+
+class ShareEpisodeButtonBuilder extends InheritedWidget {
+  final WidgetBuilder Function(String podcastURL, String episodeID) builder;
+
+  ShareEpisodeButtonBuilder({
+    Key key,
+    @required this.builder,
+    @required Widget child,
+  })  : assert(builder != null),
+        assert(child != null),
+        super(key: key, child: child);
+
+  static ShareEpisodeButtonBuilder of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<ShareEpisodeButtonBuilder>();
+  }
+
+  @override
+  bool updateShouldNotify(ShareEpisodeButtonBuilder oldWidget) {
+    return builder != oldWidget.builder;
   }
 }

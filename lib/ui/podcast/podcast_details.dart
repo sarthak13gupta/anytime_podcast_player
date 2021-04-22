@@ -247,6 +247,7 @@ class _PodcastDetailsState extends State<PodcastDetails> {
                             delegate: SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
                               return EpisodeTile(
+                                podcastURL: widget.podcast.url,
                                 episode: snapshot.data[index],
                                 download: true,
                                 play: true,
