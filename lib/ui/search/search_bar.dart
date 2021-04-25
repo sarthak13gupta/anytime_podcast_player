@@ -54,10 +54,12 @@ class _SearchBarState extends State<SearchBar> {
           splashColor: _searchFocusNode.hasFocus ? Theme.of(context).splashColor : Colors.transparent,
           highlightColor: _searchFocusNode.hasFocus ? Theme.of(context).highlightColor : Colors.transparent,
           icon: Icon(_searchController.text.isEmpty && !_searchFocusNode.hasFocus ? Icons.search : Icons.clear),
-          onPressed: () {
-            _searchController.clear();
-            FocusScope.of(context).requestFocus(FocusNode());
-          }),
+          onPressed: _searchController.text.isEmpty && !_searchFocusNode.hasFocus
+              ? () => FocusScope.of(context).requestFocus(_searchFocusNode)
+              : () {
+                  _searchController.clear();
+                  FocusScope.of(context).requestFocus(FocusNode());
+                }),
     );
   }
 }
