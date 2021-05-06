@@ -502,7 +502,7 @@ class NowPlayingDetails extends StatelessWidget {
                 fontSize: FontSize.large,
               ),
             },
-            onLinkTap: (url) {
+            onLinkTap: (url, context, attributes, element) {
               canLaunch(url).then((value) => launch(url));
             },
           ),

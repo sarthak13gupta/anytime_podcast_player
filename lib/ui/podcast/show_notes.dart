@@ -29,8 +29,7 @@ class ShowNotes extends StatelessWidget {
       SliverAppBar(
         backwardsCompatibility: false,
         systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarIconBrightness:
-              Theme.of(context).brightness == Brightness.light ? Brightness.dark : Brightness.light,
+          statusBarIconBrightness: Theme.of(context).brightness == Brightness.light ? Brightness.dark : Brightness.light,
           statusBarColor: Colors.transparent,
         ),
         brightness: Theme.of(context).brightness,
@@ -58,7 +57,7 @@ class ShowNotes extends StatelessWidget {
                     fontSize: FontSize.large,
                   ),
                 },
-                onLinkTap: (url) {
+                onLinkTap: (url, context, attributes, element) {
                   canLaunch(url).then((value) => launch(url));
                 },
               ),
