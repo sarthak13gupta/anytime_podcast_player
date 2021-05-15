@@ -247,6 +247,7 @@ class _PodcastDetailsState extends State<PodcastDetails> {
                             delegate: SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
                               return EpisodeTile(
+                                podcastTitle: widget.podcast.title,
                                 podcastURL: widget.podcast.url,
                                 episode: snapshot.data[index],
                                 download: true,
@@ -334,7 +335,7 @@ class PodcastTitle extends StatelessWidget {
                 SubscriptionButton(podcast, useMaterialDesign: settings.useMaterialDesign),
                 PodcastContextMenu(podcast, useMaterialDesign: settings.useMaterialDesign),
                 settings.showFunding ? FundingMenu(podcast.funding, useMaterialDesign: settings.useMaterialDesign) : Container(),
-                sharePodcastButtonBuilder != null ? sharePodcastButtonBuilder?.builder(podcast.url)(context) : Container(),
+                sharePodcastButtonBuilder != null ? sharePodcastButtonBuilder?.builder(podcast.title, podcast.url)(context) : Container(),
               ],
             ),
           )
@@ -454,7 +455,7 @@ class SubscriptionButton extends StatelessWidget {
 }
 
 class SharePodcastButtonBuilder extends InheritedWidget {
-  final WidgetBuilder Function(String podcastURL) builder;
+  final WidgetBuilder Function(String podcastTitle, String podcastURL) builder;
 
   SharePodcastButtonBuilder({
     Key key,
