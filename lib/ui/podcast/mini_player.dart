@@ -161,7 +161,10 @@ class _MiniPlayerBuilderState extends State<_MiniPlayerBuilder> with SingleTicke
                                 return TextButton(
                                   style: TextButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                                    shape: CircleBorder(side: BorderSide(color: Theme.of(context).backgroundColor, width: 0.0)),
+                                    backgroundColor: Theme.of(context).brightness == Brightness.light
+                                        ? Theme.of(context).buttonColor
+                                        : Theme.of(context).bottomAppBarColor,
+                                    shape: CircleBorder(),
                                   ),
                                   onPressed: () {
                                     if (playing) {
