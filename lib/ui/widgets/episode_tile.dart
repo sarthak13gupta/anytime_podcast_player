@@ -21,12 +21,14 @@ import 'package:provider/provider.dart';
 /// expanded to present addition information about the episode and further
 /// controls.
 class EpisodeTile extends StatelessWidget {
+  final String podcastTitle;
   final String podcastURL;
   final Episode episode;
   final bool download;
   final bool play;
 
   const EpisodeTile({
+    this.podcastTitle,
     this.podcastURL,
     @required this.episode,
     @required this.download,
@@ -277,7 +279,7 @@ class EpisodeTile extends StatelessWidget {
                   ),
                 ),
               ),
-              shareEpisodeButtonBuilder != null ? shareEpisodeButtonBuilder?.builder(podcastURL, episode.guid)(context) : Container(),
+              shareEpisodeButtonBuilder != null ? shareEpisodeButtonBuilder?.builder(podcastTitle, podcastURL, episode.title, episode.guid)(context) : Container(),
             ],
           ),
         ),
@@ -378,7 +380,7 @@ class EpisodeSubtitle extends StatelessWidget {
 }
 
 class ShareEpisodeButtonBuilder extends InheritedWidget {
-  final WidgetBuilder Function(String podcastURL, String episodeID) builder;
+  final WidgetBuilder Function(String podcastTitle, String podcastURL, String episodeTitle, String episodeID) builder;
 
   ShareEpisodeButtonBuilder({
     Key key,
