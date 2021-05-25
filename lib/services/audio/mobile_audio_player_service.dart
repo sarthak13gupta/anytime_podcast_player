@@ -256,8 +256,6 @@ class MobileAudioPlayerService extends AudioPlayerService {
       }
     }
 
-    await PersistentState.clearState();
-
     _episodeEvent.sink.add(_episode);
 
     return Future.value(_episode);
@@ -277,6 +275,7 @@ class MobileAudioPlayerService extends AudioPlayerService {
     if (persistedState != null) {
       log.fine(
           ' - Loaded state ${persistedState.state} - for episode ${persistedState.episodeId} - ${persistedState.position}');
+      log.fine(' - Loaded state ${persistedState.state} - for episode ${persistedState.episodeId} - ${persistedState.position}');
       _episode = await repository.findEpisodeById(persistedState.episodeId);
 
       // if (_episode != null && persistedState.lastUpdated.isAfter(_episode?.lastUpdated)) {
@@ -287,7 +286,7 @@ class MobileAudioPlayerService extends AudioPlayerService {
         } else {
           _episode.position = persistedState.position;
 
-          if (persistedState.state == LastState.paused) {
+          if (persistedState.state == LastState.paused || persistedState.state == LastState.playing) {
             _playingState.add(AudioState.pausing);
             updateCurrentPosition(_episode);
           }

@@ -11,9 +11,7 @@ import 'package:path_provider/path_provider.dart';
 
 class PersistentState {
   static Future<void> persistState(Persistable persistable) async {
-    var d = await getApplicationSupportDirectory();
-
-    var file = File(join(d.path, 'state.json'));
+    var file = await _getFile();
     var sink = file.openWrite();
     var json = jsonEncode(persistable.toMap());
 
@@ -23,9 +21,7 @@ class PersistentState {
   }
 
   static Future<Persistable> fetchState() async {
-    var d = await getApplicationSupportDirectory();
-
-    var file = File(join(d.path, 'state.json'));
+    var file = await _getFile();
     var p = Persistable.empty();
 
     if (file.existsSync()) {
@@ -39,14 +35,6 @@ class PersistentState {
     }
 
     return Future.value(p);
-  }
-
-  static Future<void> clearState() async {
-    var file = await _getFile();
-
-    if (file.existsSync()) {
-      return file.delete();
-    }
   }
 
   static Future<void> writeInt(String name, int value) async {
