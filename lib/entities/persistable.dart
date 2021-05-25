@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-enum LastState { none, completed, stopped, paused }
+enum LastState { none, playing, completed, stopped, paused }
 
 /// This class is used to persist information about the currently playing
 /// episode to disk. This allows the background audio service to persist
@@ -65,6 +65,9 @@ class Persistable {
           break;
         case 'LastState.paused':
           state = LastState.paused;
+          break;
+        case 'LastState.playing':
+          state = LastState.playing;
           break;
       }
     }
