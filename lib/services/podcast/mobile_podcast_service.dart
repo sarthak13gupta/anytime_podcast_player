@@ -62,6 +62,9 @@ class MobilePodcastService extends PodcastService {
     return api.charts(size);
   }
 
+  @override
+  Future<psapi.SearchResult> mostRecent() => api.mostRecent();
+
   /// Loads the specified [Podcast]. If the Podcast instance has an ID we'll fetch
   /// it from storage. If not, we'll check the cache to see if we have seen it
   /// recently and return that if available. If not, we'll make a call to load
