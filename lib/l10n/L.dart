@@ -77,6 +77,16 @@ class L {
         );
   }
 
+  String get new_podcasts {
+    return message('new_podcasts') ??
+        Intl.message(
+          'New',
+          name: 'new_podcasts',
+          desc: 'New Podcasts tab label',
+          locale: localeName,
+        );
+  }
+
   String get downloads {
     return message('downloads') ??
         Intl.message(

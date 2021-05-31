@@ -40,6 +40,9 @@ class MobilePodcastApi extends PodcastApi {
   }
 
   @override
+  Future<SearchResult> mostRecent() => _mostRecent();
+
+  @override
   Future<Podcast> loadFeed(String url) async {
     return _loadFeed(url);
   }
@@ -68,6 +71,10 @@ class MobilePodcastApi extends PodcastApi {
 
   static Future<SearchResult> _charts(int size) {
     return Search(userAgent: Environment.userAgent()).charts().timeout(Duration(seconds: 30));
+  }
+
+  static Future<SearchResult> _mostRecent() {
+    return Search(userAgent: Environment.userAgent()).mostRecent().timeout(Duration(seconds: 30));
   }
 
   static Future<Podcast> _loadFeed(String url) {

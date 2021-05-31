@@ -37,6 +37,8 @@ abstract class PodcastService {
     @required int size,
   });
 
+  Future<pcast.SearchResult> mostRecent();
+
   Future<Podcast> loadPodcast({
     @required Podcast podcast,
     bool refresh,

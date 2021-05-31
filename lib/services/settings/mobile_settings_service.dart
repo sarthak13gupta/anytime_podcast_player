@@ -1,4 +1,3 @@
-import 'package:anytime/core/environment.dart';
 import 'package:anytime/entities/app_settings.dart';
 import 'package:anytime/services/settings/settings_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -66,12 +65,7 @@ class MobileSettingsService extends SettingsService {
 
   @override
   String get searchProvider {
-    // If we do not have PodcastIndex key, fallback to iTunes
-    if (podcastIndexKey.isEmpty) {
-      return 'itunes';
-    } else {
-      return _sharedPreferences.getString('search') ?? 'itunes';
-    }
+    return _sharedPreferences.getString('search') ?? 'itunes';
   }
 
   @override
