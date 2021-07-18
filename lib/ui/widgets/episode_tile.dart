@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'package:anytime/bloc/podcast/episode_bloc.dart';
-import 'package:anytime/bloc/settings/settings_bloc.dart';
 import 'package:anytime/entities/episode.dart';
 import 'package:anytime/l10n/L.dart';
 import 'package:anytime/ui/podcast/show_notes.dart';
@@ -39,7 +38,6 @@ class EpisodeTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final bloc = Provider.of<EpisodeBloc>(context);
-    final settings = Provider.of<SettingsBloc>(context, listen: false).currentSettings;
     final shareEpisodeButtonBuilder = ShareEpisodeButtonBuilder.of(context);
 
     return ExpansionTile(
@@ -118,71 +116,37 @@ class EpisodeTile extends StatelessWidget {
                   ),
                   onPressed: episode.downloaded
                       ? () {
-                          if (settings.useMaterialDesign) {
-                            showDialog<void>(
-                              context: context,
-                              useRootNavigator: false,
-                              builder: (_) => AlertDialog(
-                                title: Text(
-                                  L.of(context).delete_episode_title,
-                                ),
-                                content: Text(L.of(context).delete_episode_confirmation),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text(
-                                      L.of(context).cancel_button_label,
-                                      style: TextStyle(color: Theme.of(context).primaryColor),
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      bloc.deleteDownload(episode);
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text(
-                                      L.of(context).delete_button_label,
-                                      style: TextStyle(color: Theme.of(context).primaryColor),
-                                    ),
-                                  ),
-                                ],
+                          showDialog<void>(
+                            context: context,
+                            useRootNavigator: false,
+                            builder: (_) => BasicDialogAlert(
+                              title: Text(
+                                L.of(context).delete_episode_title,
                               ),
-                            );
-                          } else {
-                            showDialog<void>(
-                              context: context,
-                              useRootNavigator: false,
-                              builder: (_) => BasicDialogAlert(
-                                title: Text(
-                                  L.of(context).delete_episode_title,
+                              content: Text(L.of(context).delete_episode_confirmation),
+                              actions: <Widget>[
+                                BasicDialogAction(
+                                  title: Text(
+                                    L.of(context).cancel_button_label,
+                                    style: TextStyle(color: Theme.of(context).primaryColor),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
                                 ),
-                                content: Text(L.of(context).delete_episode_confirmation),
-                                actions: <Widget>[
-                                  BasicDialogAction(
-                                    title: Text(
-                                      L.of(context).cancel_button_label,
-                                      style: TextStyle(color: Theme.of(context).primaryColor),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
+                                BasicDialogAction(
+                                  title: Text(
+                                    L.of(context).delete_button_label,
+                                    style: TextStyle(color: Theme.of(context).primaryColor),
                                   ),
-                                  BasicDialogAction(
-                                    title: Text(
-                                      L.of(context).delete_button_label,
-                                      style: TextStyle(color: Theme.of(context).primaryColor),
-                                    ),
-                                    onPressed: () {
-                                      bloc.deleteDownload(episode);
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
+                                  onPressed: () {
+                                    bloc.deleteDownload(episode);
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
                         }
                       : null,
                   child: Column(

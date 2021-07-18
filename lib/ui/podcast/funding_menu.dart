@@ -21,16 +21,11 @@ import 'package:url_launcher/url_launcher.dart';
 /// The target platform is based on the current [Theme]: [ThemeData.platform].
 class FundingMenu extends StatelessWidget {
   final List<Funding> funding;
-  final bool useMaterialDesign;
 
-  FundingMenu(this.funding, {this.useMaterialDesign});
+  FundingMenu(this.funding);
 
   @override
   Widget build(BuildContext context) {
-    if (useMaterialDesign) {
-      return _MaterialFundingMenu(funding);
-    }
-
     var theme = Theme.of(context);
 
     switch (theme.platform) {
@@ -69,9 +64,11 @@ class _MaterialFundingMenu extends StatelessWidget {
               return PopupMenuButton<String>(
                 color: Theme.of(context).dialogBackgroundColor,
                 onSelected: (url) {
-                  FundingLink.fundingLink(url, snapshot.data.externalLinkConsent, context,
-                          useMaterialDesign: snapshot.data.useMaterialDesign)
-                      .then((value) {
+                  FundingLink.fundingLink(
+                    url,
+                    snapshot.data.externalLinkConsent,
+                    context,
+                  ).then((value) {
                     settingsBloc.setExternalLinkConsent(value);
                   });
                 },
@@ -144,7 +141,7 @@ class FundingLink {
   /// requested to open a funding link, present the user with and
   /// information dialog first to make clear that the link is provided
   /// by the podcast owner and not AnyTime.
-  static Future<bool> fundingLink(String url, bool consent, BuildContext context, {bool useMaterialDesign}) async {
+  static Future<bool> fundingLink(String url, bool consent, BuildContext context) async {
     var result = false;
 
     if (consent) {
@@ -154,51 +151,27 @@ class FundingLink {
         canLaunch(url).then((value) => launch(url)),
       );
     } else {
-      result = useMaterialDesign
-          ? await showDialog<bool>(
-              context: context,
-              useRootNavigator: false,
-              builder: (_) => AlertDialog(
-                title: Text(L.of(context).podcast_funding_dialog_header),
-                content: Text(L.of(context).consent_message),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context, false);
-                    },
-                    child: Text(L.of(context).go_back_button_label),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context, true);
-                    },
-                    child: Text(L.of(context).continue_button_label),
-                  ),
-                ],
-              ),
-            )
-          : await showDialog<bool>(
-              context: context,
-              useRootNavigator: false,
-              builder: (_) => BasicDialogAlert(
-                title: Text(L.of(context).podcast_funding_dialog_header),
-                content: Text(L.of(context).consent_message),
-                actions: <Widget>[
-                  BasicDialogAction(
-                    title: Text(L.of(context).go_back_button_label),
-                    onPressed: () {
-                      Navigator.pop(context, false);
-                    },
-                  ),
-                  BasicDialogAction(
-                    title: Text(L.of(context).continue_button_label),
-                    onPressed: () {
-                      Navigator.pop(context, true);
-                    },
-                  ),
-                ],
-              ),
-            );
+      result = await showPlatformDialog<bool>(
+        context: context,
+        builder: (_) => BasicDialogAlert(
+          title: Text(L.of(context).podcast_funding_dialog_header),
+          content: Text(L.of(context).consent_message),
+          actions: <Widget>[
+            BasicDialogAction(
+              title: Text(L.of(context).go_back_button_label),
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+            ),
+            BasicDialogAction(
+              title: Text(L.of(context).continue_button_label),
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+            ),
+          ],
+        ),
+      );
 
       if (result) {
         unawaited(

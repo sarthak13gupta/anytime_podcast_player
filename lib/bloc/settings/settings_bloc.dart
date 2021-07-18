@@ -25,7 +25,6 @@ class SettingsBloc extends Bloc {
   final BehaviorSubject<bool> _externalLinkConsent = BehaviorSubject<bool>();
   final BehaviorSubject<bool> _autoOpenNowPlaying = BehaviorSubject<bool>();
   final BehaviorSubject<bool> _showFunding = BehaviorSubject<bool>();
-  final BehaviorSubject<bool> _useMaterialDesign = BehaviorSubject<bool>();
 
   SettingsBloc(this._settingsService) {
     _init();
@@ -42,7 +41,6 @@ class SettingsBloc extends Bloc {
     var searchProvider = _settingsService.searchProvider;
     var externalLinkConsent = _settingsService.externalLinkConsent;
     var showFunding = _settingsService.showFunding;
-    var useMaterialDesign = _settingsService.useMaterialDesign;
 
     // Add our available search providers.
     var providers = <SearchProvider>[SearchProvider(key: 'itunes', name: 'iTunes')];
@@ -61,7 +59,6 @@ class SettingsBloc extends Bloc {
       externalLinkConsent: externalLinkConsent,
       autoOpenNowPlaying: autoOpenNowPlaying,
       showFunding: showFunding,
-      useMaterialDesign: useMaterialDesign,
     );
 
     _settings.add(s);
@@ -79,7 +76,6 @@ class SettingsBloc extends Bloc {
         externalLinkConsent: externalLinkConsent,
         autoOpenNowPlaying: autoOpenNowPlaying,
         showFunding: showFunding,
-        useMaterialDesign: useMaterialDesign,
       );
 
       _settings.add(s);
@@ -100,7 +96,6 @@ class SettingsBloc extends Bloc {
         externalLinkConsent: externalLinkConsent,
         autoOpenNowPlaying: autoOpenNowPlaying,
         showFunding: showFunding,
-        useMaterialDesign: useMaterialDesign,
       );
 
       _settings.add(s);
@@ -121,7 +116,6 @@ class SettingsBloc extends Bloc {
         externalLinkConsent: externalLinkConsent,
         autoOpenNowPlaying: autoOpenNowPlaying,
         showFunding: showFunding,
-        useMaterialDesign: useMaterialDesign,
       );
 
       _settings.add(s);
@@ -140,7 +134,6 @@ class SettingsBloc extends Bloc {
         externalLinkConsent: externalLinkConsent,
         autoOpenNowPlaying: autoOpenNowPlaying,
         showFunding: showFunding,
-        useMaterialDesign: useMaterialDesign,
       );
 
       _settings.add(s);
@@ -161,7 +154,6 @@ class SettingsBloc extends Bloc {
         externalLinkConsent: externalLinkConsent,
         autoOpenNowPlaying: autoOpen,
         showFunding: showFunding,
-        useMaterialDesign: useMaterialDesign,
       );
 
       _settings.add(s);
@@ -180,7 +172,6 @@ class SettingsBloc extends Bloc {
         externalLinkConsent: externalLinkConsent,
         autoOpenNowPlaying: autoOpenNowPlaying,
         showFunding: show,
-        useMaterialDesign: useMaterialDesign,
       );
 
       _settings.add(s);
@@ -204,7 +195,6 @@ class SettingsBloc extends Bloc {
         externalLinkConsent: externalLinkConsent,
         autoOpenNowPlaying: autoOpenNowPlaying,
         showFunding: showFunding,
-        useMaterialDesign: useMaterialDesign,
       );
 
       _settings.add(s);
@@ -223,7 +213,6 @@ class SettingsBloc extends Bloc {
         externalLinkConsent: consent,
         autoOpenNowPlaying: autoOpenNowPlaying,
         showFunding: showFunding,
-        useMaterialDesign: useMaterialDesign,
       );
 
       _settings.add(s);
@@ -231,28 +220,6 @@ class SettingsBloc extends Bloc {
       // If the setting has not changed, don't bother updating it
       if (consent != externalLinkConsent) {
         _settingsService.externalLinkConsent = consent;
-      }
-    });
-
-    _useMaterialDesign.listen((useMaterial) {
-      s = AppSettings(
-        theme: themeName,
-        markDeletedEpisodesAsPlayed: markDeletedEpisodesAsPlayed,
-        storeDownloadsSDCard: storeDownloadsSDCard,
-        playbackSpeed: playbackSpeed,
-        searchProvider: searchProvider,
-        searchProviders: providers,
-        externalLinkConsent: externalLinkConsent,
-        autoOpenNowPlaying: autoOpenNowPlaying,
-        showFunding: showFunding,
-        useMaterialDesign: useMaterial,
-      );
-
-      _settings.add(s);
-
-      // If the setting has not changed, don't bother updating it
-      if (useMaterial != useMaterialDesign) {
-        _settingsService.useMaterialDesign = useMaterial;
       }
     });
   }
@@ -274,8 +241,6 @@ class SettingsBloc extends Bloc {
   void Function(bool) get setExternalLinkConsent => _externalLinkConsent.add;
 
   void Function(bool) get setShowFunding => _showFunding.add;
-
-  void Function(bool) get useMaterialDesign => _useMaterialDesign.add;
 
   AppSettings get currentSettings => _settings.value;
 

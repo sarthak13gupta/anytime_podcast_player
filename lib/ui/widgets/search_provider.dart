@@ -39,7 +39,6 @@ class _SearchProviderWidgetState extends State<SearchProviderWidget> {
                       onTap: () {
                         showDialog<void>(
                           context: context,
-                          useRootNavigator: false,
                           builder: (BuildContext context) {
                             return AlertDialog(
                                 title: Text(L.of(context).search_provider_label),
