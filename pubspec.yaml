@@ -8,16 +8,16 @@ environment:
 
 dependencies:
   auto_size_text: ^3.0.0
-  audio_service: ^0.18.3
-  audio_session: ^0.1.6+1
+  audio_service: ^0.18.2
+  audio_session: ^0.1.6
   connectivity_plus: ^2.1.0
   cupertino_icons: ^1.0.4
   device_info_plus: ^3.2.0
   extended_image: ^6.0.1
-  file_picker: ^4.3.0
+  file_picker: ^4.2.7
   flutter_dialogs: ^2.1.1
   flutter_downloader: 1.7.1
-  flutter_html: ^3.0.0-alpha.1
+  flutter_html: ^2.2.1
   flutter_launcher_icons: ^0.9.2
   flutter_spinkit: ^5.1.0
   html: ^0.15.0
@@ -35,7 +35,7 @@ dependencies:
   shared_preferences: ^2.0.11
   url_launcher: ^6.0.17
   xml: ^5.3.1
-  flutter_svg: ^1.0.0
+  flutter_svg: ^0.23.0+1
 
   flutter:
     sdk: flutter
@@ -48,6 +48,7 @@ dev_dependencies:
       url: https://github.com/breez/podcast_search.git
       ref: e5edaea
   mockito: ^5.0.16
+  pedantic: ^1.11.1
   lints: ^1.0.1
   flutter_test:
     sdk: flutter
