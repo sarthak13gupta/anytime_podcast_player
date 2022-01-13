@@ -13,8 +13,11 @@ class L {
 
   static Future<L> load(Locale locale, Map<String, Map<String, String>> overrides) {
     final name = locale.countryCode.isEmpty ? locale.languageCode : locale.toString();
-    final localeName = Intl.canonicalizedLocale(name);
-
+    String localeName = Intl.canonicalizedLocale(name);
+    final List<String> supportedLocales = ['en', 'de', 'pt'];
+    if(!supportedLocales.contains(localeName)){
+      localeName = 'en_US';
+    }
     return initializeMessages(localeName).then((_) {
       return L(localeName, overrides);
     });
