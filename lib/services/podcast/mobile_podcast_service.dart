@@ -389,6 +389,7 @@ class MobilePodcastService extends PodcastService {
   /// Remove HTML padding from the content. The padding may look fine within
   /// the context of a browser, but can look out of place on a mobile screen.
   String _format(String input) {
+    if (input == null) return "";
     input = input.replaceAll('\n', '').trim() ?? '';
 
     return input.replaceAll(descriptionRegExp2, '')..replaceAll(descriptionRegExp1, '</p>');
