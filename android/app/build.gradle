@@ -39,10 +39,6 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 android {
     compileSdkVersion 33
 
-    lintOptions {
-        disable 'InvalidPackage'
-        abortOnError false
-    }
 
     defaultConfig {
         applicationId "uk.me.amugofjava.anytime"
@@ -70,6 +66,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt')
         }
     }
+    lint {
+        abortOnError false
+        disable 'InvalidPackage'
+    }
 }
 
 flutter {
@@ -78,7 +78,7 @@ flutter {
 
 dependencies {
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
