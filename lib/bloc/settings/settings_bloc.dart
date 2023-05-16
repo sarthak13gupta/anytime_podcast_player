@@ -14,20 +14,20 @@ import 'package:rxdart/rxdart.dart';
 //       maintainable or efficient.
 class SettingsBloc extends Bloc {
   final log = Logger('SettingsBloc');
-  final SettingsService _settingsService;
+  final SettingsService? _settingsService;
 
   final BehaviorSubject<AppSettings> _settings = BehaviorSubject<AppSettings>.seeded(AppSettings.sensibleDefaults());
   final BehaviorSubject<bool> _darkMode = BehaviorSubject<bool>();
   final BehaviorSubject<bool> _markDeletedAsPlayed = BehaviorSubject<bool>();
   final BehaviorSubject<bool> _storeDownloadonSDCard = BehaviorSubject<bool>();
   final BehaviorSubject<double> _playbackSpeed = BehaviorSubject<double>();
-  final BehaviorSubject<String> _searchProvider = BehaviorSubject<String>();
+  final BehaviorSubject<String?> _searchProvider = BehaviorSubject<String?>();
   final BehaviorSubject<bool> _externalLinkConsent = BehaviorSubject<bool>();
   final BehaviorSubject<bool> _autoOpenNowPlaying = BehaviorSubject<bool>();
   final BehaviorSubject<bool> _showFunding = BehaviorSubject<bool>();
   final BehaviorSubject<bool> _trimSilence = BehaviorSubject<bool>();
   final BehaviorSubject<bool> _volumeBoost = BehaviorSubject<bool>();
-  final BehaviorSubject<int> _autoUpdatePeriod = BehaviorSubject<int>();
+  final BehaviorSubject<int?> _autoUpdatePeriod = BehaviorSubject<int?>();
   final BehaviorSubject<int> _layoutMode = BehaviorSubject<int>();
 
   SettingsBloc(this._settingsService) {
@@ -36,19 +36,19 @@ class SettingsBloc extends Bloc {
 
   void _init() {
     /// Load all settings
-    var themeDarkMode = _settingsService.themeDarkMode;
-    var markDeletedEpisodesAsPlayed = _settingsService.markDeletedEpisodesAsPlayed;
-    var storeDownloadsSDCard = _settingsService.storeDownloadsSDCard;
-    var playbackSpeed = _settingsService.playbackSpeed;
-    var autoOpenNowPlaying = _settingsService.autoOpenNowPlaying;
+    var themeDarkMode = _settingsService!.themeDarkMode;
+    var markDeletedEpisodesAsPlayed = _settingsService!.markDeletedEpisodesAsPlayed;
+    var storeDownloadsSDCard = _settingsService!.storeDownloadsSDCard;
+    var playbackSpeed = _settingsService!.playbackSpeed;
+    var autoOpenNowPlaying = _settingsService!.autoOpenNowPlaying;
     var themeName = themeDarkMode ? 'dark' : 'light';
-    var searchProvider = _settingsService.searchProvider;
-    var externalLinkConsent = _settingsService.externalLinkConsent;
-    var showFunding = _settingsService.showFunding;
-    var autoUpdateEpisodePeriod = _settingsService.autoUpdateEpisodePeriod;
-    var trimSilence = _settingsService.trimSilence;
-    var volumeBoost = _settingsService.volumeBoost;
-    var layoutMode = _settingsService.layoutMode;
+    String? searchProvider = _settingsService!.searchProvider;
+    var externalLinkConsent = _settingsService!.externalLinkConsent;
+    var showFunding = _settingsService!.showFunding;
+    int? autoUpdateEpisodePeriod = _settingsService!.autoUpdateEpisodePeriod;
+    var trimSilence = _settingsService!.trimSilence;
+    var volumeBoost = _settingsService!.volumeBoost;
+    var layoutMode = _settingsService!.layoutMode;
 
     // Add our available search providers.
     var providers = <SearchProvider>[SearchProvider(key: 'itunes', name: 'iTunes')];
@@ -96,7 +96,7 @@ class SettingsBloc extends Bloc {
 
       _settings.add(s);
 
-      _settingsService.themeDarkMode = darkMode;
+      _settingsService!.themeDarkMode = darkMode;
     });
 
     _markDeletedAsPlayed.listen((bool mark) {
@@ -120,7 +120,7 @@ class SettingsBloc extends Bloc {
 
       _settings.add(s);
 
-      _settingsService.markDeletedEpisodesAsPlayed = mark;
+      _settingsService!.markDeletedEpisodesAsPlayed = mark;
     });
 
     _storeDownloadonSDCard.listen((bool sdcard) {
@@ -144,7 +144,7 @@ class SettingsBloc extends Bloc {
 
       _settings.add(s);
 
-      _settingsService.storeDownloadsSDCard = sdcard;
+      _settingsService!.storeDownloadsSDCard = sdcard;
     });
 
     _playbackSpeed.listen((double speed) {
@@ -168,7 +168,7 @@ class SettingsBloc extends Bloc {
 
       _settings.add(s);
 
-      _settingsService.playbackSpeed = speed;
+      _settingsService!.playbackSpeed = speed;
     });
 
     _autoOpenNowPlaying.listen((bool autoOpen) {
@@ -192,7 +192,7 @@ class SettingsBloc extends Bloc {
 
       _settings.add(s);
 
-      _settingsService.autoOpenNowPlaying = autoOpen;
+      _settingsService!.autoOpenNowPlaying = autoOpen;
     });
 
     _showFunding.listen((show) {
@@ -216,7 +216,7 @@ class SettingsBloc extends Bloc {
 
       // If the setting has not changed, don't bother updating it
       if (show != showFunding) {
-        _settingsService.showFunding = show;
+        _settingsService!.showFunding = show;
       }
 
       showFunding = show;
@@ -243,7 +243,7 @@ class SettingsBloc extends Bloc {
 
       _settings.add(s);
 
-      _settingsService.searchProvider = search;
+      _settingsService!.searchProvider = search;
     });
 
     _externalLinkConsent.listen((consent) {
@@ -267,7 +267,7 @@ class SettingsBloc extends Bloc {
 
       // If the setting has not changed, don't bother updating it
       if (consent != externalLinkConsent) {
-        _settingsService.externalLinkConsent = consent;
+        _settingsService!.externalLinkConsent = consent;
       }
 
       externalLinkConsent = consent;
@@ -294,7 +294,7 @@ class SettingsBloc extends Bloc {
 
       _settings.add(s);
 
-      _settingsService.autoUpdateEpisodePeriod = period;
+      _settingsService!.autoUpdateEpisodePeriod = period;
     });
 
     _externalLinkConsent.listen((consent) {
@@ -318,7 +318,7 @@ class SettingsBloc extends Bloc {
 
       // If the setting has not changed, don't bother updating it
       if (consent != externalLinkConsent) {
-        _settingsService.externalLinkConsent = consent;
+        _settingsService!.externalLinkConsent = consent;
       }
 
       externalLinkConsent = consent;
@@ -345,7 +345,7 @@ class SettingsBloc extends Bloc {
 
       // If the setting has not changed, don't bother updating it
       if (trim != trimSilence) {
-        _settingsService.trimSilence = trim;
+        _settingsService!.trimSilence = trim;
       }
 
       trimSilence = trim;
@@ -372,7 +372,7 @@ class SettingsBloc extends Bloc {
 
       // If the setting has not changed, don't bother updating it
       if (boost != volumeBoost) {
-        _settingsService.volumeBoost = boost;
+        _settingsService!.volumeBoost = boost;
       }
 
       volumeBoost = boost;
@@ -399,7 +399,7 @@ class SettingsBloc extends Bloc {
 
       // If the setting has not changed, don't bother updating it
       if (mode != layoutMode) {
-        _settingsService.layoutMode = mode;
+        _settingsService!.layoutMode = mode;
       }
 
       layoutMode = mode;
@@ -418,13 +418,13 @@ class SettingsBloc extends Bloc {
 
   void Function(bool) get setAutoOpenNowPlaying => _autoOpenNowPlaying.add;
 
-  void Function(String) get setSearchProvider => _searchProvider.add;
+  void Function(String?) get setSearchProvider => _searchProvider.add;
 
   void Function(bool) get setExternalLinkConsent => _externalLinkConsent.add;
 
   void Function(bool) get setShowFunding => _showFunding.add;
 
-  void Function(int) get autoUpdatePeriod => _autoUpdatePeriod.add;
+  void Function(int?) get autoUpdatePeriod => _autoUpdatePeriod.add;
 
   void Function(bool) get trimSilence => _trimSilence.add;
 

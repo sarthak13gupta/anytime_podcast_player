@@ -6,7 +6,7 @@
 class SearchEvent {}
 
 class SearchTermEvent extends SearchEvent {
-  final String term;
+  final String? term;
 
   SearchTermEvent(this.term);
 }

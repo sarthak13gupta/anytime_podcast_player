@@ -10,14 +10,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class DraggableEpisodeTile extends StatelessWidget {
-  final Episode episode;
-  final int index;
+  final Episode? episode;
+  final int? index;
   final bool draggable;
   final bool playable;
 
   const DraggableEpisodeTile({
-    Key key,
-    @required this.episode,
+    Key? key,
+    required this.episode,
     this.index,
     this.draggable = true,
     this.playable = false,
@@ -30,24 +30,24 @@ class DraggableEpisodeTile extends StatelessWidget {
     final audioBloc = Provider.of<AudioBloc>(context, listen: false);
 
     return ListTile(
-      key: Key('DT${episode.guid}'),
+      key: Key('DT${episode!.guid}'),
       enabled: playable,
       leading: TileImage(
-        url: episode.thumbImageUrl ?? episode.imageUrl,
+        url: episode!.thumbImageUrl ?? episode!.imageUrl,
         size: 56.0,
-        highlight: episode.highlight,
+        highlight: episode!.highlight,
       ),
       title: Text(
-        episode.title,
+        episode!.title!,
         overflow: TextOverflow.ellipsis,
         maxLines: 2,
         softWrap: false,
-        style: textTheme.bodyMedium.copyWith(color: theme.iconTheme.color),
+        style: textTheme.bodyMedium!.copyWith(color: theme.iconTheme.color),
       ),
-      subtitle: EpisodeSubtitle(episode, textColor: theme.iconTheme.color),
+      subtitle: EpisodeSubtitle(episode!, textColor: theme.iconTheme.color),
       trailing: draggable
           ? ReorderableDragStartListener(
-              index: index,
+              index: index!,
               child: Icon(Icons.drag_handle, color: theme.iconTheme.color),
             )
           : SizedBox(

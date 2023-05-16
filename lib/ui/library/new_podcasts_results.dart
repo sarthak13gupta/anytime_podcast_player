@@ -12,10 +12,10 @@ import 'package:flutter/material.dart';
 import 'package:podcast_search/podcast_search.dart' as search;
 
 class NewPodcastsResults extends StatelessWidget {
-  final Stream<NewPodcastsState> data;
-  final bool inlineSearch;
+  final Stream<NewPodcastsState>? data;
+  final bool? inlineSearch;
 
-  NewPodcastsResults({@required this.data, this.inlineSearch});
+  NewPodcastsResults({required this.data, this.inlineSearch});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class NewPodcastsResults extends StatelessWidget {
         final state = snapshot.data;
 
         if (state is NewPodcastsPopulatedState) {
-          if (inlineSearch) return PodcastListWithSearchBar(results: state.results as search.SearchResult);
+          if (inlineSearch!) return PodcastListWithSearchBar(results: state.results as search.SearchResult);
           return PodcastList(results: state.results as search.SearchResult);
         } else {
           if (state is NewPodcastsLoadingState) {

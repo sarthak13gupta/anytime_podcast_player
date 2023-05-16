@@ -12,7 +12,7 @@ import 'package:provider/provider.dart';
 ///
 /// The target platform is based on the current [Theme]: [ThemeData.platform].
 class PodcastContextMenu extends StatelessWidget {
-  final Podcast podcast;
+  final Podcast? podcast;
 
   PodcastContextMenu(this.podcast);
 
@@ -30,16 +30,13 @@ class PodcastContextMenu extends StatelessWidget {
       case TargetPlatform.macOS:
         return _CupertinoContextMenu(podcast);
     }
-
-    // Not needed, but stops the linter complaining.
-    return null;
   }
 }
 
 /// This is the material design version of the context menu. This will be rendered
 /// for all platforms that are not iOS.
 class _MaterialPodcastMenu extends StatelessWidget {
-  final Podcast podcast;
+  final Podcast? podcast;
 
   _MaterialPodcastMenu(this.podcast);
 
@@ -63,12 +60,12 @@ class _MaterialPodcastMenu extends StatelessWidget {
               return <PopupMenuEntry<String>>[
                 PopupMenuItem<String>(
                   value: 'ma',
-                  enabled: podcast.subscribed,
+                  enabled: podcast!.subscribed,
                   child: Text(L.of(context).mark_episodes_played_label),
                 ),
                 PopupMenuItem<String>(
                   value: 'ua',
-                  enabled: podcast.subscribed,
+                  enabled: podcast!.subscribed,
                   child: Text(L.of(context).mark_episodes_not_played_label),
                 ),
               ];
@@ -78,8 +75,8 @@ class _MaterialPodcastMenu extends StatelessWidget {
   }
 
   void togglePlayed({
-    @required String value,
-    @required PodcastBloc bloc,
+    required String value,
+    required PodcastBloc bloc,
   }) {
     if (value == 'ma') {
       bloc.podcastEvent(PodcastEvent.markAllPlayed);
@@ -92,7 +89,7 @@ class _MaterialPodcastMenu extends StatelessWidget {
 /// This is the Cupertino context menu and is rendered only when running on
 /// an iOS device.
 class _CupertinoContextMenu extends StatelessWidget {
-  final Podcast podcast;
+  final Podcast? podcast;
 
   _CupertinoContextMenu(this.podcast);
 

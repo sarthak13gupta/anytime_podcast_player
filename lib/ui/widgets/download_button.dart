@@ -7,23 +7,23 @@ import 'package:percent_indicator/percent_indicator.dart';
 
 class DownloadButton extends StatelessWidget {
   final String label;
-  final String title;
+  final String? title;
   final IconData icon;
-  final int percent;
+  final int? percent;
   final VoidCallback onPressed;
 
   const DownloadButton({
-    Key key,
-    @required this.label,
-    @required this.title,
-    @required this.icon,
-    @required this.percent,
-    @required this.onPressed,
+    Key? key,
+    required this.label,
+    required this.title,
+    required this.icon,
+    required this.percent,
+    required this.onPressed,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var progress = percent.toDouble() / 100;
+    var progress = percent!.toDouble() / 100;
 
     return Semantics(
       label: '$label $title',
@@ -32,12 +32,12 @@ class DownloadButton extends StatelessWidget {
         child: CircularPercentIndicator(
           radius: 19.0,
           lineWidth: 1.5,
-          backgroundColor: Theme.of(context).buttonTheme.colorScheme.onPrimary,
-          progressColor: Theme.of(context).buttonTheme.colorScheme.onSecondary,
+          backgroundColor: Theme.of(context).buttonTheme.colorScheme!.onPrimary,
+          progressColor: Theme.of(context).buttonTheme.colorScheme!.onSecondary,
           animation: true,
           animateFromLastPercent: true,
           percent: progress,
-          center: percent > 0
+          center: percent! > 0
               ? Text(
                   '$percent%',
                   style: TextStyle(
@@ -47,7 +47,7 @@ class DownloadButton extends StatelessWidget {
               : Icon(
                   icon,
                   size: 20.0,
-                  color: Theme.of(context).buttonTheme.colorScheme.onPrimary,
+                  color: Theme.of(context).buttonTheme.colorScheme!.onPrimary,
                 ),
         ),
       ),

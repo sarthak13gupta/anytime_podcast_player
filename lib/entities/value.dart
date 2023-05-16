@@ -2,22 +2,21 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/foundation.dart';
 import 'package:podcast_search/podcast_search.dart' as psapi;
 
 /// A class that represents value for value payment information
 /// for a [Podcast] or an [Episode].
 /// Part of the [podcast namespace](https://github.com/Podcastindex-org/podcast-namespace)
 class Value {
-  final String type;
-  final String method;
-  final String suggested;
+  final String? type;
+  final String? method;
+  final String? suggested;
   List<ValueRecipient> recipients;
 
   Value({
-    @required this.type,
-    @required this.method,
-    @required this.suggested,
+    required this.type,
+    required this.method,
+    required this.suggested,
     this.recipients = const <ValueRecipient>[],
   });
 
@@ -26,7 +25,7 @@ class Value {
       'type': type,
       'method': method,
       'suggested': suggested,
-      'recipients': (recipients ?? <ValueRecipient>[]).map((recipient) => recipient.toMap())?.toList(growable: false),
+      'recipients': (recipients).map((recipient) => recipient.toMap()).toList(growable: false),
     };
   }
 
@@ -41,14 +40,14 @@ class Value {
     }
 
     return Value(
-      type: value['type'] as String,
-      method: value['method'] as String,
-      suggested: value['suggested'] as String,
+      type: value['type'] as String?,
+      method: value['method'] as String?,
+      suggested: value['suggested'] as String?,
       recipients: recipients,
     );
   }
 
-  static Value fromPodcastSearchValue(psapi.Value v) {
+  static Value? fromPodcastSearchValue(psapi.Value? v) {
     if (v == null) return null;
 
     List<ValueRecipient> recipients = v.recipients.map((r) =>
@@ -85,18 +84,18 @@ class Value {
 }
 
 class ValueRecipient {
-  final String type;
-  final String address;
-  final String split;
-  final String name;
-  final String customKey;
-  final String customValue;
-  final String fee;
+  final String? type;
+  final String? address;
+  final String? split;
+  final String? name;
+  final String? customKey;
+  final String? customValue;
+  final String? fee;
 
   ValueRecipient({
-    @required this.type,
-    @required this.address,
-    @required this.split,
+    required this.type,
+    required this.address,
+    required this.split,
     this.name,
     this.customKey,
     this.customValue,
@@ -117,13 +116,13 @@ class ValueRecipient {
 
   static ValueRecipient fromMap(Map<String, dynamic> valueRecipient) {
     return ValueRecipient(
-      type: valueRecipient['type'] as String,
-      address: valueRecipient['address'] as String,
-      split: valueRecipient['split'] as String,
-      name: valueRecipient['name'] as String,
-      customKey: valueRecipient['customKey'] as String,
-      customValue: valueRecipient['customValue'] as String,
-      fee: valueRecipient['fee'] as String,
+      type: valueRecipient['type'] as String?,
+      address: valueRecipient['address'] as String?,
+      split: valueRecipient['split'] as String?,
+      name: valueRecipient['name'] as String?,
+      customKey: valueRecipient['customKey'] as String?,
+      customValue: valueRecipient['customValue'] as String?,
+      fee: valueRecipient['fee'] as String?,
     );
   }
 

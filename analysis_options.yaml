@@ -2,6 +2,6 @@ include: package:lints/recommended.yaml
 
 analyzer:
   exclude: [build/**, lib/**/*.g.dart, lib/l10n/**]
-  strong-mode:
-    implicit-casts: false
-    implicit-dynamic: false
+  language:
+    strict-casts: true
+    strict-raw-types: true

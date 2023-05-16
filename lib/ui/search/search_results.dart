@@ -9,19 +9,19 @@ import 'package:flutter/material.dart';
 import 'package:podcast_search/podcast_search.dart' as search;
 
 class SearchResults extends StatelessWidget {
-  final Stream<BlocState> data;
+  final Stream<BlocState<dynamic>>? data;
 
-  SearchResults({@required this.data});
+  SearchResults({required this.data});
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<BlocState>(
+    return StreamBuilder<BlocState<dynamic>>(
       stream: data,
-      builder: (BuildContext context, AsyncSnapshot<BlocState> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<BlocState<dynamic>> snapshot) {
         final state = snapshot.data;
 
         if (state is BlocPopulatedState) {
-          return PodcastList(results: state.results as search.SearchResult);
+          return PodcastList(results: state.results as search.SearchResult?);
         } else {
           if (state is BlocLoadingState) {
             return SliverFillRemaining(

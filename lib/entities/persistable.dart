@@ -11,19 +11,19 @@ enum LastState { none, completed, stopped, paused, playing }
 /// either when bringing it to the foreground or upon next start.
 class Persistable {
   /// The Podcast GUID.
-  String pguid;
+  String? pguid;
 
   /// The episode ID (provided by the DB layer).
-  int episodeId;
+  int? episodeId;
 
   /// The current position in seconds;
-  int position;
+  int? position;
 
   /// The current playback state.
-  LastState state;
+  LastState? state;
 
   /// Date & time episode was last updated.
-  DateTime lastUpdated;
+  DateTime? lastUpdated;
 
   Persistable({
     this.pguid,
@@ -47,12 +47,12 @@ class Persistable {
       'episodeId': episodeId ?? episodeId.toString(),
       'position': position ?? position.toString(),
       'state': state == null ? LastState.none.toString() : state.toString(),
-      'lastUpdated': lastUpdated == null ? DateTime.now().millisecondsSinceEpoch : lastUpdated.millisecondsSinceEpoch,
+      'lastUpdated': lastUpdated == null ? DateTime.now().millisecondsSinceEpoch : lastUpdated!.millisecondsSinceEpoch,
     };
   }
 
   static Persistable fromMap(Map<String, dynamic> persistable) {
-    var stateString = persistable['state'] as String;
+    var stateString = persistable['state'] as String?;
     var state = LastState.none;
 
     if (stateString != null) {
@@ -72,12 +72,12 @@ class Persistable {
       }
     }
 
-    var lastUpdated = persistable['lastUpdated'] as int;
+    var lastUpdated = persistable['lastUpdated'] as int?;
 
     return Persistable(
-      pguid: persistable['pguig'] as String,
-      episodeId: persistable['episodeId'] as int,
-      position: persistable['position'] as int,
+      pguid: persistable['pguig'] as String?,
+      episodeId: persistable['episodeId'] as int?,
+      position: persistable['position'] as int?,
       state: state,
       lastUpdated: lastUpdated == null ? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(lastUpdated),
     );

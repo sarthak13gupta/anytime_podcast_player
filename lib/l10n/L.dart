@@ -17,7 +17,7 @@ import 'package:flutter/widgets.dart';
 class L {
   L(this.localizations, this.overrides);
 
-  static L load(Locale locale, Map<String, Map<String, String>> overrides) {
+  static L load(Locale locale, Map<String, Map<String, String>>? overrides) {
     final localization = localeMap[locale.languageCode] ?? AppLocalizationsEn();
     return L(localization, overrides);
   }
@@ -37,14 +37,14 @@ class L {
       };
 
   final AppLocalizations localizations;
-  Map<String, Map<String, String>> overrides;
+  Map<String, Map<String, String>>? overrides;
 
   /// Message definitions start here
-  String message(String name) {
-    if (overrides == null || overrides.isEmpty || !overrides.containsKey(name)) {
+  String? message(String name) {
+    if (overrides == null || (overrides != null && overrides!.isEmpty) || (overrides != null && !overrides!.containsKey(name))) {
       return null;
     } else {
-      return overrides[name][localizations.localeName] ?? 'Missing translation for $name and locale $localizations';
+      return overrides![name]![localizations.localeName] ?? 'Missing translation for $name and locale $localizations';
     }
   }
 
@@ -338,7 +338,7 @@ class LocalisationsDelegate extends LocalizationsDelegate<L> {
 }
 
 class EmbeddedLocalisationsDelegate extends LocalizationsDelegate<L> {
-  Map<String, Map<String, String>> messages = {};
+  Map<String, Map<String, String>>? messages = {};
 
   EmbeddedLocalisationsDelegate({@required this.messages});
 

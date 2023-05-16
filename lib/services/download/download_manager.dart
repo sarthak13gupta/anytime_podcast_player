@@ -7,8 +7,8 @@ import 'dart:async';
 import 'package:anytime/entities/downloadable.dart';
 
 class DownloadProgress {
-  final String id;
-  final int percentage;
+  final String? id;
+  final int? percentage;
   final DownloadState status;
 
   DownloadProgress(
@@ -19,7 +19,7 @@ class DownloadProgress {
 }
 
 abstract class DownloadManager {
-  Future<String> enqueTask(String url, String downloadPath, String fileName);
+  Future<String?> enqueTask(String? url, String downloadPath, String fileName);
   Stream<DownloadProgress> get downloadProgress;
   void dispose();
 }

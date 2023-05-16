@@ -9,65 +9,64 @@ import 'package:anytime/entities/podcast.dart';
 import 'package:anytime/repository/repository.dart';
 import 'package:anytime/services/settings/settings_service.dart';
 import 'package:anytime/state/episode_state.dart';
-import 'package:meta/meta.dart';
 import 'package:podcast_search/podcast_search.dart' as pcast;
 
 abstract class PodcastService {
-  final PodcastApi api;
+  final PodcastApi? api;
   final Repository repository;
-  final SettingsService settingsService;
+  final SettingsService? settingsService;
 
   PodcastService({
-    @required this.api,
-    @required this.repository,
-    @required this.settingsService,
+    required this.api,
+    required this.repository,
+    required this.settingsService,
   });
 
   Future<pcast.SearchResult> search({
-    @required String term,
-    String country,
-    String attribute,
-    int limit,
-    String language,
+    required String term,
+    String? country,
+    String? attribute,
+    int? limit,
+    String? language,
     int version = 0,
     bool explicit = false,
   });
 
   Future<pcast.SearchResult> charts({
-    @required int size,
-    String genre,
+    required int size,
+    String? genre,
   });
 
-  Future<pcast.SearchResult> mostRecent();
+  Future<pcast.SearchResult?> mostRecent();
 
   List<String> genres();
 
-  Future<Podcast> loadPodcast({
-    @required Podcast podcast,
-    bool highlightNewEpisodes,
-    bool refresh,
+  Future<Podcast?> loadPodcast({
+    required Podcast podcast,
+    bool? highlightNewEpisodes,
+    bool? refresh,
   });
 
-  Future<Podcast> loadPodcastById({
-    @required int id,
+  Future<Podcast?> loadPodcastById({
+    required int id,
   });
 
   Future<List<Episode>> loadDownloads();
   Future<List<Episode>> loadEpisodes();
 
-  Future<List<Chapter>> loadChaptersByUrl({@required String url});
+  Future<List<Chapter>> loadChaptersByUrl({required String? url});
 
   Future<void> deleteDownload(Episode episode);
   Future<void> toggleEpisodePlayed(Episode episode);
   Future<List<Podcast>> subscriptions();
-  Future<Podcast> subscribe(Podcast podcast);
-  Future<void> unsubscribe(Podcast podcast);
-  Future<Podcast> save(Podcast podcast);
+  Future<Podcast?> subscribe(Podcast? podcast);
+  Future<void> unsubscribe(Podcast? podcast);
+  Future<Podcast?> save(Podcast? podcast);
   Future<Episode> saveEpisode(Episode episode);
-  Future<void> saveQueue(List<Episode> episodes);
-  Future<List<Episode>> loadQueue();
+  Future<void> saveQueue(List<Episode?> episodes);
+  Future<List<Episode?>> loadQueue();
 
   /// Event listeners
-  Stream<Podcast> podcastListener;
-  Stream<EpisodeState> episodeListener;
+  Stream<Podcast?>? podcastListener;
+  Stream<EpisodeState>? episodeListener;
 }

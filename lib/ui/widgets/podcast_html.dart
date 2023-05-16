@@ -7,10 +7,10 @@ import 'package:url_launcher/url_launcher.dart';
 /// can cause rendering issues when viewing podcast descriptions on a
 /// mobile device.
 class PodcastHtml extends StatelessWidget {
-  final String content;
+  final String? content;
 
   PodcastHtml({
-    @required this.content,
+    required this.content,
   });
 
   @override
@@ -21,11 +21,11 @@ class PodcastHtml extends StatelessWidget {
       data: content ?? '',
       style: {
         'html': Style(
-          fontWeight: textTheme.bodyLarge.fontWeight,
+          fontWeight: textTheme.bodyLarge!.fontWeight,
         )
       },
       onLinkTap: (url, _, __) =>
-          canLaunchUrl(Uri.parse(url)).then((value) => launchUrl(
+          canLaunchUrl(Uri.parse(url!)).then((value) => launchUrl(
                 Uri.parse(url),
                 mode: LaunchMode.externalApplication,
               )),

@@ -10,21 +10,21 @@ abstract class PodcastApi {
   /// Search for podcasts matching the search criteria. Returns a
   /// [SearchResult] instance.
   Future<SearchResult> search(
-    String term, {
-    String country,
-    String attribute,
-    int limit,
-    String language,
+    String? term, {
+    String? country,
+    String? attribute,
+    int? limit,
+    String? language,
     int version = 0,
     bool explicit = false,
-    String searchProvider,
+    String? searchProvider,
   });
 
   /// Request the top podcast charts from iTunes, and at most [size] records.
   Future<SearchResult> charts({
-    int size,
-    String searchProvider,
-    String genre,
+    int? size,
+    String? searchProvider,
+    String? genre,
   });
 
   List<String> genres(
@@ -32,13 +32,13 @@ abstract class PodcastApi {
   );
 
   /// Request the most recent podcast charts
-  Future<SearchResult> mostRecent();
+  Future<SearchResult?> mostRecent();
 
   /// URL representing the RSS feed for a podcast.
-  Future<Podcast> loadFeed(String url);
+  Future<Podcast> loadFeed(String? url);
 
   /// Load episode chapters via JSON file.
-  Future<Chapters> loadChapters(String url);
+  Future<Chapters> loadChapters(String? url);
 
-  void addClientAuthorityBytes(List<int> certificateAuthorityBytes);
+  void addClientAuthorityBytes(List<int>? certificateAuthorityBytes);
 }

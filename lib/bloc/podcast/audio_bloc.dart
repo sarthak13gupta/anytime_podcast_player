@@ -8,7 +8,6 @@ import 'package:anytime/bloc/bloc.dart';
 import 'package:anytime/entities/episode.dart';
 import 'package:anytime/services/audio/audio_player_service.dart';
 import 'package:anytime/state/sleep_policy.dart';
-import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -32,7 +31,7 @@ class AudioBloc extends Bloc {
   final log = Logger('AudioBloc');
 
   /// Listen for new episode play requests.
-  final BehaviorSubject<Episode> _play = BehaviorSubject<Episode>();
+  final BehaviorSubject<Episode?> _play = BehaviorSubject<Episode?>();
 
   /// Move from one playing state to another such as from paused to play
   final PublishSubject<TransitionState> _transitionPlayingState = PublishSubject<TransitionState>();
@@ -41,7 +40,7 @@ class AudioBloc extends Bloc {
   final PublishSubject<double> _transitionPosition = PublishSubject<double>();
 
   /// Handles persisting data to storage.
-  final AudioPlayerService audioPlayerService;
+  final AudioPlayerService? audioPlayerService;
 
   /// Listens for playback speed change requests.
   final PublishSubject<double> _playbackSpeedSubject = PublishSubject<double>();
@@ -56,7 +55,7 @@ class AudioBloc extends Bloc {
   final Subject<SleepPolicy> _sleepPolicy = BehaviorSubject<SleepPolicy>();
 
   AudioBloc({
-    @required this.audioPlayerService,
+    required this.audioPlayerService,
   }) {
     /// Listen for transition events from the client.
     _handlePlayingStateTransitions();
@@ -90,21 +89,21 @@ class AudioBloc extends Bloc {
     _transitionPlayingState.asyncMap((event) => Future.value(event)).listen((state) async {
       switch (state) {
         case TransitionState.play:
-          await audioPlayerService.play();
+          await audioPlayerService!.play();
           break;
         case TransitionState.pause:
           _turnSleepPolicyOff();
-          await audioPlayerService.pause();
+          await audioPlayerService!.pause();
           break;
         case TransitionState.fastforward:
-          await audioPlayerService.fastForward();
+          await audioPlayerService!.fastForward();
           break;
         case TransitionState.rewind:
-          await audioPlayerService.rewind();
+          await audioPlayerService!.rewind();
           break;
         case TransitionState.stop:
           _turnSleepPolicyOff();
-          await audioPlayerService.stop();
+          await audioPlayerService!.stop();
           break;
       }
     });
@@ -115,40 +114,40 @@ class AudioBloc extends Bloc {
   void _handleEpisodeRequests() async {
     _play.listen((episode) {
       _turnSleepPolicyOff();
-      audioPlayerService.playEpisode(episode: episode, resume: true);
+      audioPlayerService!.playEpisode(episode: episode, resume: true);
     });
   }
 
   /// Listen for requests to change the position of the current episode.
   void _handlePositionTransitions() async {
     _transitionPosition.listen((pos) async {
-      await audioPlayerService.seek(position: pos.ceil());
+      await audioPlayerService!.seek(position: pos.ceil());
     });
   }
 
   void _handlePlaybackSpeedTransitions() {
     _playbackSpeedSubject.listen((double speed) async {
-      await audioPlayerService.setPlaybackSpeed(speed);
+      await audioPlayerService!.setPlaybackSpeed(speed);
     });
   }
 
   void _handleTrimSilenceTransitions() {
     _trimSilence.listen((bool trim) async {
-      await audioPlayerService.trimSilence(trim);
+      await audioPlayerService!.trimSilence(trim);
     });
   }
 
   void _handleVolumeBoostTransitions() {
     _volumeBoost.listen((bool boost) async {
-      await audioPlayerService.volumeBoost(boost);
+      await audioPlayerService!.volumeBoost(boost);
     });
   }
 
   void _handleSleepPolicyChanges() {
+    StreamSubscription<bool>? endOfEpisodeListener;
     changeSleepPolicy(sleepPolicyOff(true));
     _sleepPolicy.listen((SleepPolicy policy) async {
-      StreamSubscription endOfEpisodeListener;
-      endOfEpisodeListener?.cancel();
+      if (endOfEpisodeListener != null) endOfEpisodeListener!.cancel();
       log.fine('Policy changed to $policy');
       if (policy is SleepPolicyTimer) {
         await Future<void>.delayed(policy.duration).then((_) async {
@@ -158,7 +157,7 @@ class AudioBloc extends Bloc {
           }
         });
       } else if (policy is SleepPolicyEndOfEpisode) {
-        endOfEpisodeListener = episodeCompletedEvent.listen((isCompleted) async {
+        endOfEpisodeListener = episodeCompletedEvent!.listen((isCompleted) async {
           if (isCompleted) {
             final current = await _sleepPolicy.first;
             if (policy == current) {
@@ -179,23 +178,23 @@ class AudioBloc extends Bloc {
   @override
   void pause() async {
     log.fine('Audio lifecycle pause');
-    await audioPlayerService.suspend();
+    await audioPlayerService!.suspend();
   }
 
   @override
   void resume() async {
     log.fine('Audio lifecycle resume');
-    var ep = await audioPlayerService.resume();
+    var ep = await audioPlayerService!.resume();
 
     if (ep != null) {
-      log.fine('Resuming with episode ${ep?.title} - ${ep?.position} - ${ep?.played}');
+      log.fine('Resuming with episode ${ep.title} - ${ep.position} - ${ep.played}');
     } else {
       log.fine('Resuming without an episode');
     }
   }
 
   /// Play the specified track now
-  void Function(Episode) get play => _play.add;
+  void Function(Episode?) get play => _play.add;
 
   /// Transition the state from connecting, to play, pause, stop etc.
   void Function(TransitionState) get transitionState => _transitionPlayingState.add;
@@ -204,19 +203,19 @@ class AudioBloc extends Bloc {
   void Function(double) get transitionPosition => _transitionPosition.sink.add;
 
   /// Get the current playing state
-  Stream<AudioState> get playingState => audioPlayerService.playingState;
+  Stream<AudioState>? get playingState => audioPlayerService!.playingState;
 
   /// Listen for any playback errors
-  Stream<int> get playbackError => audioPlayerService.playbackError;
+  Stream<int>? get playbackError => audioPlayerService!.playbackError;
 
   /// Get the current playing episode
-  Stream<Episode> get nowPlaying => audioPlayerService.episodeEvent;
+  Stream<Episode?>? get nowPlaying => audioPlayerService!.episodeEvent;
 
   /// Get position and percentage played of playing episode
-  Stream<PositionState> get playPosition => audioPlayerService.playPosition;
+  Stream<PositionState>? get playPosition => audioPlayerService!.playPosition;
 
   /// Listen for end of episode
-  Stream<bool> get episodeCompletedEvent => audioPlayerService.episodeCompletedEvent;
+  Stream<bool>? get episodeCompletedEvent => audioPlayerService!.episodeCompletedEvent;
 
   /// Change playback speed
   void Function(double) get playbackSpeed => _playbackSpeedSubject.sink.add;

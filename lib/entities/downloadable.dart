@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/foundation.dart';
-
 enum DownloadState { none, queued, downloading, failed, cancelled, paused, downloaded }
 
 /// A Downloadble is an object that holds information about a podcast episode
@@ -13,32 +11,32 @@ enum DownloadState { none, queued, downloading, failed, cancelled, paused, downl
 /// if an episode can be played from the filesystem.
 class Downloadable {
   /// Database ID
-  int id;
+  int? id;
 
   /// Unique identifier for the download
-  final String guid;
+  final String? guid;
 
   /// URL of the file to download
-  final String url;
+  final String? url;
 
   /// Destination directory
-  String directory;
+  String? directory;
 
   /// Name of file
-  String filename;
+  String? filename;
 
   /// Current task ID for the download
-  String taskId;
+  String? taskId;
 
   /// Current state of the download
-  DownloadState state;
+  DownloadState? state;
 
   /// Percentage of MP3 downloaded
-  int percentage;
+  int? percentage;
 
   Downloadable({
-    @required this.guid,
-    @required this.url,
+    required this.guid,
+    required this.url,
     this.directory,
     this.filename,
     this.taskId,
@@ -53,46 +51,39 @@ class Downloadable {
       'filename': filename,
       'directory': directory,
       'taskId': taskId,
-      'state': state.index,
+      'state': state!.index,
       'percentage': percentage.toString(),
     };
   }
 
   static Downloadable fromMap(Map<String, dynamic> downloadable) {
     return Downloadable(
-      guid: downloadable['guid'] as String,
-      url: downloadable['url'] as String,
-      directory: downloadable['directory'] as String,
-      filename: downloadable['filename'] as String,
-      taskId: downloadable['taskId'] as String,
-      state: _determineState(downloadable['state'] as int),
+      guid: downloadable['guid'] as String?,
+      url: downloadable['url'] as String?,
+      directory: downloadable['directory'] as String?,
+      filename: downloadable['filename'] as String?,
+      taskId: downloadable['taskId'] as String?,
+      state: _determineState(downloadable['state'] as int?),
       percentage: int.parse(downloadable['percentage'] as String),
     );
   }
 
-  static DownloadState _determineState(int index) {
+  static DownloadState _determineState(int? index) {
     switch (index) {
       case 0:
         return DownloadState.none;
-        break;
       case 1:
         return DownloadState.queued;
-        break;
       case 2:
         return DownloadState.downloading;
-        break;
       case 3:
         return DownloadState.failed;
-        break;
       case 4:
         return DownloadState.cancelled;
-        break;
       case 5:
         return DownloadState.paused;
-        break;
       case 6:
         return DownloadState.downloaded;
-        break;
     }
 
     return DownloadState.none;
@@ -100,7 +91,8 @@ class Downloadable {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is Downloadable && runtimeType == other.runtimeType && guid == other.guid;
+      identical(this, other) ||
+      other is Downloadable && runtimeType == other.runtimeType && guid == other.guid;
 
   @override
   int get hashCode => guid.hashCode;

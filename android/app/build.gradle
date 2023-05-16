@@ -42,11 +42,12 @@ android {
 
     defaultConfig {
         applicationId "uk.me.amugofjava.anytime"
-        minSdkVersion 22
-        targetSdkVersion 31
+        minSdkVersion 28
+        targetSdkVersion 33
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
 
     signingConfigs {

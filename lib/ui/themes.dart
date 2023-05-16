@@ -13,10 +13,10 @@ ThemeData _buildLightTheme() {
 
   return base.copyWith(
     buttonTheme: base.buttonTheme.copyWith(
-        colorScheme: base.buttonTheme.colorScheme.copyWith(
+        colorScheme: base.buttonTheme.colorScheme!.copyWith(
             onPrimary: Colors.orange,
             onSecondary: Color(0xffffe0b2),
-            onSurface: Colors.grey[800].withOpacity(0.5))),
+            onSurface: Colors.grey[800]!.withOpacity(0.5))),
     textButtonTheme: base.textButtonTheme,
     elevatedButtonTheme: base.elevatedButtonTheme,
     outlinedButtonTheme: OutlinedButtonThemeData(
@@ -71,7 +71,7 @@ ThemeData _buildLightTheme() {
     bottomAppBarTheme: BottomAppBarTheme(color: Color(0xffffffff)),
     checkboxTheme: CheckboxThemeData(
       fillColor:
-          MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+          MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
         if (states.contains(MaterialState.disabled)) {
           return null;
         }
@@ -93,7 +93,7 @@ ThemeData _buildLightTheme() {
       ),
     ).copyWith(
       fillColor:
-          MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+          MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
         if (states.contains(MaterialState.disabled)) {
           return null;
         }
@@ -105,7 +105,7 @@ ThemeData _buildLightTheme() {
     ),
     switchTheme: SwitchThemeData(
       thumbColor:
-          MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+          MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
         if (states.contains(MaterialState.disabled)) {
           return null;
         }
@@ -115,7 +115,7 @@ ThemeData _buildLightTheme() {
         return null;
       }),
       trackColor:
-          MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+          MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
         if (states.contains(MaterialState.disabled)) {
           return null;
         }
@@ -190,7 +190,7 @@ ThemeData _buildDarktheme() {
       actionTextColor: Colors.orange,
     ),
     buttonTheme: base.buttonTheme.copyWith(
-        colorScheme: base.buttonTheme.colorScheme
+        colorScheme: base.buttonTheme.colorScheme!
             .copyWith(onSecondary: Colors.orange, onSurface: Colors.grey[800])),
     textButtonTheme: base.textButtonTheme,
     elevatedButtonTheme: base.elevatedButtonTheme,
@@ -205,7 +205,7 @@ ThemeData _buildDarktheme() {
     ),
     checkboxTheme: CheckboxThemeData(
       fillColor:
-          MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+          MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
         if (states.contains(MaterialState.disabled)) {
           return null;
         }
@@ -223,7 +223,7 @@ ThemeData _buildDarktheme() {
       ),
     ).copyWith(
       fillColor:
-          MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+          MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
         if (states.contains(MaterialState.disabled)) {
           return null;
         }
@@ -235,7 +235,7 @@ ThemeData _buildDarktheme() {
     ),
     switchTheme: SwitchThemeData(
       thumbColor:
-          MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+          MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
         if (states.contains(MaterialState.disabled)) {
           return null;
         }
@@ -245,7 +245,7 @@ ThemeData _buildDarktheme() {
         return null;
       }),
       trackColor:
-          MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+          MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
         if (states.contains(MaterialState.disabled)) {
           return null;
         }
@@ -270,7 +270,7 @@ ThemeData _buildDarktheme() {
 class Themes {
   final ThemeData themeData;
 
-  Themes({@required this.themeData});
+  Themes({required this.themeData});
 
   factory Themes.lightTheme() {
     return Themes(themeData: _lightTheme);

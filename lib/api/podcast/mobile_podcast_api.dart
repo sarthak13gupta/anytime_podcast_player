@@ -13,19 +13,19 @@ import 'package:podcast_search/podcast_search.dart';
 /// interacts with the iTunes/PodcastIndex search API via the
 /// podcast_search package.
 class MobilePodcastApi extends PodcastApi {
-  SecurityContext _defaultSecurityContext;
-  List<int> _certificateAuthorityBytes = [];
+  SecurityContext? _defaultSecurityContext;
+  List<int>? _certificateAuthorityBytes = [];
 
   @override
   Future<SearchResult> search(
-    String term, {
-    String country,
-    String attribute,
-    int limit,
-    String language,
+    String? term, {
+    String? country,
+    String? attribute,
+    int? limit,
+    String? language,
     int version = 0,
     bool explicit = false,
-    String searchProvider,
+    String? searchProvider,
   }) async {
     var searchParams = {
       'term': term,
@@ -37,9 +37,9 @@ class MobilePodcastApi extends PodcastApi {
 
   @override
   Future<SearchResult> charts({
-    int size = 20,
-    String genre,
-    String searchProvider,
+    int? size = 20,
+    String? genre,
+    String? searchProvider,
   }) async {
     var searchParams = {
       'size': size.toString(),
@@ -66,20 +66,20 @@ class MobilePodcastApi extends PodcastApi {
   }
 
   @override
-  Future<SearchResult> mostRecent() => _mostRecent();
+  Future<SearchResult?> mostRecent() => _mostRecent();
 
   @override
-  Future<Podcast> loadFeed(String url) async {
-    return _loadFeed(url);
+  Future<Podcast> loadFeed(String? url) async {
+    return _loadFeed(url!);
   }
 
   @override
-  Future<Chapters> loadChapters(String url) async {
-    return Podcast.loadChaptersByUrl(url: url);
+  Future<Chapters> loadChapters(String? url) async {
+    return Podcast.loadChaptersByUrl(url: url!);
   }
 
-  static Future<SearchResult> _search(Map<String, String> searchParams) {
-    var term = searchParams['term'];
+  static Future<SearchResult> _search(Map<String, String?> searchParams) {
+    var term = searchParams['term']!;
     var provider = searchParams['searchProvider'] == 'itunes'
         ? ITunesProvider()
         : PodcastIndexProvider(
@@ -92,7 +92,7 @@ class MobilePodcastApi extends PodcastApi {
         .timeout(Duration(seconds: 30));
   }
 
-  static Future<SearchResult> _charts(Map<String, String> searchParams) {
+  static Future<SearchResult> _charts(Map<String, String?> searchParams) {
     var provider = searchParams['searchProvider'] == 'itunes'
         ? ITunesProvider()
         : PodcastIndexProvider(
@@ -101,7 +101,7 @@ class MobilePodcastApi extends PodcastApi {
           );
 
     return Search(userAgent: Environment.userAgent(), searchProvider: provider)
-        .charts(genre: searchParams['genre'])
+        .charts(genre: searchParams['genre']!)
         .timeout(Duration(seconds: 30));
   }
 
@@ -110,19 +110,19 @@ class MobilePodcastApi extends PodcastApi {
     return Podcast.loadFeed(url: url, userAgent: Environment.userAgent());
   }
 
-  static Future<SearchResult> _mostRecent() {
+  static Future<SearchResult?> _mostRecent() {
     return Search(userAgent: Environment.userAgent()).mostRecent().timeout(Duration(seconds: 30));
   }
 
   void _setupSecurityContext() {
-    if (_certificateAuthorityBytes.isNotEmpty && _defaultSecurityContext == null) {
-      SecurityContext.defaultContext.setTrustedCertificatesBytes(_certificateAuthorityBytes);
+    if (_certificateAuthorityBytes!.isNotEmpty && _defaultSecurityContext == null) {
+      SecurityContext.defaultContext.setTrustedCertificatesBytes(_certificateAuthorityBytes!);
       _defaultSecurityContext = SecurityContext.defaultContext;
     }
   }
 
   @override
-  void addClientAuthorityBytes(List<int> certificateAuthorityBytes) {
+  void addClientAuthorityBytes(List<int>? certificateAuthorityBytes) {
     _certificateAuthorityBytes = certificateAuthorityBytes;
   }
 }

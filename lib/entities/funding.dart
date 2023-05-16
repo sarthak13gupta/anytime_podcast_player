@@ -8,10 +8,10 @@
 /// Part of the [podcast namespace](https://github.com/Podcastindex-org/podcast-namespace)
 class Funding {
   /// The URL to the funding/donation/information page.
-  final String url;
+  final String? url;
 
   /// The label for the link which will be presented to the user.
-  final String value;
+  final String? value;
 
   const Funding({
     this.url,
@@ -27,8 +27,8 @@ class Funding {
 
   static Funding fromMap(Map<String, dynamic> chapter) {
     return Funding(
-      url: chapter['url'] as String,
-      value: chapter['value'] as String,
+      url: chapter['url'] as String?,
+      value: chapter['value'] as String?,
     );
   }
 }

@@ -27,7 +27,7 @@ class PersistentState {
     if (file.existsSync()) {
       var result = file.readAsStringSync();
 
-      if (result != null && result.isNotEmpty) {
+      if (result.isNotEmpty) {
         var data = jsonDecode(result) as Map<String, dynamic>;
 
         p = Persistable.fromMap(data);
@@ -44,7 +44,7 @@ class PersistentState {
   static Future<int> readInt(String name) async {
     var result = await _readValue(name);
 
-    return result == null || result.isEmpty ? 0 : int.parse(result);
+    return result.isEmpty ? 0 : int.parse(result);
   }
 
   static Future<void> writeString(String name, String value) async {
@@ -75,12 +75,13 @@ class PersistentState {
     await sink.close();
   }
 
-  static Future<void> clearState() async {
+  static Future<FileSystemEntity?> clearState() async {
     var file = await _getFile();
 
     if (file.existsSync()) {
-      return file.delete();
+      return await file.delete();
     }
+    return null;
   }
 
   static Future<File> _getFile() async {

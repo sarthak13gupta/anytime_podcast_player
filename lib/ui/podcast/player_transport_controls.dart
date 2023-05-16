@@ -82,13 +82,13 @@ class _PlayerTransportControlsState extends State<PlayerTransportControls> {
 typedef PlayHandler = Function(AudioBloc audioBloc);
 
 class AnimatedPlayButton extends StatefulWidget {
-  final AudioState audioState;
+  final AudioState? audioState;
   final PlayHandler onPlay;
   final PlayHandler onPause;
 
   AnimatedPlayButton({
-    Key key,
-    @required this.audioState,
+    Key? key,
+    required this.audioState,
     this.onPlay = _onPlay,
     this.onPause = _onPause,
   }) : super(key: key);
@@ -107,8 +107,8 @@ void _onPause(AudioBloc audioBloc) {
 
 class _AnimatedPlayButtonState extends State<AnimatedPlayButton>
     with SingleTickerProviderStateMixin {
-  AnimationController _playPauseController;
-  StreamSubscription<AudioState> _audioStateSubscription;
+  late AnimationController _playPauseController;
+  late StreamSubscription<AudioState> _audioStateSubscription;
   bool init = true;
 
   @override
@@ -125,7 +125,7 @@ class _AnimatedPlayButtonState extends State<AnimatedPlayButton>
     /// just set the animation controller to the correct state; for all other
     /// frames we want to animate. Doing it this way prevents the play/pause
     /// button from animating when the form is first loaded.
-    _audioStateSubscription = audioBloc.playingState.listen((event) {
+    _audioStateSubscription = audioBloc.playingState!.listen((event) {
       if (event == AudioState.playing || event == AudioState.buffering) {
         if (init) {
           _playPauseController.value = 1;

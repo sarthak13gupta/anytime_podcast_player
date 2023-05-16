@@ -5,7 +5,6 @@
 import 'package:anytime/bloc/bloc.dart';
 import 'package:anytime/bloc/new_podcasts/new_podcasts_state_event.dart';
 import 'package:anytime/services/podcast/podcast_service.dart';
-import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:podcast_search/podcast_search.dart' as pcast;
 import 'package:rxdart/rxdart.dart';
@@ -20,10 +19,10 @@ class NewPodcastsBloc extends Bloc {
 
   final BehaviorSubject<NewPodcastsEvent> _newPodcastsInput = BehaviorSubject<NewPodcastsEvent>();
 
-  Stream<NewPodcastsState> _newPodcastsResults;
-  pcast.SearchResult _resultsCache;
+  Stream<NewPodcastsState>? _newPodcastsResults;
+  pcast.SearchResult? _resultsCache;
 
-  NewPodcastsBloc({@required this.podcastService}) {
+  NewPodcastsBloc({required this.podcastService}) {
     _init();
   }
 
@@ -35,11 +34,11 @@ class NewPodcastsBloc extends Bloc {
     yield NewPodcastsLoadingState();
 
     if (event is NewPodcastsChartEvent) {
-      if (_resultsCache == null || DateTime.now().difference(_resultsCache.processedTime).inMinutes > cacheMinutes) {
+      if (_resultsCache == null || DateTime.now().difference(_resultsCache!.processedTime).inMinutes > cacheMinutes) {
         _resultsCache = await podcastService.mostRecent();
       }
 
-      yield NewPodcastsPopulatedState<pcast.SearchResult>(_resultsCache);
+      yield NewPodcastsPopulatedState<pcast.SearchResult?>(_resultsCache);
     }
   }
 
@@ -50,5 +49,5 @@ class NewPodcastsBloc extends Bloc {
 
   void Function(NewPodcastsEvent) get getNewPodcasts => _newPodcastsInput.add;
 
-  Stream<NewPodcastsState> get results => _newPodcastsResults;
+  Stream<NewPodcastsState>? get results => _newPodcastsResults;
 }

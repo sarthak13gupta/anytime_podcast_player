@@ -28,7 +28,7 @@ class PlayControl extends StatelessWidget {
   final Episode episode;
 
   PlayControl({
-    @required this.episode,
+    required this.episode,
   });
 
   @override
@@ -37,12 +37,12 @@ class PlayControl extends StatelessWidget {
     final settings = Provider.of<SettingsBloc>(context, listen: false).currentSettings;
 
     return StreamBuilder<PlayerControlState>(
-        stream: Rx.combineLatest2(audioBloc.playingState, audioBloc.nowPlaying,
-            (AudioState audioState, Episode episode) => PlayerControlState(audioState, episode)),
+        stream: Rx.combineLatest2(audioBloc.playingState!, audioBloc.nowPlaying!,
+            (AudioState audioState, Episode? episode) => PlayerControlState(audioState, episode)),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            final audioState = snapshot.data.audioState;
-            final nowPlaying = snapshot.data.episode;
+            final audioState = snapshot.data!.audioState;
+            final nowPlaying = snapshot.data!.episode;
 
             if (episode.downloadState != DownloadState.downloading) {
               // If this episode is the one we are playing, allow the user
@@ -154,7 +154,7 @@ class DownloadControl extends StatelessWidget {
   final Episode episode;
 
   DownloadControl({
-    @required this.episode,
+    required this.episode,
   });
 
   @override
@@ -163,12 +163,12 @@ class DownloadControl extends StatelessWidget {
     final podcastBloc = Provider.of<PodcastBloc>(context);
 
     return StreamBuilder<PlayerControlState>(
-        stream: Rx.combineLatest2(audioBloc.playingState, audioBloc.nowPlaying,
-            (AudioState audioState, Episode episode) => PlayerControlState(audioState, episode)),
+        stream: Rx.combineLatest2(audioBloc.playingState!, audioBloc.nowPlaying!,
+            (AudioState audioState, Episode? episode) => PlayerControlState(audioState, episode)),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            final audioState = snapshot.data.audioState;
-            final nowPlaying = snapshot.data.episode;
+            final audioState = snapshot.data!.audioState;
+            final nowPlaying = snapshot.data!.episode;
 
             if (nowPlaying?.guid == episode.guid &&
                 (audioState == AudioState.playing || audioState == AudioState.buffering)) {
@@ -226,7 +226,7 @@ class DownloadControl extends StatelessWidget {
 
           return DownloadButton(
             onPressed: () async {
-              if (await _resolveDownloadURL(episode.contentUrl)) {
+              if (await _resolveDownloadURL(episode.contentUrl!)) {
                 _showWarningDialog(context, podcastBloc);
               } else {
                 podcastBloc.downloadEpisode(episode);
@@ -329,7 +329,7 @@ class DownloadControl extends StatelessWidget {
 /// downloadables. Saves all that nesting of StreamBuilders.
 class PlayerControlState {
   final AudioState audioState;
-  final Episode episode;
+  final Episode? episode;
 
   PlayerControlState(this.audioState, this.episode);
 }

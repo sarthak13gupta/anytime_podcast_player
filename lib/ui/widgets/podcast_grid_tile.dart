@@ -13,7 +13,7 @@ class PodcastGridTile extends StatelessWidget {
   final Podcast podcast;
 
   const PodcastGridTile({
-    @required this.podcast,
+    required this.podcast,
   });
 
   @override
@@ -47,7 +47,7 @@ class PodcastTitledGridTile extends StatelessWidget {
   final Podcast podcast;
 
   const PodcastTitledGridTile({
-    @required this.podcast,
+    required this.podcast,
   });
 
   @override
@@ -79,7 +79,7 @@ class PodcastTitledGridTile extends StatelessWidget {
                   top: 4.0,
                 ),
                 child: Text(
-                  podcast.title,
+                  podcast.title!,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,

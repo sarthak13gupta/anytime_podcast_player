@@ -48,7 +48,7 @@ class _PodcastDetailsState extends State<PodcastDetails> {
   final ScrollController _sliverScrollController = ScrollController();
   var brightness = Brightness.dark;
   bool toolbarCollapsed = false;
-  SystemUiOverlayStyle _systemOverlayStyle;
+  SystemUiOverlayStyle? _systemOverlayStyle;
 
   @override
   void initState() {
@@ -93,7 +93,7 @@ class _PodcastDetailsState extends State<PodcastDetails> {
         if (_sliverScrollController.offset < 20) {
           widget._podcastBloc.podcastEvent(PodcastEvent.refresh);
         } else {
-          scaffoldMessengerKey.currentState.showSnackBar(SnackBar(
+          scaffoldMessengerKey.currentState!.showSnackBar(SnackBar(
             content: Text(L.of(context).new_episodes_label),
             behavior: SnackBarBehavior.floating,
             action: SnackBarAction(
@@ -120,7 +120,7 @@ class _PodcastDetailsState extends State<PodcastDetails> {
           : Brightness.light,
       statusBarColor: Theme.of(context)
           .appBarTheme
-          .backgroundColor
+          .backgroundColor!
           .withOpacity(toolbarCollapsed ? 1.0 : 0.5),
     );
     super.didChangeDependencies();
@@ -162,7 +162,7 @@ class _PodcastDetailsState extends State<PodcastDetails> {
                 : Brightness.light,
         statusBarColor: Theme.of(context)
             .appBarTheme
-            .backgroundColor
+            .backgroundColor!
             .withOpacity(toolbarCollapsed ? 1.0 : 0.5),
       );
     });
@@ -194,7 +194,7 @@ class _PodcastDetailsState extends State<PodcastDetails> {
                     title: AnimatedOpacity(
                         opacity: toolbarCollapsed ? 1.0 : 0.0,
                         duration: Duration(milliseconds: 500),
-                        child: Text(widget.podcast.title)),
+                        child: Text(widget.podcast.title!)),
                     leading: DecoratedIconButton(
                       icon: Platform.isAndroid
                           ? Icons.close
@@ -227,7 +227,7 @@ class _PodcastDetailsState extends State<PodcastDetails> {
                               stream: podcastBloc.details,
                               builder: (context, snapshot) {
                                 final state = snapshot.data;
-                                var podcast = widget.podcast;
+                                Podcast? podcast = widget.podcast;
 
                                 if (state is BlocLoadingState<Podcast>) {
                                   podcast = state.data;
@@ -309,10 +309,10 @@ class _PodcastDetailsState extends State<PodcastDetails> {
                         ),
                       );
                     }),
-                StreamBuilder<List<Episode>>(
+                StreamBuilder<List<Episode>?>(
                     stream: podcastBloc.episodes,
                     builder: (context, snapshot) {
-                      return snapshot.hasData && snapshot.data.isNotEmpty
+                      return snapshot.hasData && snapshot.data!.isNotEmpty
                           ? PodcastEpisodeList(
                               episodes: snapshot.data,
                               play: true,
@@ -331,19 +331,19 @@ class _PodcastDetailsState extends State<PodcastDetails> {
 
 class PodcastHeaderImage extends StatelessWidget {
   const PodcastHeaderImage({
-    Key key,
-    @required this.podcast,
-    @required this.placeholderBuilder,
+    Key? key,
+    required this.podcast,
+    required this.placeholderBuilder,
   }) : super(key: key);
 
-  final Podcast podcast;
-  final PlaceholderBuilder placeholderBuilder;
+  final Podcast? podcast;
+  final PlaceholderBuilder? placeholderBuilder;
 
   @override
   Widget build(BuildContext context) {
     if (podcast == null ||
-        podcast.imageUrl == null ||
-        podcast.imageUrl.isEmpty) {
+        podcast!.imageUrl == null ||
+        podcast!.imageUrl!.isEmpty) {
       return Container(
         height: 560,
         width: 560,
@@ -351,8 +351,8 @@ class PodcastHeaderImage extends StatelessWidget {
     }
 
     return PodcastBannerImage(
-      key: Key('details${podcast.imageUrl}'),
-      url: podcast.imageUrl,
+      key: Key('details${podcast!.imageUrl}'),
+      url: podcast!.imageUrl,
       fit: BoxFit.cover,
       placeholder: placeholderBuilder != null
           ? placeholderBuilder?.builder()(context)
@@ -366,7 +366,7 @@ class PodcastHeaderImage extends StatelessWidget {
 }
 
 class PodcastTitle extends StatelessWidget {
-  final Podcast podcast;
+  final Podcast? podcast;
 
   PodcastTitle(this.podcast);
 
@@ -384,13 +384,13 @@ class PodcastTitle extends StatelessWidget {
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Text(podcast.title ?? '', style: textTheme.titleLarge),
+            child: Text(podcast!.title ?? '', style: textTheme.titleLarge),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
-            child: Text(podcast.copyright ?? '', style: textTheme.bodySmall),
+            child: Text(podcast!.copyright ?? '', style: textTheme.bodySmall),
           ),
-          PodcastHtml(content: podcast.description),
+          PodcastHtml(content: podcast!.description),
           Padding(
             padding: const EdgeInsets.only(left: 8.0, right: 8.0),
             child: Row(
@@ -399,7 +399,7 @@ class PodcastTitle extends StatelessWidget {
                 SubscriptionButton(podcast),
                 PodcastContextMenu(podcast),
                 settings.showFunding
-                    ? FundingMenu(podcast.funding)
+                    ? FundingMenu(podcast!.funding)
                     : const SizedBox(
                         width: 0.0,
                         height: 0.0,
@@ -411,8 +411,8 @@ class PodcastTitle extends StatelessWidget {
                   ),
                 ),
                 sharePodcastButtonBuilder != null
-                    ? sharePodcastButtonBuilder?.builder(
-                        podcast.title, podcast.url)(context)
+                    ? sharePodcastButtonBuilder.builder(
+                        podcast!.title, podcast!.url)(context)
                     : const SizedBox(
                         width: 0.0,
                         height: 0.0,
@@ -427,7 +427,7 @@ class PodcastTitle extends StatelessWidget {
 }
 
 class SubscriptionButton extends StatelessWidget {
-  final Podcast podcast;
+  final Podcast? podcast;
 
   SubscriptionButton(this.podcast);
 
@@ -442,7 +442,7 @@ class SubscriptionButton extends StatelessWidget {
             final state = snapshot.data;
 
             if (state is BlocPopulatedState<Podcast>) {
-              var p = state.results;
+              var p = state.results!;
 
               return p.subscribed
                   ? OutlinedButton.icon(
@@ -511,17 +511,15 @@ class SubscriptionButton extends StatelessWidget {
 }
 
 class SharePodcastButtonBuilder extends InheritedWidget {
-  final WidgetBuilder Function(String podcastTitle, String podcastURL) builder;
+  final WidgetBuilder Function(String? podcastTitle, String? podcastURL) builder;
 
   SharePodcastButtonBuilder({
-    Key key,
-    @required this.builder,
-    @required Widget child,
-  })  : assert(builder != null),
-        assert(child != null),
-        super(key: key, child: child);
+    Key? key,
+    required this.builder,
+    required Widget child,
+  })  : super(key: key, child: child);
 
-  static SharePodcastButtonBuilder of(BuildContext context) {
+  static SharePodcastButtonBuilder? of(BuildContext context) {
     return context
         .dependOnInheritedWidgetOfExactType<SharePodcastButtonBuilder>();
   }

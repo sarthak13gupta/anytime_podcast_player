@@ -57,7 +57,7 @@ class _SettingsState extends State<Settings> {
                 shape: RoundedRectangleBorder(side: BorderSide.none),
                 title: Text(L.of(context).settings_theme_switch_label),
                 trailing: Switch.adaptive(
-                    value: snapshot.data.theme == 'dark',
+                    value: snapshot.data!.theme == 'dark',
                     onChanged: (value) {
                       settingsBloc.darkMode(value);
                     }),
@@ -66,7 +66,7 @@ class _SettingsState extends State<Settings> {
               ListTile(
                 title: Text(L.of(context).settings_mark_deleted_played_label),
                 trailing: Switch.adaptive(
-                  value: snapshot.data.markDeletedEpisodesAsPlayed,
+                  value: snapshot.data!.markDeletedEpisodesAsPlayed,
                   onChanged: (value) => setState(() => settingsBloc.markDeletedAsPlayed(value)),
                 ),
               ),
@@ -74,7 +74,7 @@ class _SettingsState extends State<Settings> {
                   ? ListTile(
                       title: Text(L.of(context).settings_download_sd_card_label),
                       trailing: Switch.adaptive(
-                        value: snapshot.data.storeDownloadsSDCard,
+                        value: snapshot.data!.storeDownloadsSDCard,
                         onChanged: (value) => sdcard
                             ? setState(() {
                                 if (value) {
@@ -96,7 +96,7 @@ class _SettingsState extends State<Settings> {
               ListTile(
                 title: Text(L.of(context).settings_auto_open_now_playing),
                 trailing: Switch.adaptive(
-                  value: snapshot.data.autoOpenNowPlaying,
+                  value: snapshot.data!.autoOpenNowPlaying,
                   onChanged: (value) => setState(() => settingsBloc.setAutoOpenNowPlaying(value)),
                 ),
               ),
@@ -105,10 +105,10 @@ class _SettingsState extends State<Settings> {
               ListTile(
                 title: Text(L.of(context).settings_import_opml),
                 onTap: () async {
-                  var result = await FilePicker.platform.pickFiles(
+                  var result = (await FilePicker.platform.pickFiles(
                     type: FileType.custom,
                     allowedExtensions: ['opml', 'xml'],
-                  );
+                  ))!;
 
                   if (result.count > 0) {
                     var file = result.files.first;
@@ -187,7 +187,7 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  void _showStorageDialog({@required bool enableExternalStorage}) {
+  void _showStorageDialog({required bool enableExternalStorage}) {
     showDialog<void>(
       context: context,
       useRootNavigator: false,
@@ -221,7 +221,9 @@ class _SettingsState extends State<Settings> {
         return _buildIos(context);
       default:
         assert(false, 'Unexpected platform $defaultTargetPlatform');
-        return null;
+        throw UnsupportedError(
+          'Settings are not supported for this platform.',
+        );
     }
   }
 

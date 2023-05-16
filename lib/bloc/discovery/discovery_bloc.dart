@@ -5,7 +5,6 @@
 import 'package:anytime/bloc/bloc.dart';
 import 'package:anytime/bloc/discovery/discovery_state_event.dart';
 import 'package:anytime/services/podcast/podcast_service.dart';
-import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:podcast_search/podcast_search.dart' as pcast;
 import 'package:rxdart/rxdart.dart';
@@ -21,11 +20,11 @@ class DiscoveryBloc extends Bloc {
   final BehaviorSubject<DiscoveryEvent> _discoveryInput = BehaviorSubject<DiscoveryEvent>();
   final PublishSubject<List<String>> _genres = PublishSubject<List<String>>();
 
-  Stream<DiscoveryState> _discoveryResults;
-  pcast.SearchResult _resultsCache;
+  Stream<DiscoveryState>? _discoveryResults;
+  pcast.SearchResult? _resultsCache;
   String _lastGenre = '';
 
-  DiscoveryBloc({@required this.podcastService}) {
+  DiscoveryBloc({required this.podcastService}) {
     _init();
   }
 
@@ -44,12 +43,12 @@ class DiscoveryBloc extends Bloc {
     if (event is DiscoveryChartEvent) {
       if (_resultsCache == null ||
           event.genre != _lastGenre ||
-          DateTime.now().difference(_resultsCache.processedTime).inMinutes > cacheMinutes) {
+          DateTime.now().difference(_resultsCache!.processedTime).inMinutes > cacheMinutes) {
         _lastGenre = event.genre;
         _resultsCache = await podcastService.charts(size: event.count, genre: event.genre);
       }
 
-      yield DiscoveryPopulatedState<pcast.SearchResult>(_resultsCache);
+      yield DiscoveryPopulatedState<pcast.SearchResult?>(_resultsCache);
     }
   }
 
@@ -60,6 +59,6 @@ class DiscoveryBloc extends Bloc {
 
   void Function(DiscoveryEvent) get discover => _discoveryInput.add;
 
-  Stream<DiscoveryState> get results => _discoveryResults;
+  Stream<DiscoveryState>? get results => _discoveryResults;
   Stream<List<String>> get genres => _genres.stream;
 }

@@ -26,7 +26,7 @@ class MobileDownloaderManager implements DownloadManager {
     _init();
   }
 
-  Future _init() async {
+  Future<void> _init() async {
     log.fine('Initialising download manager');
 
     await FlutterDownloader.initialize();
@@ -50,9 +50,9 @@ class MobileDownloaderManager implements DownloadManager {
     }
 
     _port.listen((dynamic data) {
-      final id = data[0] as String;
-      final status = data[1] as DownloadTaskStatus;
-      final progress = data[2] as int;
+      final id = data[0] as String?;
+      final status = data[1] as DownloadTaskStatus?;
+      final progress = data[2] as int?;
 
       _updateDownloadState(id: id, progress: progress, status: status);
     });
@@ -61,9 +61,9 @@ class MobileDownloaderManager implements DownloadManager {
   }
 
   @override
-  Future<String> enqueTask(String url, String downloadPath, String fileName) async {
+  Future<String?> enqueTask(String? url, String downloadPath, String fileName) async {
     return await FlutterDownloader.enqueue(
-      url: url,
+      url: url!,
       savedDir: downloadPath,
       fileName: fileName,
       showNotification: true,
@@ -78,7 +78,7 @@ class MobileDownloaderManager implements DownloadManager {
     downloadController.close();
   }
 
-  void _updateDownloadState({String id, int progress, DownloadTaskStatus status}) {
+  void _updateDownloadState({String? id, int? progress, DownloadTaskStatus? status}) {
     var state = DownloadState.none;
     var updateTime = DateTime.now().millisecondsSinceEpoch;
 
@@ -109,7 +109,7 @@ class MobileDownloaderManager implements DownloadManager {
   }
 
   static void downloadCallback(String id, DownloadTaskStatus status, int progress) {
-    final send = IsolateNameServer.lookupPortByName('downloader_send_port');
+    final send = IsolateNameServer.lookupPortByName('downloader_send_port')!;
 
     send.send([id, status, progress]);
   }

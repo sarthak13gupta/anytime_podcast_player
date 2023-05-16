@@ -9,9 +9,9 @@ class OPMLNoneState extends OPMLState {}
 class OPMLParsingState extends OPMLState {}
 
 class OPMLLoadingState extends OPMLState {
-  final int current;
-  final int total;
-  final String podcast;
+  final int? current;
+  final int? total;
+  final String? podcast;
 
   OPMLLoadingState({
     this.current,
@@ -27,7 +27,7 @@ class OPMLErrorState extends OPMLState {}
 abstract class OPMLEvent {}
 
 class OPMLImportEvent extends OPMLEvent {
-  final String file;
+  final String? file;
 
   OPMLImportEvent({
     this.file,

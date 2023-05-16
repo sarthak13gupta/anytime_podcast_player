@@ -35,7 +35,7 @@ class _LayoutSelectorWidgetState extends State<LayoutSelectorWidget> {
         stream: settingsBloc.settings,
         initialData: AppSettings.sensibleDefaults(),
         builder: (context, snapshot) {
-          final mode = snapshot.data.layout;
+          final mode = snapshot.data!.layout;
 
           return Column(
             mainAxisSize: MainAxisSize.min,

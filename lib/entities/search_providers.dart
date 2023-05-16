@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/foundation.dart';
 
 /// Anytime can support multiple search providers. This class represents a
 /// provider.
@@ -11,7 +10,7 @@ class SearchProvider {
   final String name;
 
   SearchProvider({
-    @required this.key,
-    @required this.name,
+    required this.key,
+    required this.name,
   });
 }

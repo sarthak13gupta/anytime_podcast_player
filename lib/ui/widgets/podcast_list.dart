@@ -14,34 +14,34 @@ import 'package:provider/provider.dart';
 
 class PodcastList extends StatelessWidget {
   const PodcastList({
-    Key key,
-    @required this.results,
+    Key? key,
+    required this.results,
   }) : super(key: key);
 
-  final search.SearchResult results;
+  final search.SearchResult? results;
 
   @override
   Widget build(BuildContext context) {
     final settingsBloc = Provider.of<SettingsBloc>(context);
 
-    if (results.items.isNotEmpty) {
+    if (results!.items.isNotEmpty) {
       return StreamBuilder<AppSettings>(
           stream: settingsBloc.settings,
           builder: (context, settingsSnapshot) {
             if (settingsSnapshot.hasData) {
-              var mode = settingsSnapshot.data.layout;
+              var mode = settingsSnapshot.data!.layout;
               var size = mode == 1 ? 100.0 : 160.0;
 
               if (mode == 0) {
                 return SliverList(
                     delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    final i = results.items[index];
+                    final i = results!.items[index];
                     final p = Podcast.fromSearchResultItem(i);
 
                     return PodcastTile(podcast: p);
                   },
-                  childCount: results.items.length,
+                  childCount: results!.items.length,
                   addAutomaticKeepAlives: false,
                 ));
               }
@@ -53,12 +53,12 @@ class PodcastList extends StatelessWidget {
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    final i = results.items[index];
+                    final i = results!.items[index];
                     final p = Podcast.fromSearchResultItem(i);
 
                     return PodcastGridTile(podcast: p);
                   },
-                  childCount: results.items.length,
+                  childCount: results!.items.length,
                 ),
               );
             } else {

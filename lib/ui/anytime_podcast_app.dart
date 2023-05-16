@@ -64,14 +64,14 @@ var theme = Themes.lightTheme().themeData;
 // ignore: must_be_immutable
 class AnytimePodcastApp extends StatefulWidget {
   final Repository repository;
-  PodcastApi podcastApi;
-  DownloadService downloadService;
-  PodcastService podcastService;
-  AudioPlayerService audioPlayerService;
-  SettingsBloc settingsBloc;
-  MobileSettingsService mobileSettingsService;
-  OPMLService opmlService;
-  List<int> certificateAuthorityBytes;
+  PodcastApi? podcastApi;
+  DownloadService? downloadService;
+  PodcastService? podcastService;
+  AudioPlayerService? audioPlayerService;
+  SettingsBloc? settingsBloc;
+  MobileSettingsService? mobileSettingsService;
+  OPMLService? opmlService;
+  List<int>? certificateAuthorityBytes;
 
   AnytimePodcastApp(
     this.mobileSettingsService, {
@@ -98,7 +98,7 @@ class AnytimePodcastApp extends StatefulWidget {
       repository: repository,
     );
 
-    podcastApi.addClientAuthorityBytes(certificateAuthorityBytes);
+    podcastApi!.addClientAuthorityBytes(certificateAuthorityBytes);
   }
 
   @override
@@ -107,8 +107,8 @@ class AnytimePodcastApp extends StatefulWidget {
 
 class AnytimePodcastAppState extends State<AnytimePodcastApp>
     with WidgetsBindingObserver {
-  ThemeData theme;
-  AudioBloc audioBloc;
+  ThemeData? theme;
+  late AudioBloc audioBloc;
 
   @override
   void initState() {
@@ -120,7 +120,7 @@ class AnytimePodcastAppState extends State<AnytimePodcastApp>
 
     audioBloc.transitionLifecycleState(LifecyleState.resume);
 
-    widget.settingsBloc.settings.listen((event) {
+    widget.settingsBloc!.settings.listen((event) {
       setState(() {
         var newTheme = event.theme == 'dark'
             ? Themes.darkTheme().themeData
@@ -133,7 +133,7 @@ class AnytimePodcastAppState extends State<AnytimePodcastApp>
       });
     });
 
-    if (widget.mobileSettingsService.themeDarkMode) {
+    if (widget.mobileSettingsService!.themeDarkMode) {
       theme = Themes.darkTheme().themeData;
     } else {
       theme = Themes.lightTheme().themeData;
@@ -221,9 +221,9 @@ class AnytimePodcastAppState extends State<AnytimePodcastApp>
               AudioBloc(audioPlayerService: widget.audioPlayerService),
           dispose: (_, value) => value.dispose(),
         ),
-        Provider<SettingsBloc>(
+        Provider<SettingsBloc?>(
           create: (_) => widget.settingsBloc,
-          dispose: (_, value) => value.dispose(),
+          dispose: (_, value) => value!.dispose(),
         ),
         Provider<OPMLBloc>(
           create: (_) => OPMLBloc(opmlService: widget.opmlService),
@@ -256,8 +256,8 @@ class AnytimePodcastAppState extends State<AnytimePodcastApp>
 }
 
 class AnytimeHomePage extends StatefulWidget {
-  final String title;
-  final String noSubscriptionsMessage;
+  final String? title;
+  final String? noSubscriptionsMessage;
   final bool topBarVisible;
   final bool inlineSearch;
 
@@ -273,10 +273,10 @@ class AnytimeHomePage extends StatefulWidget {
 
 class _AnytimeHomePageState extends State<AnytimeHomePage>
     with WidgetsBindingObserver {
-  StreamSubscription deepLinkSubscription;
+  StreamSubscription<Uri?>? deepLinkSubscription;
   final log = Logger('_AnytimeHomePageState');
   bool handledInitialLink = false;
-  Widget library;
+  Widget? library;
 
   @override
   void initState() {
@@ -298,7 +298,7 @@ class _AnytimeHomePageState extends State<AnytimeHomePage>
   void _setupLinkListener() async {
     /// First, setup a handler to listen for links whilst Anytime is running - a warm start
     deepLinkSubscription = uriLinkStream.listen((uri) async {
-      _handleLinkEvent(uri);
+      _handleLinkEvent(uri!);
     });
 
     /// Handle initial link
@@ -319,7 +319,7 @@ class _AnytimeHomePageState extends State<AnytimeHomePage>
     if (uri.scheme == 'anytime-subscribe' && uri.query.startsWith('uri=')) {
       var path = uri.query.substring(4);
       var loadPodcastBloc = Provider.of<PodcastBloc>(context, listen: false);
-      var routeName = NavigationRouteObserver().top.settings?.name;
+      var routeName = NavigationRouteObserver().top!.settings.name;
 
       /// If we are currently on the podcast details page, we can simply request (via
       /// the BLoC) that we load this new URL. If not, we pop the stack until we are
@@ -333,7 +333,7 @@ class _AnytimeHomePageState extends State<AnytimeHomePage>
       } else {
         /// Pop back to route.
         Navigator.of(context).popUntil((route) {
-          var currentRouteName = NavigationRouteObserver().top.settings.name;
+          var currentRouteName = NavigationRouteObserver().top!.settings.name;
 
           return currentRouteName == null ||
               currentRouteName == '' ||
@@ -518,9 +518,9 @@ class _AnytimeHomePageState extends State<AnytimeHomePage>
               stream: pager.currentPage,
               initialData: 0,
               builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-                var selectedItemColor = Theme.of(context).iconTheme.color;
+                var selectedItemColor = Theme.of(context).iconTheme.color!;
                 var unselectedItemColor = HSLColor.fromColor(
-                        Theme.of(context).bottomAppBarTheme.color)
+                        Theme.of(context).bottomAppBarTheme.color!)
                     .withLightness(0.85)
                     .toColor();
                 return BottomNavigationBar(
@@ -530,10 +530,10 @@ class _AnytimeHomePageState extends State<AnytimeHomePage>
                   selectedIconTheme: Theme.of(context).iconTheme,
                   selectedItemColor: Theme.of(context).iconTheme.color,
                   unselectedItemColor: HSLColor.fromColor(
-                          Theme.of(context).bottomAppBarTheme.color)
+                          Theme.of(context).bottomAppBarTheme.color!)
                       .withLightness(0.85)
                       .toColor(),
-                  currentIndex: snapshot.data,
+                  currentIndex: snapshot.data!,
                   onTap: pager.changePage,
                   items: _buildNavBarItems(unselectedItemColor,
                       selectedItemColor, context, settings),
@@ -544,7 +544,7 @@ class _AnytimeHomePageState extends State<AnytimeHomePage>
     );
   }
 
-  Widget _fragment(int index, String searchProvider) {
+  Widget _fragment(int? index, String? searchProvider) {
     if (index == 0) {
       return Library(noSubscriptionsMessage: widget.noSubscriptionsMessage);
     } else if (index == 1) {
@@ -741,21 +741,21 @@ class _AnytimeHomePageState extends State<AnytimeHomePage>
 }
 
 class TitleWidget extends StatelessWidget {
-  final TextStyle _titleTheme1 = theme.textTheme.bodyMedium.copyWith(
+  final TextStyle _titleTheme1 = theme.textTheme.bodyMedium!.copyWith(
     color: Colors.red,
     fontWeight: FontWeight.bold,
     fontFamily: 'MontserratRegular',
     fontSize: 18,
   );
 
-  final TextStyle _titleTheme2Light = theme.textTheme.bodyMedium.copyWith(
+  final TextStyle _titleTheme2Light = theme.textTheme.bodyMedium!.copyWith(
     color: Colors.black,
     fontWeight: FontWeight.bold,
     fontFamily: 'MontserratRegular',
     fontSize: 18,
   );
 
-  final TextStyle _titleTheme2Dark = theme.textTheme.bodyMedium.copyWith(
+  final TextStyle _titleTheme2Dark = theme.textTheme.bodyMedium!.copyWith(
     color: Colors.white,
     fontWeight: FontWeight.bold,
     fontFamily: 'MontserratRegular',

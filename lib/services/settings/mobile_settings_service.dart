@@ -5,12 +5,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// An implementation [SettingService] for mobile devices backed by
 /// shared preferences.
 class MobileSettingsService extends SettingsService {
-  static SharedPreferences _sharedPreferences;
-  static MobileSettingsService _instance;
+  static late SharedPreferences _sharedPreferences;
+  static MobileSettingsService? _instance;
 
   MobileSettingsService._create();
 
-  static Future<MobileSettingsService> instance() async {
+  static Future<MobileSettingsService?> instance() async {
     if (_instance == null) {
       _instance = MobileSettingsService._create();
 
@@ -59,8 +59,8 @@ class MobileSettingsService extends SettingsService {
   }
 
   @override
-  set searchProvider(String provider) {
-    _sharedPreferences.setString('search', provider);
+  set searchProvider(String? provider) {
+    _sharedPreferences.setString('search', provider!);
   }
 
   @override
@@ -99,8 +99,8 @@ class MobileSettingsService extends SettingsService {
   }
 
   @override
-  set autoUpdateEpisodePeriod(int period) {
-    _sharedPreferences.setInt('autoUpdateEpisodePeriod', period);
+  set autoUpdateEpisodePeriod(int? period) {
+    _sharedPreferences.setInt('autoUpdateEpisodePeriod', period!);
   }
 
   @override
@@ -140,5 +140,5 @@ class MobileSettingsService extends SettingsService {
   }
 
   @override
-  AppSettings settings;
+  AppSettings? settings;
 }

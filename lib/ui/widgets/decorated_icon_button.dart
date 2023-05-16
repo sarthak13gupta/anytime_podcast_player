@@ -7,16 +7,16 @@ import 'package:flutter/material.dart';
 /// wraps an IconButton in a shape so that it can have a background.
 class DecoratedIconButton extends StatelessWidget {
   final Color decorationColour;
-  final Color iconColour;
+  final Color? iconColour;
   final IconData icon;
   final VoidCallback onPressed;
 
   DecoratedIconButton({
-    Key key,
-    @required this.iconColour,
-    @required this.decorationColour,
-    @required this.icon,
-    @required this.onPressed,
+    Key? key,
+    required this.iconColour,
+    required this.decorationColour,
+    required this.icon,
+    required this.onPressed,
   }) : super(key: key);
 
   @override

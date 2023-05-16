@@ -64,7 +64,7 @@ class _SpeedSelectorWidgetState extends State<SpeedSelectorWidget> {
                   width: 36.0,
                   child: Center(
                     child: Text(
-                      snapshot.data.playbackSpeed == 1.0 ? 'x1' : 'x${snapshot.data.playbackSpeed}',
+                      snapshot.data!.playbackSpeed == 1.0 ? 'x1' : 'x${snapshot.data!.playbackSpeed}',
                       style: TextStyle(
                         fontSize: 14.0,
                       ),
@@ -79,7 +79,7 @@ class _SpeedSelectorWidgetState extends State<SpeedSelectorWidget> {
 }
 
 class SpeedSlider extends StatefulWidget {
-  const SpeedSlider({Key key}) : super(key: key);
+  const SpeedSlider({Key? key}) : super(key: key);
 
   @override
   State<SpeedSlider> createState() => _SpeedSliderState();

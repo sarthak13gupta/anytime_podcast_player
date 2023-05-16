@@ -9,7 +9,6 @@ import 'package:anytime/repository/repository.dart';
 import 'package:anytime/services/podcast/opml_service.dart';
 import 'package:anytime/services/podcast/podcast_service.dart';
 import 'package:anytime/state/opml_state.dart';
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
@@ -20,21 +19,21 @@ class MobileOPMLService extends OPMLService {
   final log = Logger('MobileOPMLService');
   var process = false;
 
-  final PodcastService podcastService;
+  final PodcastService? podcastService;
   final Repository repository;
 
   MobileOPMLService({
-    @required this.podcastService,
-    @required this.repository,
+    required this.podcastService,
+    required this.repository,
   });
 
   @override
-  Stream<OPMLState> loadOPMLFile(String file) async* {
+  Stream<OPMLState> loadOPMLFile(String? file) async* {
     yield OPMLParsingState();
 
     process = true;
 
-    final opmlFile = File(file);
+    final opmlFile = File(file!);
     final document = XmlDocument.parse(opmlFile.readAsStringSync());
     final outlines = document.findAllElements('outline');
     final pods = <OmplOutlineTag>[];
@@ -43,7 +42,7 @@ class MobileOPMLService extends OPMLService {
       pods.add(OmplOutlineTag.parse(outline));
     }
 
-    var total = pods?.length ?? 0;
+    var total = pods.length;
     var current = 0;
 
     for (var p in pods) {
@@ -57,12 +56,12 @@ class MobileOPMLService extends OPMLService {
         try {
           log.fine('Importing podcast ${p.xmlUrl}');
 
-          var result = await podcastService.loadPodcast(
+          var result = await podcastService!.loadPodcast(
             podcast: Podcast(guid: '', link: '', title: p.text, url: p.xmlUrl),
             refresh: true,
           );
 
-          await podcastService.subscribe(result);
+          await podcastService!.subscribe(result);
         } on Exception {
           log.fine('Failed to load podcast ${p.xmlUrl}');
         }
@@ -74,7 +73,7 @@ class MobileOPMLService extends OPMLService {
 
   @override
   Stream<OPMLState> saveOPMLFile() async* {
-    var subs = await podcastService.subscriptions();
+    var subs = await podcastService!.subscriptions();
 
     final builder = XmlBuilder();
     builder.processing('xml', 'version="1.0"');
@@ -102,7 +101,7 @@ class MobileOPMLService extends OPMLService {
 
     final export = builder.buildDocument();
 
-    var output = Platform.isAndroid ? await getExternalStorageDirectory() : await getApplicationDocumentsDirectory();
+    var output = Platform.isAndroid ? (await getExternalStorageDirectory())! : await getApplicationDocumentsDirectory();
     var outputFilePath = '${output.path}/anytime_export.opml';
     var file = File(outputFilePath);
 
@@ -123,8 +122,8 @@ class MobileOPMLService extends OPMLService {
 }
 
 class OmplOutlineTag {
-  final String text;
-  final String xmlUrl;
+  final String? text;
+  final String? xmlUrl;
 
   OmplOutlineTag({
     this.text,

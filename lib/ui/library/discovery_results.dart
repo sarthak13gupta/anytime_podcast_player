@@ -15,10 +15,10 @@ import 'package:podcast_search/podcast_search.dart' as search;
 import 'package:provider/provider.dart';
 
 class DiscoveryResults extends StatelessWidget {
-  final Stream<DiscoveryState> data;
-  final bool inlineSearch;
+  final Stream<DiscoveryState>? data;
+  final bool? inlineSearch;
 
-  DiscoveryResults({@required this.data, this.inlineSearch});
+  DiscoveryResults({required this.data, this.inlineSearch});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class DiscoveryResults extends StatelessWidget {
         final state = snapshot.data;
 
         if (state is DiscoveryPopulatedState) {
-          if (inlineSearch) return PodcastListWithSearchBar(results: state.results as search.SearchResult);
+          if (inlineSearch!) return PodcastListWithSearchBar(results: state.results as search.SearchResult);
           return PodcastList(results: state.results as search.SearchResult);
         } else {
           if (state is DiscoveryLoadingState) {
@@ -78,10 +78,10 @@ class DiscoveryResults extends StatelessWidget {
 }
 
 class DiscoveryHeader extends StatefulWidget {
-  final search.SearchResult results;
+  final search.SearchResult? results;
 
   DiscoveryHeader({
-    Key key,
+    Key? key,
     this.results,
   }) : super(key: key);
 
@@ -115,12 +115,12 @@ class _DiscoveryHeaderState extends State<DiscoveryHeader> {
                           height: 2,
                           color: Colors.white,
                         ),
-                        onChanged: (String newValue) {
+                        onChanged: (String? newValue) {
                           setState(() {
                             // dropdownValue = newValue!;
                           });
                         },
-                        items: snapshot.data.map<DropdownMenuItem<String>>((String value) {
+                        items: snapshot.data!.map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(value),

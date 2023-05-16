@@ -36,14 +36,14 @@ class _EpisodesState extends State<Episodes> {
   Widget build(BuildContext context) {
     final bloc = Provider.of<EpisodeBloc>(context);
 
-    return StreamBuilder<BlocState>(
+    return StreamBuilder<BlocState<dynamic>>(
       stream: bloc.episodes,
-      builder: (BuildContext context, AsyncSnapshot<BlocState> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<BlocState<dynamic>> snapshot) {
         final state = snapshot.data;
 
         if (state is BlocPopulatedState) {
           return PodcastEpisodeList(
-            episodes: state.results as List<Episode>,
+            episodes: state.results as List<Episode>?,
             play: true,
             download: true,
             icon: Icons.cloud_download,
@@ -92,7 +92,7 @@ class _EpisodesState extends State<Episodes> {
                 var episode = episodes[index];
 
                 if (snapshot.hasData) {
-                  queued = snapshot.data.queue.any((element) => element.guid == episode.guid);
+                  queued = snapshot.data!.queue.any((element) => element!.guid == episode.guid);
                 }
 
                 return EpisodeTile(

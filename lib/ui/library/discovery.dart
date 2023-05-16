@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class Discovery extends StatefulWidget {
-  final bool inlineSearch;
+  final bool? inlineSearch;
 
   Discovery({this.inlineSearch});
 

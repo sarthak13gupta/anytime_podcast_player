@@ -11,7 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class Search extends StatefulWidget {
-  final String searchTerm;
+  final String? searchTerm;
 
   Search({this.searchTerm});
 
@@ -20,8 +20,8 @@ class Search extends StatefulWidget {
 }
 
 class _SearchState extends State<Search> {
-  TextEditingController _searchController;
-  FocusNode _searchFocusNode;
+  TextEditingController? _searchController;
+  FocusNode? _searchFocusNode;
 
   @override
   void initState() {
@@ -36,14 +36,14 @@ class _SearchState extends State<Search> {
 
     if (widget.searchTerm != null) {
       bloc.search(SearchTermEvent(widget.searchTerm));
-      _searchController.text = widget.searchTerm;
+      _searchController!.text = widget.searchTerm!;
     }
   }
 
   @override
   void dispose() {
-    _searchFocusNode.dispose();
-    _searchController.dispose();
+    _searchFocusNode!.dispose();
+    _searchController!.dispose();
 
     super.dispose();
   }
@@ -94,7 +94,7 @@ class _SearchState extends State<Search> {
                 tooltip: L.of(context).clear_search_button_label,
                 icon: Icon(Icons.clear),
                 onPressed: () {
-                  _searchController.clear();
+                  _searchController!.clear();
                   FocusScope.of(context).requestFocus(_searchFocusNode);
                 },
               ),

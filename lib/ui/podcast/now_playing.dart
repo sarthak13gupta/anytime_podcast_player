@@ -38,11 +38,11 @@ class NowPlaying extends StatefulWidget {
 }
 
 class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
-  StreamSubscription<AudioState> playingStateSubscription;
+  late StreamSubscription<AudioState> playingStateSubscription;
   var textGroup = AutoSizeGroup();
-  double opacity, scrollPos = 0.0;
+  double? opacity, scrollPos = 0.0;
   double baseSize = 48.0;
-  Future<bool> isLoaded;
+  Future<bool>? isLoaded;
   bool isEmbedded = false;
 
   @override
@@ -54,7 +54,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
     var popped = false;
 
     // If the episode finishes we can close.
-    playingStateSubscription = audioBloc.playingState.where((state) => state == AudioState.stopped).listen((playingState) async {
+    playingStateSubscription = audioBloc.playingState!.where((state) => state == AudioState.stopped).listen((playingState) async {
       // Prevent responding to multiple stop events after we've popped and lost context.
       if (!popped) {
         Navigator.pop(context);
@@ -90,15 +90,15 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
     final isLight = Theme.of(context).brightness == Brightness.light;
     final double bottomPadding = MediaQuery.of(context).viewPadding.bottom;
 
-    return StreamBuilder<Episode>(
+    return StreamBuilder<Episode?>(
         stream: audioBloc.nowPlaying,
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Container();
           }
 
-          var duration = snapshot.data == null ? 0 : snapshot.data.duration;
-          final transportBuilder = playerBuilder?.builder(duration);
+          var duration = snapshot.data == null ? 0 : snapshot.data!.duration;
+          final Widget Function(BuildContext)? transportBuilder = playerBuilder?.builder(duration);
           isEmbedded = transportBuilder != null;
           baseSize = isEmbedded ? 24.0 : 48.0;
 
@@ -115,8 +115,8 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
               fit: StackFit.expand,
               children: [
                 DefaultTabController(
-                    length: snapshot.data.hasChapters ? 3 : 2,
-                    initialIndex: snapshot.data.hasChapters ? 1 : 0,
+                    length: snapshot.data!.hasChapters ? 3 : 2,
+                    initialIndex: snapshot.data!.hasChapters ? 1 : 0,
                     child: Scaffold(
                       appBar: AppBar(
                         systemOverlayStyle: SystemUiOverlayStyle(
@@ -142,7 +142,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: <Widget>[
                               EpisodeTabBar(
-                                chapters: snapshot.data.hasChapters,
+                                chapters: snapshot.data!.hasChapters,
                               ),
                             ],
                           ),
@@ -153,11 +153,11 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
                           Expanded(
                             child: EpisodeTabBarView(
                               episode: snapshot.data,
-                              chapters: snapshot.data.hasChapters,
+                              chapters: snapshot.data!.hasChapters,
                             ),
                           ),
                           if (isEmbedded) ...[
-                            transportBuilder(context),
+                            transportBuilder!(context),
                           ],
                           if (!isEmbedded) ...[
                             SizedBox(
@@ -169,11 +169,11 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
                         ],
                       ),
                     )),
-                if (scrollPos > 0)
+                if (scrollPos! > 0)
                   Padding(
                     padding: isEmbedded ? EdgeInsets.only(bottom: bottomPadding + 64) : EdgeInsets.zero,
                     child: Opacity(
-                      opacity: opacity,
+                      opacity: opacity!,
                       child: Column(
                         children: [
                           FloatingPlayer(),
@@ -209,18 +209,16 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
     final texts = L.of(context);
     final double bottomPadding = MediaQuery.of(context).viewPadding.bottom;
 
-    if (scaffoldMessenger != null) {
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating,
-          margin: EdgeInsets.only(bottom: baseSize + (isEmbedded ? bottomPadding + 64.0 : 4.0)),
-          content: Text(
-            policy is SleepPolicyOff ? texts.sleep_episode_function_toggled_off : texts.sleep_episode_function_toggled_on,
-          ),
+    scaffoldMessenger.showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.only(bottom: baseSize + (isEmbedded ? bottomPadding + 64.0 : 4.0)),
+        content: Text(
+          policy is SleepPolicyOff ? texts.sleep_episode_function_toggled_off : texts.sleep_episode_function_toggled_on,
         ),
-      );
-      policy.feedbackGiven = true;
-    }
+      ),
+    );
+    policy.feedbackGiven = true;
   }
 }
 
@@ -230,7 +228,7 @@ class EpisodeTabBar extends StatelessWidget {
   final bool chapters;
 
   const EpisodeTabBar({
-    Key key,
+    Key? key,
     this.chapters = false,
   }) : super(key: key);
 
@@ -269,12 +267,12 @@ class EpisodeTabBar extends StatelessWidget {
 /// the episode supports chapters), the episode details (image and description) and the show
 /// notes view.
 class EpisodeTabBarView extends StatelessWidget {
-  final Episode episode;
-  final AutoSizeGroup textGroup;
+  final Episode? episode;
+  final AutoSizeGroup? textGroup;
   final bool chapters;
 
   EpisodeTabBarView({
-    Key key,
+    Key? key,
     this.episode,
     this.textGroup,
     this.chapters = false,
@@ -288,12 +286,12 @@ class EpisodeTabBarView extends StatelessWidget {
       children: [
         if (chapters)
           ChapterSelector(
-            episode: episode,
+            episode: episode!,
           ),
-        StreamBuilder<Episode>(
+        StreamBuilder<Episode?>(
             stream: audioBloc.nowPlaying,
             builder: (context, snapshot) {
-              final e = snapshot.hasData ? snapshot.data : episode;
+              final e = snapshot.hasData ? snapshot.data! : episode!;
 
               return NowPlayingEpisode(
                 episode: e,
@@ -301,21 +299,21 @@ class EpisodeTabBarView extends StatelessWidget {
                 textGroup: textGroup,
               );
             }),
-        NowPlayingShowNotes(title: episode.title, description: episode.description),
+        NowPlayingShowNotes(title: episode!.title, description: episode!.description),
       ],
     );
   }
 }
 
 class NowPlayingEpisode extends StatelessWidget {
-  final String imageUrl;
+  final String? imageUrl;
   final Episode episode;
-  final AutoSizeGroup textGroup;
+  final AutoSizeGroup? textGroup;
 
   const NowPlayingEpisode({
-    @required this.imageUrl,
-    @required this.episode,
-    @required this.textGroup,
+    required this.imageUrl,
+    required this.episode,
+    required this.textGroup,
   });
 
   @override
@@ -340,10 +338,10 @@ class NowPlayingEpisode extends StatelessWidget {
                         fit: BoxFit.contain,
                         borderRadius: 6.0,
                         placeholder: placeholderBuilder != null
-                            ? placeholderBuilder?.builder()(context)
+                            ? placeholderBuilder.builder()(context)
                             : DelayedCircularProgressIndicator(),
                         errorPlaceholder: placeholderBuilder != null
-                            ? placeholderBuilder?.errorBuilder()(context)
+                            ? placeholderBuilder.errorBuilder()(context)
                             : Image(image: AssetImage('assets/images/anytime-placeholder-logo.png')),
                       ),
                     ),
@@ -369,10 +367,10 @@ class NowPlayingEpisode extends StatelessWidget {
                         fit: BoxFit.contain,
                         borderRadius: 8.0,
                         placeholder: placeholderBuilder != null
-                            ? placeholderBuilder?.builder()(context)
+                            ? placeholderBuilder.builder()(context)
                             : DelayedCircularProgressIndicator(),
                         errorPlaceholder: placeholderBuilder != null
-                            ? placeholderBuilder?.errorBuilder()(context)
+                            ? placeholderBuilder.errorBuilder()(context)
                             : Image(image: AssetImage('assets/images/anytime-placeholder-logo.png')),
                       ),
                     ),
@@ -392,11 +390,11 @@ class NowPlayingEpisode extends StatelessWidget {
 }
 
 class NowPlayingEpisodeDetails extends StatelessWidget {
-  final Episode episode;
-  final AutoSizeGroup textGroup;
+  final Episode? episode;
+  final AutoSizeGroup? textGroup;
 
   const NowPlayingEpisodeDetails({
-    Key key,
+    Key? key,
     this.episode,
     this.textGroup,
   }) : super(key: key);
@@ -422,11 +420,11 @@ class NowPlayingEpisodeDetails extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 fontSize: 20.0,
               ),
-              maxLines: episode.hasChapters ? 4 : 5,
+              maxLines: episode!.hasChapters ? 4 : 5,
             ),
           ),
         ),
-        if (episode.hasChapters)
+        if (episode!.hasChapters)
           Expanded(
             flex: 1,
             child: Padding(
@@ -437,7 +435,7 @@ class NowPlayingEpisodeDetails extends StatelessWidget {
                 children: [
                   Flexible(
                     child: AutoSizeText(
-                      chapterTitle ?? '',
+                      chapterTitle,
                       group: textGroup,
                       minFontSize: 12.0,
                       textAlign: TextAlign.center,
@@ -480,12 +478,12 @@ class NowPlayingEpisodeDetails extends StatelessWidget {
 }
 
 class NowPlayingShowNotes extends StatelessWidget {
-  final String title;
-  final String description;
+  final String? title;
+  final String? description;
 
   const NowPlayingShowNotes({
-    @required this.title,
-    @required this.description,
+    required this.title,
+    required this.description,
   });
 
   @override
@@ -525,14 +523,12 @@ class PlayerControlsBuilder extends InheritedWidget {
   final WidgetBuilder Function(int duration) builder;
 
   PlayerControlsBuilder({
-    Key key,
-    @required this.builder,
-    @required Widget child,
-  })  : assert(builder != null),
-        assert(child != null),
-        super(key: key, child: child);
+    Key? key,
+    required this.builder,
+    required Widget child,
+  })  : super(key: key, child: child);
 
-  static PlayerControlsBuilder of(BuildContext context) {
+  static PlayerControlsBuilder? of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<PlayerControlsBuilder>();
   }
 

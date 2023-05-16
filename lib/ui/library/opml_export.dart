@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 
 class OPMLExport extends StatefulWidget {
   const OPMLExport({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override

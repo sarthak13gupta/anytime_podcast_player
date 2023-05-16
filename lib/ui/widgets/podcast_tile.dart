@@ -13,7 +13,7 @@ class PodcastTile extends StatelessWidget {
   final Podcast podcast;
 
   const PodcastTile({
-    @required this.podcast,
+    required this.podcast,
   });
 
   @override
@@ -38,7 +38,7 @@ class PodcastTile extends StatelessWidget {
         ),
       ),
       title: Text(
-        podcast.title,
+        podcast.title!,
         maxLines: 1,
       ),
       subtitle: Text(

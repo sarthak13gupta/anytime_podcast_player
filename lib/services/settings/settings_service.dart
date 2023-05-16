@@ -1,9 +1,9 @@
 import 'package:anytime/entities/app_settings.dart';
 
 abstract class SettingsService {
-  AppSettings get settings;
+  AppSettings? get settings;
 
-  set settings(AppSettings settings);
+  set settings(AppSettings? settings);
 
   bool get themeDarkMode;
 
@@ -21,7 +21,7 @@ abstract class SettingsService {
 
   double get playbackSpeed;
 
-  set searchProvider(String provider);
+  set searchProvider(String? provider);
 
   String get searchProvider;
 
@@ -37,7 +37,7 @@ abstract class SettingsService {
 
   bool get showFunding;
 
-  set autoUpdateEpisodePeriod(int period);
+  set autoUpdateEpisodePeriod(int? period);
 
   int get autoUpdateEpisodePeriod;
 

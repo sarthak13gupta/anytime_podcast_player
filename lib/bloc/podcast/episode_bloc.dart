@@ -9,7 +9,6 @@ import 'package:anytime/entities/episode.dart';
 import 'package:anytime/services/audio/audio_player_service.dart';
 import 'package:anytime/services/podcast/podcast_service.dart';
 import 'package:anytime/state/bloc_state.dart';
-import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -18,7 +17,7 @@ import 'package:rxdart/rxdart.dart';
 class EpisodeBloc extends Bloc {
   final log = Logger('EpisodeBloc');
   final PodcastService podcastService;
-  final AudioPlayerService audioPlayerService;
+  final AudioPlayerService? audioPlayerService;
 
   /// Add to sink to fetch list of current downloaded episodes.
   final BehaviorSubject<bool> _downloadsInput = BehaviorSubject<bool>();
@@ -33,17 +32,17 @@ class EpisodeBloc extends Bloc {
   final PublishSubject<Episode> _togglePlayed = PublishSubject<Episode>();
 
   /// Stream of currently downloaded episodes
-  Stream<BlocState<List<Episode>>> _downloadsOutput;
+  Stream<BlocState<List<Episode>>>? _downloadsOutput;
 
   /// Stream of current episodes
-  Stream<BlocState<List<Episode>>> _episodesOutput;
+  Stream<BlocState<List<Episode>>>? _episodesOutput;
 
   /// Cache of our currently downloaded episodes.
-  List<Episode> _episodes;
+  List<Episode>? _episodes;
 
   EpisodeBloc({
-    @required this.podcastService,
-    @required this.audioPlayerService,
+    required this.podcastService,
+    required this.audioPlayerService,
   }) {
     _init();
   }
@@ -59,13 +58,13 @@ class EpisodeBloc extends Bloc {
 
   void _handleDeleteDownloads() async {
     _deleteDownload.stream.listen((episode) async {
-      var nowPlaying = audioPlayerService.nowPlaying == episode;
+      var nowPlaying = audioPlayerService!.nowPlaying == episode;
 
       await podcastService.deleteDownload(episode);
 
       /// If we are attempting to delete the episode we are currently playing, we need to stop the audio.
       if (nowPlaying) {
-        await audioPlayerService.stop();
+        await audioPlayerService!.stop();
       }
 
       fetchDownloads(true);
@@ -81,10 +80,10 @@ class EpisodeBloc extends Bloc {
   }
 
   void _listenEpisodeEvents() {
-    podcastService.episodeListener.listen((state) {
+    podcastService.episodeListener!.listen((state) {
       // Do we have this episode?
       if (_episodes != null) {
-        var episode = _episodes.indexWhere((e) => e.pguid == state.episode.pguid && e.guid == state.episode.guid);
+        var episode = _episodes!.indexWhere((e) => e.pguid == state.episode.pguid && e.guid == state.episode.guid);
 
         if (episode != -1) {
           fetchDownloads(true);
@@ -123,8 +122,8 @@ class EpisodeBloc extends Bloc {
   void Function(bool) get fetchDownloads => _downloadsInput.add;
   void Function(bool) get fetchEpisodes => _episodesInput.add;
 
-  Stream<BlocState<List<Episode>>> get downloads => _downloadsOutput;
-  Stream<BlocState<List<Episode>>> get episodes => _episodesOutput;
+  Stream<BlocState<List<Episode>>>? get downloads => _downloadsOutput;
+  Stream<BlocState<List<Episode>>>? get episodes => _episodesOutput;
 
   void Function(Episode) get deleteDownload => _deleteDownload.add;
   void Function(Episode) get togglePlayed => _togglePlayed.add;

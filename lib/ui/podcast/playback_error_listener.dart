@@ -16,8 +16,8 @@ class PlaybackErrorListener extends StatefulWidget {
   final double margin;
 
   PlaybackErrorListener({
-    @required this.child,
-    @required this.margin,
+    required this.child,
+    required this.margin,
   });
 
   @override
@@ -25,7 +25,7 @@ class PlaybackErrorListener extends StatefulWidget {
 }
 
 class _PlaybackErrorListenerState extends State<PlaybackErrorListener> {
-  StreamSubscription<int> errorSubscription;
+  StreamSubscription<int>? errorSubscription;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,7 @@ class _PlaybackErrorListenerState extends State<PlaybackErrorListener> {
     super.initState();
     final audioBloc = Provider.of<AudioBloc>(context, listen: false);
 
-    errorSubscription = audioBloc.playbackError.listen((code) {
+    errorSubscription = audioBloc.playbackError!.listen((code) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           behavior: SnackBarBehavior.floating,

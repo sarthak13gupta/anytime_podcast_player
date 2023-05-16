@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class PodcastListEmpty extends StatelessWidget {
   const PodcastListEmpty({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override

@@ -15,7 +15,7 @@ class ShowNotes extends StatelessWidget {
   final Episode episode;
 
   ShowNotes({
-    @required this.episode,
+    required this.episode,
   });
 
   @override
@@ -32,7 +32,7 @@ class ShowNotes extends StatelessWidget {
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             body: CustomScrollView(controller: _sliverScrollController, slivers: <Widget>[
               SliverAppBar(
-                title: Text(episode.podcast),
+                title: Text(episode.podcast!),
                 floating: false,
                 pinned: true,
                 snap: false,

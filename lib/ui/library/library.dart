@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class Library extends StatefulWidget {
-  final String noSubscriptionsMessage;
+  final String? noSubscriptionsMessage;
 
   const Library({this.noSubscriptionsMessage});
 
@@ -32,7 +32,7 @@ class _LibraryState extends State<Library> {
         stream: podcastBloc.subscriptions,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            if (snapshot.data.isEmpty) {
+            if (snapshot.data!.isEmpty) {
               return SliverFillRemaining(
                 hasScrollBody: false,
                 child: Padding(
@@ -60,16 +60,16 @@ class _LibraryState extends State<Library> {
                   stream: settingsBloc.settings,
                   builder: (context, settingsSnapshot) {
                     if (settingsSnapshot.hasData) {
-                      var mode = settingsSnapshot.data.layout;
+                      var mode = settingsSnapshot.data!.layout;
                       var size = mode == 1 ? 100.0 : 160.0;
 
                       if (mode == 0) {
                         return SliverList(
                             delegate: SliverChildBuilderDelegate(
                           (BuildContext context, int index) {
-                            return PodcastTile(podcast: snapshot.data.elementAt(index));
+                            return PodcastTile(podcast: snapshot.data!.elementAt(index));
                           },
-                          childCount: snapshot.data.length,
+                          childCount: snapshot.data!.length,
                           addAutomaticKeepAlives: false,
                         ));
                       }
@@ -81,9 +81,9 @@ class _LibraryState extends State<Library> {
                         ),
                         delegate: SliverChildBuilderDelegate(
                           (BuildContext context, int index) {
-                            return PodcastGridTile(podcast: snapshot.data.elementAt(index));
+                            return PodcastGridTile(podcast: snapshot.data!.elementAt(index));
                           },
-                          childCount: snapshot.data.length,
+                          childCount: snapshot.data!.length,
                         ),
                       );
                     } else {

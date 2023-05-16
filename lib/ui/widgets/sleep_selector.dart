@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class SleepSelector extends StatelessWidget {
-  final Widget iconOn;
-  final Widget iconOff;
-  final BoxConstraints constraints;
+  final Widget? iconOn;
+  final Widget? iconOff;
+  final BoxConstraints? constraints;
   final EdgeInsetsGeometry padding;
 
   const SleepSelector({
-    Key key,
+    Key? key,
     this.iconOn,
     this.iconOff,
     this.constraints,
@@ -160,7 +160,7 @@ class SleepSelector extends StatelessWidget {
     SleepOption option,
   ) {
     return InkWell(
-      highlightColor: theme.buttonTheme.colorScheme.onPrimary.withAlpha(50),
+      highlightColor: theme.buttonTheme.colorScheme!.onPrimary.withAlpha(50),
       onTap: () {
         changeSleepPolicy(context, texts, audioBloc, option.policy);
       },

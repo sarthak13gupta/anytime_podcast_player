@@ -13,32 +13,32 @@ abstract class Repository {
   Future<void> close();
 
   /// Podcasts
-  Future<Podcast> findPodcastById(num id);
-  Future<Podcast> findPodcastByGuid(String guid);
-  Future<Podcast> savePodcast(Podcast podcast);
-  Future<void> deletePodcast(Podcast podcast);
+  Future<Podcast?> findPodcastById(num? id);
+  Future<Podcast?> findPodcastByGuid(String? guid);
+  Future<Podcast?> savePodcast(Podcast? podcast);
+  Future<void> deletePodcast(Podcast? podcast);
   Future<List<Podcast>> subscriptions();
 
   /// Episodes
   Future<List<Episode>> findAllEpisodes();
-  Future<Episode> findEpisodeById(int id);
-  Future<Episode> findEpisodeByGuid(String guid);
-  Future<List<Episode>> findEpisodesByPodcastGuid(String pguid);
-  Future<Episode> findEpisodeByTaskId(String taskId);
-  Future<Episode> saveEpisode(Episode episode, [bool updateIfSame]);
+  Future<Episode?> findEpisodeById(int? id);
+  Future<Episode?> findEpisodeByGuid(String? guid);
+  Future<List<Episode>> findEpisodesByPodcastGuid(String? pguid);
+  Future<Episode?> findEpisodeByTaskId(String? taskId);
+  Future<Episode> saveEpisode(Episode? episode, [bool? updateIfSame]);
   Future<void> deleteEpisode(Episode episode);
   Future<void> deleteEpisodes(List<Episode> episodes);
-  Future<List<Episode>> findDownloadsByPodcastGuid(String pguid);
+  Future<List<Episode>> findDownloadsByPodcastGuid(String? pguid);
   Future<List<Episode>> findDownloads();
 
   /// Queue
-  Future<void> saveQueue(List<Episode> episodes);
-  Future<List<Episode>> loadQueue();
+  Future<void> saveQueue(List<Episode?> episodes);
+  Future<List<Episode?>> loadQueue();
 
   /// Event listeners
-  Stream<Podcast> podcastListener;
-  Stream<EpisodeState> episodeListener;
-  Stream<bool> backupDatabaseListener;
-  Sink<bool> backupDatabaseSink;
-  Sink<bool> reloadDatabaseSink;
+  Stream<Podcast?>? podcastListener;
+  Stream<EpisodeState>? episodeListener;
+  Stream<bool>? backupDatabaseListener;
+  late Sink<bool> backupDatabaseSink;
+  Sink<bool>? reloadDatabaseSink;
 }

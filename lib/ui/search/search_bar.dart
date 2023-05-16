@@ -10,14 +10,14 @@ class SearchBar extends StatefulWidget {
 }
 
 class _SearchBarState extends State<SearchBar> {
-  TextEditingController _searchController;
-  FocusNode _searchFocusNode;
+  TextEditingController? _searchController;
+  FocusNode? _searchFocusNode;
 
   @override
   void initState() {
     super.initState();
     _searchController = TextEditingController();
-    _searchController.addListener(() {
+    _searchController!.addListener(() {
       setState(() {});
     });
     _searchFocusNode = FocusNode();
@@ -25,8 +25,8 @@ class _SearchBarState extends State<SearchBar> {
 
   @override
   void dispose() {
-    _searchFocusNode.dispose();
-    _searchController.dispose();
+    _searchFocusNode!.dispose();
+    _searchController!.dispose();
 
     super.dispose();
   }
@@ -52,19 +52,19 @@ class _SearchBarState extends State<SearchBar> {
                 widget: Search(searchTerm: value),
                 settings: RouteSettings(name: 'search'),
               ));
-          _searchController.clear();
+          _searchController!.clear();
         },
       ),
       trailing: IconButton(
           padding: EdgeInsets.zero,
-          tooltip: _searchFocusNode.hasFocus ? L.of(context).clear_search_button_label : null,
-          splashColor: _searchFocusNode.hasFocus ? Theme.of(context).splashColor : Colors.transparent,
-          highlightColor: _searchFocusNode.hasFocus ? Theme.of(context).highlightColor : Colors.transparent,
-          icon: Icon(_searchController.text.isEmpty && !_searchFocusNode.hasFocus ? Icons.search : Icons.clear),
-          onPressed: _searchController.text.isEmpty && !_searchFocusNode.hasFocus
+          tooltip: _searchFocusNode!.hasFocus ? L.of(context).clear_search_button_label : null,
+          splashColor: _searchFocusNode!.hasFocus ? Theme.of(context).splashColor : Colors.transparent,
+          highlightColor: _searchFocusNode!.hasFocus ? Theme.of(context).highlightColor : Colors.transparent,
+          icon: Icon(_searchController!.text.isEmpty && !_searchFocusNode!.hasFocus ? Icons.search : Icons.clear),
+          onPressed: _searchController!.text.isEmpty && !_searchFocusNode!.hasFocus
               ? () => FocusScope.of(context).requestFocus(_searchFocusNode)
               : () {
-                  _searchController.clear();
+                  _searchController!.clear();
                   FocusScope.of(context).requestFocus(FocusNode());
                 }),
     );

@@ -4,7 +4,6 @@
 
 import 'package:anytime/entities/episode.dart';
 import 'package:anytime/state/queue_event_state.dart';
-import 'package:flutter/cupertino.dart';
 
 enum AudioState {
   none,
@@ -17,11 +16,11 @@ enum AudioState {
 }
 
 class PositionState {
-  Duration position;
-  Duration length;
-  int percentage;
-  Episode episode;
-  bool buffering;
+  Duration? position;
+  Duration? length;
+  int? percentage;
+  Episode? episode;
+  bool? buffering;
 
   PositionState(this.position, this.length, this.percentage, this.episode, [this.buffering = false]);
 
@@ -34,7 +33,7 @@ class PositionState {
 /// classes will then handle the specifics for the platform we are running on.
 abstract class AudioPlayerService {
   /// Play a new episode, optionally resume at last save point.
-  Future<void> playEpisode({@required Episode episode, bool resume});
+  Future<void> playEpisode({required Episode? episode, bool? resume});
 
   /// Resume playing of current episode
   Future<void> play();
@@ -53,19 +52,19 @@ abstract class AudioPlayerService {
   Future<void> fastForward();
 
   /// Seek to the specified position within the current episode.
-  Future<void> seek({@required int position});
+  Future<void> seek({required int position});
 
   /// Call when the app is resumed to re-establish the audio service.
-  Future<Episode> resume();
+  Future<Episode?> resume();
 
   /// Add an episode to the playback queue
-  Future<void> addUpNextEpisode(Episode episode);
+  Future<void> addUpNextEpisode(Episode? episode);
 
   /// Remove an episode from the playback queue if it exists
-  Future<bool> removeUpNextEpisode(Episode episode);
+  Future<bool> removeUpNextEpisode(Episode? episode);
 
   /// Remove an episode from the playback queue if it exists
-  Future<bool> moveUpNextEpisode(Episode episode, int oldIndex, int newIndex);
+  Future<bool> moveUpNextEpisode(Episode? episode, int oldIndex, int newIndex);
 
   /// Empty the up next queue
   Future<void> clearUpNext();
@@ -82,13 +81,13 @@ abstract class AudioPlayerService {
   /// Call to toggle trim silence.
   Future<void> volumeBoost(bool boost);
 
-  Episode nowPlaying;
+  Episode? nowPlaying;
 
   /// Event listeners
-  Stream<AudioState> playingState;
-  Stream<PositionState> playPosition;
-  Stream<bool> episodeCompletedEvent;
-  Stream<Episode> episodeEvent;
-  Stream<int> playbackError;
-  Stream<QueueListState> queueState;
+  Stream<AudioState>? playingState;
+  Stream<PositionState>? playPosition;
+  Stream<bool>? episodeCompletedEvent;
+  Stream<Episode?>? episodeEvent;
+  Stream<int>? playbackError;
+  Stream<QueueListState>? queueState;
 }

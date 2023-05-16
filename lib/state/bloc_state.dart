@@ -12,13 +12,13 @@ abstract class BlocState<T> {}
 class BlocDefaultState<T> extends BlocState<T> {}
 
 class BlocLoadingState<T> extends BlocState<T> {
-  final T data;
+  final T? data;
 
   BlocLoadingState([this.data]);
 }
 
 class BlocBackgroundLoadingState<T> extends BlocState<T> {
-  final T data;
+  final T? data;
 
   BlocBackgroundLoadingState([this.data]);
 }
@@ -38,7 +38,7 @@ class BlocErrorState<T> extends BlocState<T> {
 class BlocNoInputState<T> extends BlocState<T> {}
 
 class BlocPopulatedState<T> extends BlocState<T> {
-  final T results;
+  final T? results;
 
   BlocPopulatedState({this.results});
 }

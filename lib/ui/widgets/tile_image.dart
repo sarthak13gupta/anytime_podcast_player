@@ -8,19 +8,19 @@ import 'package:flutter/material.dart';
 
 class TileImage extends StatelessWidget {
   const TileImage({
-    Key key,
-    @required this.url,
-    @required this.size,
+    Key? key,
+    required this.url,
+    required this.size,
     this.highlight = false,
   }) : super(key: key);
 
   /// The URL of the image to display.
-  final String url;
+  final String? url;
 
   /// The size of the image container; both height and width.
   final double size;
 
-  final bool highlight;
+  final bool? highlight;
 
   @override
   Widget build(BuildContext context) {
@@ -35,13 +35,13 @@ class TileImage extends StatelessWidget {
       borderRadius: 4.0,
       fit: BoxFit.contain,
       placeholder: placeholderBuilder != null
-          ? placeholderBuilder?.builder()(context)
+          ? placeholderBuilder.builder()(context)
           : Image(
               fit: BoxFit.contain,
               image: AssetImage('assets/images/anytime-placeholder-logo.png'),
             ),
       errorPlaceholder: placeholderBuilder != null
-          ? placeholderBuilder?.errorBuilder()(context)
+          ? placeholderBuilder.errorBuilder()(context)
           : Image(
               fit: BoxFit.contain,
               image: AssetImage('assets/images/anytime-placeholder-logo.png'),

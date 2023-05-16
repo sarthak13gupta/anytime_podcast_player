@@ -12,7 +12,7 @@ import 'package:sembast/sembast_io.dart';
 /// Provides a database instance to other services and handles the opening
 /// of the Sembast DB.
 class DatabaseService {
-  Completer<Database> _databaseCompleter;
+  Completer<Database>? _databaseCompleter;
   String databaseName;
 
   DatabaseService(this.databaseName);
@@ -23,22 +23,22 @@ class DatabaseService {
       await _openDatabase();
     }
 
-    return _databaseCompleter.future;
+    return _databaseCompleter!.future;
   }
 
-  Future _openDatabase() async {
+  Future<void> _openDatabase() async {
     final appDocumentDir = await getApplicationDocumentsDirectory();
     final dbPath = join(appDocumentDir.path, databaseName);
     final database = await databaseFactoryIo.openDatabase(dbPath);
 
-    _databaseCompleter.complete(database);
+    _databaseCompleter!.complete(database);
   }
 
   Future<Database> reloadDatabase() async {
-    var db = await _databaseCompleter.future;
+    var db = await _databaseCompleter!.future;
     await db.close();
     _databaseCompleter = Completer();
     await _openDatabase();
-    return _databaseCompleter.future;
+    return _databaseCompleter!.future;
   }
 }

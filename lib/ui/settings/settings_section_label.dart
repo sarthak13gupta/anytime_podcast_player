@@ -5,11 +5,11 @@
 import 'package:flutter/material.dart';
 
 class SettingsDividerLabel extends StatelessWidget {
-  final String label;
+  final String? label;
   final EdgeInsetsGeometry padding;
 
   const SettingsDividerLabel({
-    Key key,
+    Key? key,
     this.label,
     this.padding = const EdgeInsets.fromLTRB(16.0, 24.0, 0.0, 0.0),
   }) : super(key: key);
@@ -19,8 +19,8 @@ class SettingsDividerLabel extends StatelessWidget {
     return Padding(
       padding: padding,
       child: Text(
-        label,
-        style: Theme.of(context).textTheme.titleSmall.copyWith(
+        label!,
+        style: Theme.of(context).textTheme.titleSmall!.copyWith(
               fontSize: 12.0,
               color: Theme.of(context).primaryColor,
             ),

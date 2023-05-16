@@ -10,10 +10,10 @@ import 'package:anytime/ui/widgets/tile_image.dart';
 import 'package:flutter/material.dart';
 
 class EpisodeDetails extends StatefulWidget {
-  final Episode episode;
+  final Episode? episode;
 
   EpisodeDetails({
-    Key key,
+    Key? key,
     this.episode,
   }) : super(key: key);
 
@@ -24,7 +24,7 @@ class EpisodeDetails extends StatefulWidget {
 class _EpisodeDetailsState extends State<EpisodeDetails> {
   @override
   Widget build(BuildContext context) {
-    final episode = widget.episode;
+    final episode = widget.episode!;
 
     /// Ensure we do not highlight this as a new episode
     episode.highlight = false;
@@ -64,7 +64,7 @@ class _EpisodeDetailsState extends State<EpisodeDetails> {
                     ),
                     subtitle: EpisodeSubtitle(episode),
                     title: Text(
-                      episode.title,
+                      episode.title!,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                       softWrap: false,

@@ -17,54 +17,54 @@ class Episode {
   final log = Logger('Episode');
 
   /// Database ID
-  int id;
+  int? id;
 
   /// A String GUID for the episode.
-  final String guid;
+  final String? guid;
 
   /// The GUID for an associated podcast. If an episode has been downloaded
   /// without subscribing to a podcast this may be null.
-  String pguid;
+  String? pguid;
 
   /// If the episode is currently being downloaded, this contains the unique
   /// ID supplied by the download manager for the episode.
-  String downloadTaskId;
+  String? downloadTaskId;
 
   /// The path to the directory containing the download for this episode; or null.
-  String filepath;
+  String? filepath;
 
   /// The filename of the downloaded episode; or null.
-  String filename;
+  String? filename;
 
   /// The current downloading state of the episode.
   DownloadState downloadState = DownloadState.none;
 
   /// The name of the podcast the episode is part of.
-  String podcast;
+  String? podcast;
 
   /// The episode title.
-  String title;
+  String? title;
 
   /// The episode description. This could be plain text or HTML.
-  String description;
+  String? description;
 
   /// External link
-  String link;
+  String? link;
 
   /// URL to the episode artwork image.
-  String imageUrl;
+  String? imageUrl;
 
   /// URL to a thumbnail version of the episode artwork image.
-  String thumbImageUrl;
+  String? thumbImageUrl;
 
   /// The date the episode was published (if known).
-  DateTime publicationDate;
+  DateTime? publicationDate;
 
   /// The URL for the episode location.
-  String contentUrl;
+  String? contentUrl;
 
   /// Author of the episode if known.
-  String author;
+  String? author;
 
   /// The season the episode is part of if available.
   int season;
@@ -77,47 +77,47 @@ class Episode {
   int duration;
 
   /// Stores the current position within the episode in milliseconds. Used for resuming.
-  int position;
+  int? position;
 
   /// Stores the progress of the current download progress if available.
-  int downloadPercentage;
+  int? downloadPercentage;
 
   /// True if this episode is 'marked as played'.
   bool played;
 
   /// URL pointing to a JSON file containing chapter information if available.
-  String chaptersUrl;
+  String? chaptersUrl;
 
   /// List of chapters for the episode if available.
   List<Chapter> chapters;
 
   /// Date and time episode was last updated and persisted.
-  DateTime lastUpdated;
+  DateTime? lastUpdated;
 
   /// Processed version of episode description.
-  String _descriptionText;
+  String? _descriptionText;
 
   /// Index of the currently playing chapter it available. Transient.
-  int chapterIndex;
+  int? chapterIndex;
 
   /// Current chapter we are listening to if this episode has chapters.  Transient.
-  Chapter currentChapter;
+  Chapter? currentChapter;
 
   /// Podcast metadata.
-  Map<String, dynamic> metadata;
+  Map<String, dynamic>? metadata;
 
   /// Episode metadata.
-  Map<String, dynamic> episodeMetadata;
+  Map<String, dynamic>? episodeMetadata;
 
   /// Value for value payment information.
-  Value value;
+  Value? value;
 
   /// Set to true if chapter data is currently being loaded.
   @Transient()
   bool chaptersLoading = false;
 
   @Transient()
-  bool highlight = false;
+  bool? highlight = false;
 
   @Transient()
   bool queued = false;
@@ -126,9 +126,9 @@ class Episode {
   bool streaming = true;
 
   Episode({
-    @required this.guid,
-    @required this.pguid,
-    @required this.podcast,
+    required this.guid,
+    required this.pguid,
+    required this.podcast,
     this.id,
     this.downloadTaskId,
     this.filepath,
@@ -181,7 +181,7 @@ class Episode {
       'downloadPercentage': downloadPercentage.toString(),
       'played': played ? 'true' : 'false',
       'chaptersUrl': chaptersUrl,
-      'chapters': (chapters ?? <Chapter>[]).map((chapter) => chapter.toMap())?.toList(growable: false),
+      'chapters': (chapters).map((chapter) => chapter.toMap()).toList(growable: false),
       'lastUpdated': lastUpdated?.millisecondsSinceEpoch.toString() ?? '',
       'metadata': metadata,
       'episodeMetadata': episodeMetadata,
@@ -189,7 +189,7 @@ class Episode {
     };
   }
 
-  static Episode fromMap(int key, Map<String, dynamic> episode) {
+  static Episode fromMap(int? key, Map<String, dynamic> episode) {
     var chapters = <Chapter>[];
 
     // We need to perform an 'is' on each loop to prevent Dart
@@ -202,70 +202,63 @@ class Episode {
       }
     }
 
-    Value value;
+    Value? value;
     if (episode['value'] != null && episode['value'] is Map<String, dynamic>) {
       value = Value.fromMap(episode['value'] as Map<String, dynamic>);
     }
 
     return Episode(
       id: key,
-      guid: episode['guid'] as String,
-      pguid: episode['pguid'] as String,
-      downloadTaskId: episode['downloadTaskId'] as String,
-      filepath: episode['filepath'] as String,
-      filename: episode['filename'] as String,
-      downloadState: _determineState(episode['downloadState'] as int),
-      podcast: episode['podcast'] as String,
-      title: episode['title'] as String,
-      description: episode['description'] as String,
-      link: episode['link'] as String,
-      imageUrl: episode['imageUrl'] as String,
-      thumbImageUrl: episode['thumbImageUrl'] as String,
+      guid: episode['guid'] as String?,
+      pguid: episode['pguid'] as String?,
+      downloadTaskId: episode['downloadTaskId'] as String?,
+      filepath: episode['filepath'] as String?,
+      filename: episode['filename'] as String?,
+      downloadState: _determineState(episode['downloadState'] as int?),
+      podcast: episode['podcast'] as String?,
+      title: episode['title'] as String?,
+      description: episode['description'] as String?,
+      link: episode['link'] as String?,
+      imageUrl: episode['imageUrl'] as String?,
+      thumbImageUrl: episode['thumbImageUrl'] as String?,
       publicationDate: episode['publicationDate'] == null || episode['publicationDate'] == 'null'
           ? DateTime.now()
           : DateTime.fromMillisecondsSinceEpoch(int.parse(episode['publicationDate'] as String)),
-      contentUrl: (episode['contentUrl'] as String)?.trim(),
-      author: episode['author'] as String,
-      season: int.parse(episode['season'] as String ?? '0'),
-      episode: int.parse(episode['episode'] as String ?? '0'),
-      duration: int.parse(episode['duration'] as String ?? '0'),
-      position: int.parse(episode['position'] as String ?? '0'),
-      downloadPercentage: int.parse(episode['downloadPercentage'] as String ?? '0'),
+      contentUrl: (episode['contentUrl'] as String?)?.trim(),
+      author: episode['author'] as String?,
+      season: int.parse(episode['season'] as String? ?? '0'),
+      episode: int.parse(episode['episode'] as String? ?? '0'),
+      duration: int.parse(episode['duration'] as String? ?? '0'),
+      position: int.parse(episode['position'] as String? ?? '0'),
+      downloadPercentage: int.parse(episode['downloadPercentage'] as String? ?? '0'),
       played: episode['played'] == 'true' ? true : false,
-      chaptersUrl: episode['chaptersUrl'] as String,
+      chaptersUrl: episode['chaptersUrl'] as String?,
       chapters: chapters,
       lastUpdated: episode['lastUpdated'] == null || episode['lastUpdated'] == 'null'
           ? DateTime.now()
           : DateTime.fromMillisecondsSinceEpoch(int.parse(episode['lastUpdated'] as String)),
-      metadata: episode['metadata'] as Map<String, dynamic>,
-      episodeMetadata: episode['episodeMetadata'] as Map<String, dynamic>,
+      metadata: episode['metadata'] as Map<String, dynamic>?,
+      episodeMetadata: episode['episodeMetadata'] as Map<String, dynamic>?,
       value: value,
     );
   }
 
-  static DownloadState _determineState(int index) {
+  static DownloadState _determineState(int? index) {
     switch (index) {
       case 0:
         return DownloadState.none;
-        break;
       case 1:
         return DownloadState.queued;
-        break;
       case 2:
         return DownloadState.downloading;
-        break;
       case 3:
         return DownloadState.failed;
-        break;
       case 4:
         return DownloadState.cancelled;
-        break;
       case 5:
         return DownloadState.paused;
-        break;
       case 6:
         return DownloadState.downloaded;
-        break;
     }
 
     return DownloadState.none;
@@ -337,8 +330,8 @@ class Episode {
   bool get downloaded => downloadPercentage == 100;
 
   Duration get timeRemaining {
-    if (position > 0 && duration > 0) {
-      var currentPosition = Duration(milliseconds: position);
+    if (position! > 0 && duration > 0) {
+      var currentPosition = Duration(milliseconds: position!);
 
       var tr = duration - currentPosition.inSeconds;
 
@@ -349,8 +342,8 @@ class Episode {
   }
 
   double get percentagePlayed {
-    if (position > 0 && duration > 0) {
-      var pc = (position / (duration * 1000)) * 100;
+    if (position! > 0 && duration > 0) {
+      var pc = (position! / (duration * 1000)) * 100;
 
       if (pc > 100.0) {
         pc = 100.0;
@@ -362,13 +355,13 @@ class Episode {
     return 0.0;
   }
 
-  String get descriptionText {
-    if (_descriptionText == null || _descriptionText.isEmpty) {
-      if (description == null || description.isEmpty) {
+  String? get descriptionText {
+    if (_descriptionText == null || _descriptionText!.isEmpty) {
+      if (description == null || description!.isEmpty) {
         _descriptionText = '';
       } else {
         // Replace break tags with space character for readability
-        var formattedDescription = description.replaceAll(RegExp(r'(\<br\/?>)+'), ' ');
+        var formattedDescription = description!.replaceAll(RegExp(r'(\<br\/?>)+'), ' ');
         _descriptionText = parseFragment(formattedDescription).text;
       }
     }
@@ -376,15 +369,15 @@ class Episode {
     return _descriptionText;
   }
 
-  bool get hasChapters => chaptersUrl != null && chaptersUrl.isNotEmpty;
+  bool get hasChapters => chaptersUrl != null && chaptersUrl!.isNotEmpty;
 
-  bool get chaptersAreLoaded => chapters != null;
+  bool get chaptersAreLoaded => chapters.isNotEmpty;
 
-  bool get chaptersAreNotLoaded => chapters == null;
+  bool get chaptersAreNotLoaded => chapters.isEmpty;
 
-  String get positionalImageUrl {
-    if (currentChapter != null && currentChapter.imageUrl != null && currentChapter.imageUrl.isNotEmpty) {
-      return currentChapter.imageUrl;
+  String? get positionalImageUrl {
+    if (currentChapter != null && currentChapter!.imageUrl != null && currentChapter!.imageUrl!.isNotEmpty) {
+      return currentChapter!.imageUrl;
     }
 
     return imageUrl;

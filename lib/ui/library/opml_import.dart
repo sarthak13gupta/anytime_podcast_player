@@ -9,11 +9,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class OPMLImport extends StatefulWidget {
-  final String file;
+  final String? file;
 
   const OPMLImport({
-    Key key,
-    @required this.file,
+    Key? key,
+    required this.file,
   }) : super(key: key);
 
   @override
@@ -33,7 +33,7 @@ class _OPMLImportState extends State<OPMLImport> {
             initialData: OPMLNoneState(),
             stream: bloc.opmlState,
             builder: (context, snapshot) {
-              var t = '';
+              String? t = '';
               var d = snapshot.data;
 
               if (d is OPMLCompletedState) {
@@ -66,7 +66,7 @@ class _OPMLImportState extends State<OPMLImport> {
                             height: 2.0,
                           ),
                           Text(
-                            t,
+                            t!,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(

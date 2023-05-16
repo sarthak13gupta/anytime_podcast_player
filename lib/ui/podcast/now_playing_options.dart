@@ -12,11 +12,11 @@ import 'package:flutter_dialogs/flutter_dialogs.dart';
 import 'package:provider/provider.dart';
 
 class NowPlayingOptionsSelector extends StatefulWidget {
-  final double scrollPos;
-  final double baseSize;
-  final bool isEmbedded;
+  final double? scrollPos;
+  final double? baseSize;
+  final bool? isEmbedded;
 
-  NowPlayingOptionsSelector({Key key, this.scrollPos, this.baseSize, this.isEmbedded}) : super(key: key);
+  NowPlayingOptionsSelector({Key? key, this.scrollPos, this.baseSize, this.isEmbedded}) : super(key: key);
 
   @override
   State<NowPlayingOptionsSelector> createState() => _NowPlayingOptionsSelectorState();
@@ -31,13 +31,13 @@ class _NowPlayingOptionsSelectorState extends State<NowPlayingOptionsSelector> {
   @override
   Widget build(BuildContext context) {
     final queueBloc = Provider.of<QueueBloc>(context, listen: false);
-    final topMargin = widget.baseSize + MediaQuery.of(context).viewPadding.top;
+    final topMargin = widget.baseSize! + MediaQuery.of(context).viewPadding.top;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final floatingPlayerHeight = 64.0;
     final windowHeight = MediaQuery.of(context).size.height;
-    final minSize = widget.baseSize / (windowHeight - widget.baseSize);
-    final maxSize = (windowHeight - topMargin - (floatingPlayerHeight - widget.baseSize)) / windowHeight;
+    final minSize = widget.baseSize! / (windowHeight - widget.baseSize!);
+    final maxSize = (windowHeight - topMargin - (floatingPlayerHeight - widget.baseSize!)) / windowHeight;
     final l10n = L.of(context);
 
     final ColorTween sheetColor = ColorTween(begin: theme.scaffoldBackgroundColor, end: theme.bottomAppBarTheme.color);
@@ -63,20 +63,20 @@ class _NowPlayingOptionsSelectorState extends State<NowPlayingOptionsSelector> {
               decoration: ShapeDecoration(
                 shape: RoundedRectangleBorder(
                   side: BorderSide(
-                    color: widget.isEmbedded ? theme.colorScheme.background : theme.highlightColor,
-                    width: widget.isEmbedded ? 1.5 : 1.0,
+                    color: widget.isEmbedded! ? theme.colorScheme.background : theme.highlightColor,
+                    width: widget.isEmbedded! ? 1.5 : 1.0,
                   ),
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(18.0),
                     topRight: Radius.circular(18.0),
                   ),
                 ),
-                color: sheetColor.animate(AlwaysStoppedAnimation(widget.scrollPos)).value,
+                color: sheetColor.animate(AlwaysStoppedAnimation(widget.scrollPos!)).value,
               ),
               height: MediaQuery.of(context).size.height -
                   floatingPlayerHeight -
                   MediaQuery.of(context).viewPadding.top -
-                  (widget.isEmbedded ? 64.0 - 8.0 : 0.0),
+                  (widget.isEmbedded! ? 64.0 - 8.0 : 0.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -91,12 +91,12 @@ class _NowPlayingOptionsSelectorState extends State<NowPlayingOptionsSelector> {
                       children: <Widget>[
                         SliderHandle(scrollPos: widget.scrollPos, isMinimized: widget.isEmbedded),
                         Padding(
-                          padding: widget.isEmbedded ? EdgeInsets.zero : EdgeInsets.only(bottom: 8.0),
+                          padding: widget.isEmbedded! ? EdgeInsets.zero : EdgeInsets.only(bottom: 8.0),
                           child: Text(
                             l10n.up_next_queue_label.toUpperCase(),
-                            style: textTheme.labelLarge.copyWith(
-                              color: labelColor.animate(AlwaysStoppedAnimation(widget.scrollPos)).value,
-                              fontSize: widget.isEmbedded ? 9 : textTheme.labelLarge.fontSize,
+                            style: textTheme.labelLarge!.copyWith(
+                              color: labelColor.animate(AlwaysStoppedAnimation(widget.scrollPos!)).value,
+                              fontSize: widget.isEmbedded! ? 9 : textTheme.labelLarge!.fontSize,
                             ),
                           ),
                         ),
@@ -110,7 +110,7 @@ class _NowPlayingOptionsSelectorState extends State<NowPlayingOptionsSelector> {
                         padding: const EdgeInsets.fromLTRB(16.0, 8.0, 24.0, 8.0),
                         child: Text(
                           l10n.now_playing_queue_label,
-                          style: textTheme.titleLarge.copyWith(color: theme.iconTheme.color),
+                          style: textTheme.titleLarge!.copyWith(color: theme.iconTheme.color),
                         ),
                       ),
                     ],
@@ -123,7 +123,7 @@ class _NowPlayingOptionsSelectorState extends State<NowPlayingOptionsSelector> {
                         padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
                         child: DraggableEpisodeTile(
                           key: Key('detileplaying'),
-                          episode: snapshot.data.playing,
+                          episode: snapshot.data!.playing,
                           draggable: false,
                         ),
                       );
@@ -137,7 +137,7 @@ class _NowPlayingOptionsSelectorState extends State<NowPlayingOptionsSelector> {
                         padding: const EdgeInsets.fromLTRB(16.0, 0.0, 24.0, 8.0),
                         child: Text(
                           l10n.up_next_queue_label,
-                          style: textTheme.titleLarge.copyWith(color: theme.iconTheme.color),
+                          style: textTheme.titleLarge!.copyWith(color: theme.iconTheme.color),
                         ),
                       ),
                       Spacer(),
@@ -171,7 +171,7 @@ class _NowPlayingOptionsSelectorState extends State<NowPlayingOptionsSelector> {
                                     iosIsDefaultAction: true,
                                     iosIsDestructiveAction: true,
                                     onPressed: () {
-                                      queueBloc.queueEvent(QueueClearEvent());
+                                      queueBloc.queueEvent(QueueClearEvent(episode: null));
                                       Navigator.pop(context);
                                     },
                                   ),
@@ -181,7 +181,7 @@ class _NowPlayingOptionsSelectorState extends State<NowPlayingOptionsSelector> {
                           },
                           child: Text(
                             l10n.clear_queue_button_label,
-                            style: textTheme.titleSmall.copyWith(fontSize: 12.0, color: theme.iconTheme.color),
+                            style: textTheme.titleSmall!.copyWith(fontSize: 12.0, color: theme.iconTheme.color),
                           ),
                         ),
                       ),
@@ -191,7 +191,7 @@ class _NowPlayingOptionsSelectorState extends State<NowPlayingOptionsSelector> {
                       initialData: QueueEmptyState(),
                       stream: queueBloc.queue,
                       builder: (context, snapshot) {
-                        return snapshot.hasData && snapshot.data.queue.isEmpty
+                        return snapshot.hasData && snapshot.data!.queue.isEmpty
                             ? Padding(
                                 padding: const EdgeInsets.all(24.0),
                                 child: Container(
@@ -205,7 +205,7 @@ class _NowPlayingOptionsSelectorState extends State<NowPlayingOptionsSelector> {
                                     padding: const EdgeInsets.all(24.0),
                                     child: Text(
                                       l10n.empty_queue_message,
-                                      style: textTheme.titleMedium.copyWith(color: theme.iconTheme.color),
+                                      style: textTheme.titleMedium!.copyWith(color: theme.iconTheme.color),
                                     ),
                                   ),
                                 ),
@@ -215,18 +215,18 @@ class _NowPlayingOptionsSelectorState extends State<NowPlayingOptionsSelector> {
                                   buildDefaultDragHandles: false,
                                   shrinkWrap: true,
                                   padding: const EdgeInsets.all(8),
-                                  itemCount: snapshot.hasData ? snapshot.data.queue.length : 0,
+                                  itemCount: snapshot.hasData ? snapshot.data!.queue.length : 0,
                                   itemBuilder: (BuildContext context, int index) {
                                     return Dismissible(
-                                      key: ValueKey('disqueue${snapshot.data.queue[index].guid}'),
+                                      key: ValueKey('disqueue${snapshot.data!.queue[index]!.guid}'),
                                       direction: DismissDirection.endToStart,
                                       onDismissed: (direction) {
-                                        queueBloc.queueEvent(QueueRemoveEvent(episode: snapshot.data.queue[index]));
+                                        queueBloc.queueEvent(QueueRemoveEvent(episode: snapshot.data!.queue[index]));
                                       },
                                       child: DraggableEpisodeTile(
-                                        key: ValueKey('tilequeue${snapshot.data.queue[index].guid}'),
+                                        key: ValueKey('tilequeue${snapshot.data!.queue[index]!.guid}'),
                                         index: index,
-                                        episode: snapshot.data.queue[index],
+                                        episode: snapshot.data!.queue[index],
                                         playable: true,
                                       ),
                                     );
@@ -239,7 +239,7 @@ class _NowPlayingOptionsSelectorState extends State<NowPlayingOptionsSelector> {
                                     }
 
                                     queueBloc.queueEvent(QueueMoveEvent(
-                                      episode: snapshot.data.queue[oldIndex],
+                                      episode: snapshot.data!.queue[oldIndex],
                                       oldIndex: oldIndex,
                                       newIndex: newIndex,
                                     ));

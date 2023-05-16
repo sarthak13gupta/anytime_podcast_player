@@ -10,7 +10,7 @@ import 'package:flutter_dialogs/flutter_dialogs.dart';
 import 'package:provider/provider.dart';
 
 class SearchProviderWidget extends StatefulWidget {
-  final ValueChanged<String> onChanged;
+  final ValueChanged<String?>? onChanged;
 
   SearchProviderWidget({this.onChanged});
 
@@ -27,7 +27,7 @@ class _SearchProviderWidgetState extends State<SearchProviderWidget> {
         stream: settingsBloc.settings,
         initialData: AppSettings.sensibleDefaults(),
         builder: (context, snapshot) {
-          return snapshot.data.searchProviders.length > 1
+          return snapshot.data!.searchProviders.length > 1
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -35,7 +35,7 @@ class _SearchProviderWidgetState extends State<SearchProviderWidget> {
                   children: [
                     ListTile(
                       title: Text(L.of(context).search_provider_label),
-                      subtitle: Text(snapshot.data.searchProvider == 'itunes' ? 'iTunes' : 'PodcastIndex'),
+                      subtitle: Text(snapshot.data!.searchProvider == 'itunes' ? 'iTunes' : 'PodcastIndex'),
                       onTap: () {
                         showPlatformDialog<void>(
                           context: context,
@@ -51,13 +51,13 @@ class _SearchProviderWidgetState extends State<SearchProviderWidget> {
                                         value: 'itunes',
                                         dense: true,
                                         contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
-                                        groupValue: snapshot.data.searchProvider,
-                                        onChanged: (String value) {
+                                        groupValue: snapshot.data!.searchProvider,
+                                        onChanged: (String? value) {
                                           setState(() {
                                             settingsBloc.setSearchProvider(value);
 
                                             if (widget.onChanged != null) {
-                                              widget.onChanged(value);
+                                              widget.onChanged!(value);
                                             }
 
                                             Navigator.pop(context);
@@ -69,13 +69,13 @@ class _SearchProviderWidgetState extends State<SearchProviderWidget> {
                                         value: 'podcastindex',
                                         dense: true,
                                         contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
-                                        groupValue: snapshot.data.searchProvider,
-                                        onChanged: (String value) {
+                                        groupValue: snapshot.data!.searchProvider,
+                                        onChanged: (String? value) {
                                           setState(() {
                                             settingsBloc.setSearchProvider(value);
 
                                             if (widget.onChanged != null) {
-                                              widget.onChanged(value);
+                                              widget.onChanged!(value);
                                             }
 
                                             Navigator.pop(context);

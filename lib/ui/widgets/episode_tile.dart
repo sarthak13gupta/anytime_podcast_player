@@ -29,9 +29,9 @@ class EpisodeTile extends StatelessWidget {
   final bool queued;
 
   const EpisodeTile({
-    @required this.episode,
-    @required this.download,
-    @required this.play,
+    required this.episode,
+    required this.download,
+    required this.play,
     this.playing = false,
     this.queued = false,
   });
@@ -82,7 +82,7 @@ class EpisodeTile extends StatelessWidget {
       title: Opacity(
         opacity: episode.played ? 0.5 : 1.0,
         child: Text(
-          episode.title,
+          episode.title!,
           overflow: TextOverflow.ellipsis,
           maxLines: 2,
           softWrap: false,
@@ -98,11 +98,11 @@ class EpisodeTile extends StatelessWidget {
               vertical: 4.0,
             ),
             child: Text(
-              episode.descriptionText,
+              episode.descriptionText!,
               overflow: TextOverflow.ellipsis,
               softWrap: false,
               maxLines: 5,
-              style: Theme.of(context).textTheme.bodyLarge.copyWith(
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                     fontSize: 14,
                     fontWeight: FontWeight.normal,
                   ),
@@ -244,7 +244,7 @@ class EpisodeTile extends StatelessWidget {
                   ),
                 ),
               ),
-              shareEpisodeButtonBuilder != null ? shareEpisodeButtonBuilder?.builder(episode.podcast, episode.pguid, episode.title, episode.guid)(context) : Container(),
+              shareEpisodeButtonBuilder != null ? shareEpisodeButtonBuilder.builder(episode.podcast, episode.pguid, episode.title, episode.guid)(context) : Container(),
               Expanded(
                 child: TextButton(
                   style: TextButton.styleFrom(
@@ -304,9 +304,9 @@ class EpisodeTransportControls extends StatelessWidget {
   final bool play;
 
   EpisodeTransportControls({
-    @required this.episode,
-    @required this.download,
-    @required this.play,
+    required this.episode,
+    required this.download,
+    required this.play,
   });
 
   @override
@@ -344,13 +344,13 @@ class EpisodeSubtitle extends StatelessWidget {
   final Episode episode;
   final String date;
   final Duration length;
-  final Color textColor;
+  final Color? textColor;
 
   EpisodeSubtitle(this.episode, {this.textColor})
       : date = episode.publicationDate == null
             ? ''
-            : DateFormat(episode.publicationDate.year == DateTime.now().year ? 'd MMM' : 'd MMM yy')
-                .format(episode.publicationDate),
+            : DateFormat(episode.publicationDate!.year == DateTime.now().year ? 'd MMM' : 'd MMM yy')
+                .format(episode.publicationDate!),
         length = Duration(seconds: episode.duration);
 
   @override
@@ -385,24 +385,22 @@ class EpisodeSubtitle extends StatelessWidget {
         title,
         overflow: TextOverflow.ellipsis,
         softWrap: false,
-        style: textColor != null ? textTheme.bodySmall.copyWith(color: textColor) : textTheme.bodySmall,
+        style: textColor != null ? textTheme.bodySmall!.copyWith(color: textColor) : textTheme.bodySmall,
       ),
     );
   }
 }
 
 class ShareEpisodeButtonBuilder extends InheritedWidget {
-  final WidgetBuilder Function(String podcastTitle, String podcastURL, String episodeTitle, String episodeID) builder;
+  final WidgetBuilder Function(String? podcastTitle, String? podcastURL, String? episodeTitle, String? episodeID) builder;
 
   ShareEpisodeButtonBuilder({
-    Key key,
-    @required this.builder,
-    @required Widget child,
-  })  : assert(builder != null),
-        assert(child != null),
-        super(key: key, child: child);
+    Key? key,
+    required this.builder,
+    required Widget child,
+  })  : super(key: key, child: child);
 
-  static ShareEpisodeButtonBuilder of(BuildContext context) {
+  static ShareEpisodeButtonBuilder? of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<ShareEpisodeButtonBuilder>();
   }
 

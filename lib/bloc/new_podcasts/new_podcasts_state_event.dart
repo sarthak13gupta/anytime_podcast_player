@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 
 /// Events
 class NewPodcastsEvent {}
@@ -6,7 +5,7 @@ class NewPodcastsEvent {}
 class NewPodcastsChartEvent extends NewPodcastsEvent {
   final int count;
 
-  NewPodcastsChartEvent({@required this.count});
+  NewPodcastsChartEvent({required this.count});
 }
 
 /// States
