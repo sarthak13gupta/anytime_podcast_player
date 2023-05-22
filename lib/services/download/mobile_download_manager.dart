@@ -50,8 +50,8 @@ class MobileDownloaderManager implements DownloadManager {
     }
 
     _port.listen((dynamic data) {
-      final id = data[0] as String;
-      final status = data[1] as DownloadTaskStatus;
+      final id = (data as List<dynamic>)[0] as String;
+      final status = DownloadTaskStatus(data[1] as int);
       final progress = data[2] as int;
 
       _updateDownloadState(id: id, progress: progress, status: status);
@@ -108,7 +108,7 @@ class MobileDownloaderManager implements DownloadManager {
     }
   }
 
-  static void downloadCallback(String id, DownloadTaskStatus status, int progress) {
+  static void downloadCallback(String id, int status, int progress) {
     final send = IsolateNameServer.lookupPortByName('downloader_send_port');
 
     send.send([id, status, progress]);
