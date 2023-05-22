@@ -43,8 +43,8 @@ class SleepSelector extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               elevation: 0,
               padding: padding,
-              foregroundColor: theme.primaryColor,
-              backgroundColor: theme.canvasColor,
+              foregroundColor: theme.buttonTheme.colorScheme.onPrimary,
+              backgroundColor: theme.scaffoldBackgroundColor,
               fixedSize: const Size(48.0, 48.0),
               shape: const CircleBorder(),
             ),
