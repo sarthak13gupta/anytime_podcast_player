@@ -26,6 +26,8 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'episode_comments.dart';
+
 /// This is the full-screen player Widget which is invoked by touching the mini player.
 /// This displays the podcast image, episode notes and standard playback controls.
 ///
@@ -54,7 +56,9 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
     var popped = false;
 
     // If the episode finishes we can close.
-    playingStateSubscription = audioBloc.playingState.where((state) => state == AudioState.stopped).listen((playingState) async {
+    playingStateSubscription = audioBloc.playingState
+        .where((state) => state == AudioState.stopped)
+        .listen((playingState) async {
       // Prevent responding to multiple stop events after we've popped and lost context.
       if (!popped) {
         Navigator.pop(context);
@@ -106,7 +110,8 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
             onNotification: (notification) {
               setState(() {
                 opacity = scrollPos =
-                    (notification.extent - notification.minExtent) / (notification.maxExtent - notification.minExtent);
+                    (notification.extent - notification.minExtent) /
+                        (notification.maxExtent - notification.minExtent);
               });
 
               return true;
@@ -115,19 +120,23 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
               fit: StackFit.expand,
               children: [
                 DefaultTabController(
-                    length: snapshot.data.hasChapters ? 3 : 2,
+                    length: snapshot.data.hasChapters ? 4 : 3,
                     initialIndex: snapshot.data.hasChapters ? 1 : 0,
                     child: Scaffold(
                       appBar: AppBar(
                         systemOverlayStyle: SystemUiOverlayStyle(
-                          statusBarIconBrightness: isLight ? Brightness.dark : Brightness.light,
-                          systemNavigationBarColor: Theme.of(context).bottomAppBarTheme.color,
+                          statusBarIconBrightness:
+                              isLight ? Brightness.dark : Brightness.light,
+                          systemNavigationBarColor:
+                              Theme.of(context).bottomAppBarTheme.color,
                           statusBarColor: Colors.transparent,
                         ),
-                        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                        backgroundColor:
+                            Theme.of(context).scaffoldBackgroundColor,
                         elevation: 0.0,
                         leading: IconButton(
-                          tooltip: L.of(context).minimise_player_window_button_label,
+                          tooltip:
+                              L.of(context).minimise_player_window_button_label,
                           icon: Icon(
                             Icons.keyboard_arrow_down,
                             color: Theme.of(context).primaryIconTheme.color,
@@ -171,7 +180,9 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
                     )),
                 if (scrollPos > 0)
                   Padding(
-                    padding: isEmbedded ? EdgeInsets.only(bottom: bottomPadding + 64) : EdgeInsets.zero,
+                    padding: isEmbedded
+                        ? EdgeInsets.only(bottom: bottomPadding + 64)
+                        : EdgeInsets.zero,
                     child: Opacity(
                       opacity: opacity,
                       child: Column(
@@ -191,8 +202,13 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return Padding(
-                        padding: isEmbedded ? EdgeInsets.only(bottom: bottomPadding + 64) : EdgeInsets.zero,
-                        child: NowPlayingOptionsSelector(scrollPos: scrollPos, baseSize: baseSize, isEmbedded: isEmbedded),
+                        padding: isEmbedded
+                            ? EdgeInsets.only(bottom: bottomPadding + 64)
+                            : EdgeInsets.zero,
+                        child: NowPlayingOptionsSelector(
+                            scrollPos: scrollPos,
+                            baseSize: baseSize,
+                            isEmbedded: isEmbedded),
                       );
                     }
                     return SizedBox();
@@ -213,9 +229,12 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
       scaffoldMessenger.showSnackBar(
         SnackBar(
           behavior: SnackBarBehavior.floating,
-          margin: EdgeInsets.only(bottom: baseSize + (isEmbedded ? bottomPadding + 64.0 : 4.0)),
+          margin: EdgeInsets.only(
+              bottom: baseSize + (isEmbedded ? bottomPadding + 64.0 : 4.0)),
           content: Text(
-            policy is SleepPolicyOff ? texts.sleep_episode_function_toggled_off : texts.sleep_episode_function_toggled_on,
+            policy is SleepPolicyOff
+                ? texts.sleep_episode_function_toggled_off
+                : texts.sleep_episode_function_toggled_on,
           ),
         ),
       );
@@ -260,6 +279,12 @@ class EpisodeTabBar extends StatelessWidget {
             child: Text(L.of(context).notes_label),
           ),
         ),
+        Tab(
+          child: Align(
+            alignment: Alignment.center,
+            child: Text("Comments"),
+          ),
+        ),
       ],
     );
   }
@@ -301,7 +326,9 @@ class EpisodeTabBarView extends StatelessWidget {
                 textGroup: textGroup,
               );
             }),
-        NowPlayingShowNotes(title: episode.title, description: episode.description),
+        NowPlayingShowNotes(
+            title: episode.title, description: episode.description),
+        EpisodeComments(episode),
       ],
     );
   }
@@ -344,7 +371,9 @@ class NowPlayingEpisode extends StatelessWidget {
                             : DelayedCircularProgressIndicator(),
                         errorPlaceholder: placeholderBuilder != null
                             ? placeholderBuilder?.errorBuilder()(context)
-                            : Image(image: AssetImage('assets/images/anytime-placeholder-logo.png')),
+                            : Image(
+                                image: AssetImage(
+                                    'assets/images/anytime-placeholder-logo.png')),
                       ),
                     ),
                     Expanded(
@@ -373,7 +402,9 @@ class NowPlayingEpisode extends StatelessWidget {
                             : DelayedCircularProgressIndicator(),
                         errorPlaceholder: placeholderBuilder != null
                             ? placeholderBuilder?.errorBuilder()(context)
-                            : Image(image: AssetImage('assets/images/anytime-placeholder-logo.png')),
+                            : Image(
+                                image: AssetImage(
+                                    'assets/images/anytime-placeholder-logo.png')),
                       ),
                     ),
                     Expanded(

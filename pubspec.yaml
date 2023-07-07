@@ -7,7 +7,10 @@ environment:
   sdk: ">=2.10.0 <4.0.0"
   flutter: ">=3.7.12"
 
-dependencies:
+dependencies: 
+  nostr_tools: ^1.0.7
+  comment_box: ^0.0.18
+  uuid: ^3.0.4
   auto_size_text: ^3.0.0
   audio_service: ^0.18.9
   audio_session: ^0.1.14
