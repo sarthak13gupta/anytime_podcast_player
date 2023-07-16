@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:anytime/api/podcast/mobile_podcast_api.dart';
 import 'package:anytime/api/podcast/podcast_api.dart';
+import 'package:anytime/bloc/comments/comments_bloc.dart';
 import 'package:anytime/bloc/discovery/discovery_bloc.dart';
 import 'package:anytime/bloc/new_podcasts/new_podcasts_bloc.dart';
 import 'package:anytime/bloc/podcast/audio_bloc.dart';
@@ -235,7 +236,12 @@ class AnytimePodcastAppState extends State<AnytimePodcastApp>
             podcastService: widget.podcastService,
           ),
           dispose: (_, value) => value.dispose(),
-        )
+        ),
+        Provider<CommentBloc>(
+          create: (_) => CommentBloc(
+              episodeStream: widget.audioPlayerService.episodeEvent),
+          dispose: (_, value) => value.dispose(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -261,11 +267,12 @@ class AnytimeHomePage extends StatefulWidget {
   final bool topBarVisible;
   final bool inlineSearch;
 
-  AnytimeHomePage(
-      {this.title,
-      this.noSubscriptionsMessage,
-      this.topBarVisible = true,
-      this.inlineSearch = false});
+  AnytimeHomePage({
+    this.title,
+    this.noSubscriptionsMessage,
+    this.topBarVisible = true,
+    this.inlineSearch = false,
+  });
 
   @override
   State<AnytimeHomePage> createState() => _AnytimeHomePageState();

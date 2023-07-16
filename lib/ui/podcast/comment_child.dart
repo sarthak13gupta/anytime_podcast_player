@@ -2,16 +2,11 @@ import 'package:comment_box/comment/comment.dart';
 // import 'package:commentsplatform/commentsPage.dart';
 // import 'package:commentsplatform/user_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
-import 'package:intl/intl.dart';
 
 import '../../entities/comment_model.dart';
 
 class CommentChild extends StatefulWidget {
-  CommentModel userRootComment;
-  // Function updateReplyData;
-  // CommentChild(this.userRootComment, this.updateReplyData, {super.key});
+  final CommentModel userRootComment;
 
   CommentChild(this.userRootComment);
 
@@ -21,33 +16,10 @@ class CommentChild extends StatefulWidget {
 
 class _CommentChildState extends State<CommentChild> {
   Widget userCommentTree = Container();
-  // Map<String, List<CommentModel>> rootUserReplies = CommentModel.threadedReplies;
 
   void updateCommentRender() {
-    setState(() {
-      // widget.userRootComment.showReplies = !widget.userRootComment.showReplies;
-    });
+    setState(() {});
   }
-
-  // void renderCommentTree(CommentModel data) {
-  //   setState(() {
-  //     // CommentModel user;
-  //     data.showReplies = !data.showReplies;
-  //     if (data.showReplies) {
-  //       userCommentTree = CommentModel.userCommentTreeWidget(
-  //           data, widget.updateReplyData, updateCommentRender);
-  //     }
-
-  //     // widget.updateReplyData();
-  //   });
-  // }
-
-  // Text dateTimeFormat(DateTime date) {
-  //   DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm");
-  //   String dateTime = dateFormat.format(date);
-
-  //   return Text(dateTime);
-  // }
 
   Widget rootCommentWidget(BuildContext context) {
     final themeData = Theme.of(context);
@@ -78,40 +50,6 @@ class _CommentChildState extends State<CommentChild> {
                 style: themeData.primaryTextTheme.bodyLarge,
               ),
             ),
-
-            // Padding(
-            //     padding:const EdgeInsets.symmetric(horizontal: 16, vertical: 8),,
-            //     child:Text(
-            //       widget.userRootComment.userMessage,
-            //       style: themeData.primaryTextTheme.bodyLarge, ,
-            //   ),
-            // DefaultTextStyle(
-            // style: Theme.of(context).textTheme.caption.copyWith(
-            //     color: Colors.grey[700], fontWeight: FontWeight.bold),
-            // child:
-            // Padding(
-            //   padding: const EdgeInsets.only(top: 4, left: 20),
-            //   child: Row(
-            //     children: [
-            //       const SizedBox(
-            //         width: 8,
-            //       ),
-            //       GestureDetector(onTap: () {}, child: const Text('Like')),
-            //       const SizedBox(
-            //         width: 24,
-            //       ),
-            //       GestureDetector(
-            //           onTap: () {
-            //             // setState(() {
-            //             //   CommentModel.replyToUserComment(widget.userRootComment);
-            //             //   widget.updateReplyData();
-            //             // });
-            //           },
-            //           child: const Text('Reply')),
-            //     ],
-            //   ),
-            // ),
-            // ),
           ],
         ),
       ),
@@ -121,10 +59,5 @@ class _CommentChildState extends State<CommentChild> {
   @override
   Widget build(BuildContext context) {
     return rootCommentWidget(context);
-    // print(
-    //     'widget.userRootComment.showReplies: ${widget.userRootComment.showReplies}');
-    // return widget.userRootComment.showReplies
-    //     ? userCommentTree
-    //     : rootCommentWidget(context);
   }
 }

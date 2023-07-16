@@ -1,5 +1,4 @@
-import 'dart:convert';
-
+import 'package:anytime/bloc/comments/comments_bloc.dart';
 import 'package:anytime/entities/comment_model.dart';
 import 'package:anytime/ui/podcast/comment_child.dart';
 import 'package:flutter/material.dart';
@@ -7,89 +6,54 @@ import 'package:flutter/material.dart';
 import 'package:nostr_tools/nostr_tools.dart';
 
 import '../../entities/time_ago.dart';
+import '../widgets/delayed_progress_indicator.dart';
 
 class CommentRender extends StatefulWidget {
-  const CommentRender({Key key}) : super(key: key);
+  final CommentBloc commentBloc;
+  const CommentRender({Key key, this.commentBloc}) : super(key: key);
 
   @override
   State<CommentRender> createState() => _CommentRenderState();
 }
 
 class _CommentRenderState extends State<CommentRender> {
-  final relaysList = [
-    "wss://relay.damus.io",
-    // "wss://nostr1.tunnelsats.com",
-    // "wss://nostr-pub.wellorder.net",
-    // "wss://relay.nostr.info",
-    // "wss://nostr-relay.wlvs.space",
-    // "wss://nostr.bitcoiner.social",
-    // "wss://nostr-01.bolt.observer",
-    // "wss://relayer.fiatjaf.com",
-  ];
+  List<Event> _events = [];
+  Map<String, Metadata> _metaDatas = {};
 
-  bool _isConnected = false;
-  final _relayPool = RelayApi(relayUrl: 'wss://relay.damus.io');
-  // RelayPoolApi _relayPool = RelayPoolApi(relaysList: []);
-
-  final List<Event> _events = [];
-  final Map<String, Metadata> _metaDatas = {};
+  Stream<Event> relayStream;
 
   @override
   void initState() {
     super.initState();
+    _init();
+    _setCommentListener();
+
+    // to make sure relay is reconnected on disconnection
+    // widget.commentBloc.isConnectedStream.listen((event) {
+    //   _connectRelay();
+    // });
   }
 
-  @override
-  void dispose() {
-    _relayPool.close();
-    super.dispose();
+  void _init() {
+    _events = widget.commentBloc.events;
+    _metaDatas = widget.commentBloc.metaDatas;
   }
 
-  Stream get relayStream async* {
-    final stream = await _relayPool.connect();
-
-    _relayPool.on((event) {
-      if (event == RelayEvent.connect) {
-        setState(() => _isConnected = true);
-      } else if (event == RelayEvent.error) {
-        setState(() => _isConnected = false);
-      }
+  void _setCommentListener() {
+    widget.commentBloc.eventStream.listen((Event event) {
+      setState(() {
+        _events = widget.commentBloc.events;
+        _metaDatas = widget.commentBloc.metaDatas;
+      });
     });
-
-    _relayPool.sub([
-      Filter(
-        kinds: [1],
-        limit: 100,
-      )
-    ]);
-
-    await for (var message in stream) {
-      if (message.type == 'EVENT') {
-        Event event = message.message as Event;
-
-        if (event.kind == 1) {
-          _events.add(event);
-          _relayPool.sub([
-            Filter(kinds: [0], authors: [event.pubkey])
-          ]);
-        } else if (event.kind == 0) {
-          Metadata metadata = Metadata.fromJson(
-              jsonDecode(event.content) as Map<String, dynamic>);
-          _metaDatas[event.pubkey] = metadata;
-        }
-      }
-      yield message;
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // _relayPool = RelayPoolApi(relaysList: relaysList);
-
-    return StreamBuilder<dynamic>(
-      stream: relayStream,
+    return StreamBuilder<Event>(
+      stream: widget.commentBloc.eventStream,
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
+        if (_events.isNotEmpty) {
           return ListView.builder(
             itemCount: _events.length,
             itemBuilder: (context, index) {
@@ -97,7 +61,8 @@ class _CommentRenderState extends State<CommentRender> {
               final metadata = _metaDatas[event.pubkey];
               final userRootComment = CommentModel(
                   metadata?.displayName ??
-                      (metadata?.display_name ?? event.pubkey),
+                      (metadata?.display_name ??
+                          Nip19().npubEncode(event.pubkey).substring(0, 11)),
                   metadata?.picture ?? 'assets/icons/person.png',
                   event.content,
                   TimeAgo.format(event.created_at),
@@ -108,10 +73,17 @@ class _CommentRenderState extends State<CommentRender> {
               return CommentChild(userRootComment);
             },
           );
-        } else if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: Text('Loading....'));
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+        // else if (snapshot.connectionState == ConnectionState.waiting &&
+        //     _events.isNotEmpty) {
+        //   return const Center(child: Text('Loading....'));
+        // } else if (_events.isEmpty) {
+        //   return const Center(child: Text('No Comments Made...'));
+        // } else if (snapshot.hasError) {
+        //   return Center(child: Text('Error: ${snapshot.error}'));
+        // }
+        else {
+          return DelayedCircularProgressIndicator();
         }
         return Container(); // Return a default widget in case none of the conditions match
       },
