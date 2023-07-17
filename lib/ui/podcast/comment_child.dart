@@ -17,10 +17,6 @@ class CommentChild extends StatefulWidget {
 class _CommentChildState extends State<CommentChild> {
   Widget userCommentTree = Container();
 
-  void updateCommentRender() {
-    setState(() {});
-  }
-
   Widget rootCommentWidget(BuildContext context) {
     final themeData = Theme.of(context);
 
@@ -37,6 +33,7 @@ class _CommentChildState extends State<CommentChild> {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(50))),
                 child: CircleAvatar(
+                    foregroundColor: Colors.white,
                     radius: 50,
                     backgroundImage: CommentBox.commentImageParser(
                         imageURLorPath: widget.userRootComment.userPic)),

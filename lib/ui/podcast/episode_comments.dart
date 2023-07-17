@@ -31,7 +31,7 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
   void initState() {
     super.initState();
     commentBloc = Provider.of<CommentBloc>(context, listen: false);
-    commentBloc.init();
+    commentBloc.reloadConnection();
   }
 
   @override
@@ -40,23 +40,17 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
     _textFieldFocusNode.dispose();
   }
 
-  void _createComment() {
-    final List<Event> events = commentBloc.events;
-    // also re loading the messages.
-    // call create comment method inside the comments_Bloc\
-
-    // first check whether this is the first comment
-
-    if (commentBloc.isRootEventPresent == false) {
-      setState(() {
-        commentBloc.createRootEvent();
-        commentBloc.createComment(commentController.text.trim());
-      });
-    } else {
-      setState(() {
-        commentBloc.createComment(commentController.text.trim());
-      });
+  void _createComment() async {
+    // check whether relay is connected or not
+    if (commentBloc.isConnected == false) {
+      commentBloc.initRelayConnection();
     }
+    if (commentBloc.isRootEventPresent == false) {
+      await commentBloc.createRootEvent(commentController.text.trim());
+    } else {
+      commentBloc.createComment(commentController.text.trim());
+    }
+    setState(() {});
   }
 
   Widget rootComment(List<CommentModel> data) {

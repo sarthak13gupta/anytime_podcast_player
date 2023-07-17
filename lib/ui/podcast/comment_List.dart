@@ -73,13 +73,14 @@ class _CommentRenderState extends State<CommentRender> {
               return CommentChild(userRootComment);
             },
           );
+          // }
+          // else if (snapshot.connectionState == ConnectionState.waiting &&
+          //     _events.isNotEmpty) {
+          //   return const Center(child: Text('Loading....'));
+        } else if (_events.isEmpty) {
+          return const Center(child: Text('No Comments Made...'));
         }
-        // else if (snapshot.connectionState == ConnectionState.waiting &&
-        //     _events.isNotEmpty) {
-        //   return const Center(child: Text('Loading....'));
-        // } else if (_events.isEmpty) {
-        //   return const Center(child: Text('No Comments Made...'));
-        // } else if (snapshot.hasError) {
+        // else if (snapshot.hasError) {
         //   return Center(child: Text('Error: ${snapshot.error}'));
         // }
         else {

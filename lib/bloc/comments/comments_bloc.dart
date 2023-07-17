@@ -22,10 +22,12 @@ class CommentBloc extends Bloc {
   //   // "wss://nostr-01.bolt.observer",
   //   // "wss://relayer.fiatjaf.com",
   // ];
+
   List<Event> events = [];
   String _rootId;
   bool isRootEventPresent = false;
   Episode currentEpisode;
+  String replyToRoot;
 
   final Map<String, Metadata> metaDatas = {};
 
@@ -35,7 +37,7 @@ class CommentBloc extends Bloc {
 
   bool _addEventToController = false;
 
-  bool _isConnected = false;
+  bool isConnected = false;
   final StreamController<bool> _isConnectedController =
       StreamController<bool>.broadcast();
 
@@ -79,7 +81,7 @@ class CommentBloc extends Bloc {
       // reload in case of a different episode
       if (currentEpisode != episode) {
         currentEpisode = episode;
-        _reloadConnection();
+        reloadConnection();
       }
     });
   }
@@ -90,7 +92,7 @@ class CommentBloc extends Bloc {
   }
 
   // create a comment
-  void createComment(String content) {
+  Future<void> createComment(String content) async {
     Map<String, dynamic> eventData = <String, dynamic>{
       "created_at": DateTime.now().millisecondsSinceEpoch ~/ 1000,
       "kind": 1,
@@ -99,23 +101,23 @@ class CommentBloc extends Bloc {
       ],
       "content": content,
     };
-    signEvent(eventData);
+    await signEvent(eventData);
   }
 
   // reload relay connection via pull to refresh
-  void _reloadConnection() {
+  Future<void> reloadConnection() async {
     // setting each variable to its default value
     isRootEventPresent = false;
     _addEventToController = false;
     _isNewEventPublishing = false;
-    _isConnected = false;
+    isConnected = false;
     _rootId = null;
     events.clear();
     metaDatas.clear();
     _eventMap.clear();
 
     // calling relay connection again
-    initRelayConnection();
+    await initRelayConnection();
   }
 
   Stream<Event> _fetchRootEvent() {
@@ -135,7 +137,8 @@ class CommentBloc extends Bloc {
         .map((message) => message.message as Event);
   }
 
-  void createRootEvent() {
+  Future<void> createRootEvent(String userComment) async {
+    replyToRoot = userComment;
     // if no Root Event present then create one
     Map<String, dynamic> eventData = <String, dynamic>{
       "created_at": DateTime.now().millisecondsSinceEpoch ~/ 1000,
@@ -147,10 +150,10 @@ class CommentBloc extends Bloc {
       "content":
           "comments about episode ${currentEpisode.title} at ${currentEpisode.contentUrl}",
     };
-    signEvent(eventData);
+    await signEvent(eventData);
   }
 
-  void initRelayConnection() async {
+  Future<void> initRelayConnection() async {
     stream = await _connectRelayPool();
 
     // if no event received then will have to show that there are no comments present
@@ -165,7 +168,6 @@ class CommentBloc extends Bloc {
           _rootId = event.id;
           isRootEventPresent = true;
 
-          // subscribing to replies to the root level comment
           _relayPool.sub([
             Filter(
               kinds: [1],
@@ -207,18 +209,38 @@ class CommentBloc extends Bloc {
 
     _relayPool.on((event) {
       if (event == RelayEvent.connect) {
-        _isConnected = true;
-        _isConnectedController.add(_isConnected);
+        isConnected = true;
+        _isConnectedController.add(isConnected);
       } else if (event == RelayEvent.error) {
-        _isConnected = false;
-        _reloadConnection();
-        _isConnectedController.add(_isConnected);
+        isConnected = false;
+        reloadConnection();
+        _isConnectedController.add(isConnected);
       }
     });
+    if (_rootId == null) {
+      // Stream<Event> rootEventStream = _fetchRootEvent();
+      _relayPool.sub([
+        Filter(
+          kinds: [1],
+          limit: 1,
+          // t: ['#r', currentEpisode.contentUrl],
+          t: [currentEpisode.contentUrl],
+        )
+      ]);
+    } else {
+      _relayPool.sub([
+        Filter(
+          kinds: [1],
+          limit: 100,
+          // denoting that this is a root level reply
+          e: [_rootId],
+        )
+      ]);
+    }
 
-    Stream<Event> rootEventStream = _fetchRootEvent();
-
-    return rootEventStream;
+    return _streamConnect
+        .where((message) => message.type == 'EVENT')
+        .map((message) => message.message as Event);
   }
 
   void _addEvent(Event event) {
@@ -250,12 +272,12 @@ class CommentBloc extends Bloc {
     // as soon as we get the pubkey break the process.
   }
 
-  void signEventResult(Map<String, dynamic> signedEvent) {
+  Future<void> signEventResult(Map<String, dynamic> signedEvent) async {
     // need to check whether to keep this if statement
-    if (previousEvent == signedEvent) {
-      return;
-    }
-    previousEvent = signedEvent;
+    // if (previousEvent == signedEvent) {
+    //   return;
+    // }
+    // previousEvent = signedEvent;
 
     final signedNostrEvent = Event(
         kind: signedEvent['kind'] as int,
@@ -266,13 +288,15 @@ class CommentBloc extends Bloc {
         sig: signedEvent['sig'] as String,
         pubkey: signedEvent['pubkey'] as String);
 
-    _publishNewEvent(signedNostrEvent);
+    await _publishNewEvent(signedNostrEvent);
   }
 
-  void _publishNewEvent(Event signedNostrEvent) {
+  Future<void> _publishNewEvent(Event signedNostrEvent) async {
     try {
       // call a loading state
       _isNewEventPublishing = true;
+
+      // check if _relayPool is not closed
       _relayPool.publish(signedNostrEvent);
       // end the loading state
       _isNewEventPublishing = false;
@@ -280,14 +304,23 @@ class CommentBloc extends Bloc {
       throw Exception(e);
     }
 
+    // if it was the root event being published
+    // creating the user comment as a reply to it
+    if (signedNostrEvent.tags[0][0] == 't' &&
+        signedNostrEvent.tags[0][1] == currentEpisode.contentUrl) {
+      _rootId = signedNostrEvent.id;
+      isRootEventPresent = true;
+      await createComment(replyToRoot);
+    }
+
     if (_isNewEventPublishing == false) {
-      _reloadConnection();
+      await reloadConnection();
     }
   }
 
   @override
   void dispose() {
-    _relayPool.close();
+    // _relayPool.close();
     _isConnectedController.close();
     _eventController.close();
     _publicKeyController.close();
