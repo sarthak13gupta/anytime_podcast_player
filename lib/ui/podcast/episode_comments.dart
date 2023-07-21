@@ -1,8 +1,7 @@
 import 'package:anytime/entities/comment_model.dart';
 import 'package:anytime/entities/episode.dart';
-import 'package:comment_box/comment/comment.dart';
+import 'package:anytime/ui/podcast/episode_comment_box.dart';
 import 'package:flutter/material.dart';
-import 'package:nostr_tools/nostr_tools.dart';
 import 'package:provider/provider.dart';
 
 import '../../bloc/comments/comments_bloc.dart';
@@ -20,7 +19,7 @@ class EpisodeComments extends StatefulWidget {
 class _EpisodeCommentsState extends State<EpisodeComments> {
   final formKey = GlobalKey<FormState>();
   final TextEditingController commentController = TextEditingController();
-  String labelText = "Add a comment...";
+  String hintText = "Add a comment...";
   List<CommentModel> rootUserdata = CommentModel.filedata;
 
   final FocusNode _textFieldFocusNode = FocusNode();
@@ -31,7 +30,12 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
   void initState() {
     super.initState();
     commentBloc = Provider.of<CommentBloc>(context, listen: false);
+    // commentBloc.init();
+    commentBloc.getPubKey();
     commentBloc.reloadConnection();
+
+    // getting the pubkey is necessary because we need to create the key pair
+    // before we try to sign the events to be able to publish them to the relay
   }
 
   @override
@@ -41,10 +45,6 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
   }
 
   void _createComment() async {
-    // check whether relay is connected or not
-    if (commentBloc.isConnected == false) {
-      commentBloc.initRelayConnection();
-    }
     if (commentBloc.isRootEventPresent == false) {
       await commentBloc.createRootEvent(commentController.text.trim());
     } else {
@@ -78,12 +78,13 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
           }
         },
         child: CommentBox(
-          userImage: CommentBox.commentImageParser(
-            imageURLorPath: "assets/icons/person.png",
-          ),
-          labelText: labelText,
+          // userImage: Icon(Icons.person),
+          // // CommentBox.commentImageParser(
+          // //   imageURLorPath: "assets/icons/person.png",
+          // // ),
+          hintText: hintText,
           errorText: 'Comment cannot be blank',
-          withBorder: false,
+          withBorder: _textFieldFocusNode.hasFocus ? true : false,
           sendButtonMethod: () {
             if (formKey.currentState.validate()) {
               // Rest of your code
@@ -97,11 +98,11 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
           focusNode: _textFieldFocusNode,
           formKey: formKey,
           commentController: commentController,
-          // textColor: themeData.textTheme.titleMedium.color,
+          textColor: themeData.textTheme.titleMedium.color,
           sendWidget: _textFieldFocusNode.hasFocus
               ? Icon(
                   Icons.send,
-                  size: 30,
+                  size: 20,
                 )
               : SizedBox.shrink(),
           child: CommentRender(

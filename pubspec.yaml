@@ -9,7 +9,6 @@ environment:
 
 dependencies: 
   nostr_tools: ^1.0.7
-  comment_box: ^0.0.18
   uuid: ^3.0.4
   auto_size_text: ^3.0.0
   audio_service: ^0.18.9
