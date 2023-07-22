@@ -48,7 +48,6 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
 
   void _createComment() async {
     if (commentBloc.isRootEventPresent == false) {
-      // await commentBloc.createRootEvent(commentController.text.trim());
       commentBloc.commentActionController
           .add(CreateRootComment(commentController.text.trim()));
     } else {
@@ -93,7 +92,6 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
             withBorder: _textFieldFocusNode.hasFocus ? true : false,
             sendButtonMethod: () {
               if (formKey.currentState.validate()) {
-                // Rest of your code
                 _createComment();
                 commentController.clear();
                 FocusScope.of(context).unfocus();

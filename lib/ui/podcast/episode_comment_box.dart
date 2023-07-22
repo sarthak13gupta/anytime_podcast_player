@@ -43,22 +43,6 @@ class _CommentBoxState extends State<CommentBox> {
   int maxLines = 2;
   Color sendWidgetColor = Colors.grey;
 
-  // Widget _placeholderImage(ThemeData themeData) {
-  //   if (widget.userImage != null) {
-  //     return CircleAvatar(
-  //       backgroundImage:
-  //           CommentBox.commentImageParser(imageURLorPath: widget.userImage),
-  //     );
-  //   }
-
-  //   return CircleAvatar(
-  //     child: Icon(
-  //       Icons.person,
-  //       color: themeData.iconTheme.color,
-  //     ),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
