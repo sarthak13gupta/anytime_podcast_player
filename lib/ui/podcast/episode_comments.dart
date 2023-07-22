@@ -69,44 +69,49 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
 
     return Theme(
       data: themeData,
-      child: GestureDetector(
-        onTap: () {
-          FocusScopeNode currentFocus = FocusScope.of(context);
-
-          if (!currentFocus.hasPrimaryFocus) {
-            _textFieldFocusNode.unfocus();
-          }
+      child: RefreshIndicator(
+        onRefresh: () async {
+          await commentBloc.reloadConnection();
         },
-        child: CommentBox(
-          // userImage: Icon(Icons.person),
-          // // CommentBox.commentImageParser(
-          // //   imageURLorPath: "assets/icons/person.png",
-          // // ),
-          hintText: hintText,
-          errorText: 'Comment cannot be blank',
-          withBorder: _textFieldFocusNode.hasFocus ? true : false,
-          sendButtonMethod: () {
-            if (formKey.currentState.validate()) {
-              // Rest of your code
-              _createComment();
-              commentController.clear();
-              FocusScope.of(context).unfocus();
-            } else {
-              formKey.currentState.setState(() {});
+        child: GestureDetector(
+          onTap: () {
+            FocusScopeNode currentFocus = FocusScope.of(context);
+
+            if (!currentFocus.hasPrimaryFocus) {
+              _textFieldFocusNode.unfocus();
             }
           },
-          focusNode: _textFieldFocusNode,
-          formKey: formKey,
-          commentController: commentController,
-          textColor: themeData.textTheme.titleMedium.color,
-          sendWidget: _textFieldFocusNode.hasFocus
-              ? Icon(
-                  Icons.send,
-                  size: 20,
-                )
-              : SizedBox.shrink(),
-          child: CommentRender(
-            commentBloc: commentBloc,
+          child: CommentBox(
+            // userImage: Icon(Icons.person),
+            // // CommentBox.commentImageParser(
+            // //   imageURLorPath: "assets/icons/person.png",
+            // // ),
+            hintText: hintText,
+            errorText: 'Comment cannot be blank',
+            withBorder: _textFieldFocusNode.hasFocus ? true : false,
+            sendButtonMethod: () {
+              if (formKey.currentState.validate()) {
+                // Rest of your code
+                _createComment();
+                commentController.clear();
+                FocusScope.of(context).unfocus();
+              } else {
+                formKey.currentState.setState(() {});
+              }
+            },
+            focusNode: _textFieldFocusNode,
+            formKey: formKey,
+            commentController: commentController,
+            textColor: themeData.textTheme.titleMedium.color,
+            sendWidget: _textFieldFocusNode.hasFocus
+                ? Icon(
+                    Icons.send,
+                    size: 20,
+                  )
+                : SizedBox.shrink(),
+            child: CommentRender(
+              commentBloc: commentBloc,
+            ),
           ),
         ),
       ),

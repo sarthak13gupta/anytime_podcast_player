@@ -45,79 +45,74 @@ class _CommentRenderState extends State<CommentRender> {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: () async {
-        await widget.commentBloc.reloadConnection();
-      },
-      child: StreamBuilder<Event>(
-        stream: widget.commentBloc.eventStream,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (_events.isNotEmpty)
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: _events.length,
-                      itemBuilder: (context, index) {
-                        final event = _events[index];
-                        final metadata = _metaDatas[event.pubkey];
-                        final userRootComment = CommentModel(
-                            metadata?.displayName ??
-                                (metadata?.display_name ??
-                                    Nip19()
-                                        .npubEncode(event.pubkey)
-                                        .substring(0, 11)),
-                            metadata?.picture,
-                            event.content,
-                            TimeAgo.format(event.created_at),
-                            '',
-                            event.id,
-                            false);
+    return StreamBuilder<Event>(
+      stream: widget.commentBloc.eventStream,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (_events.isNotEmpty)
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _events.length,
+                    itemBuilder: (context, index) {
+                      final event = _events[index];
+                      final metadata = _metaDatas[event.pubkey];
+                      final userRootComment = CommentModel(
+                          metadata?.displayName ??
+                              (metadata?.display_name ??
+                                  Nip19()
+                                      .npubEncode(event.pubkey)
+                                      .substring(0, 11)),
+                          metadata?.picture,
+                          event.content,
+                          TimeAgo.format(event.created_at),
+                          '',
+                          event.id,
+                          false);
 
-                        return CommentChild(userRootComment);
-                      },
-                    ),
+                      return CommentChild(userRootComment);
+                    },
                   ),
-                SizedBox(
-                  height: 10,
                 ),
-                DelayedCircularProgressIndicator(),
-              ],
-            );
-          }
-          if (snapshot.connectionState == ConnectionState.active ||
-              snapshot.connectionState == ConnectionState.done) {
-            return ListView.builder(
-              itemCount: _events.length,
-              itemBuilder: (context, index) {
-                final event = _events[index];
-                final metadata = _metaDatas[event.pubkey];
-                final userRootComment = CommentModel(
-                    metadata?.displayName ??
-                        (metadata?.display_name ??
-                            Nip19().npubEncode(event.pubkey).substring(0, 11)),
-                    metadata?.picture,
-                    event.content,
-                    TimeAgo.format(event.created_at),
-                    '',
-                    event.id,
-                    false);
+              SizedBox(
+                height: 10,
+              ),
+              DelayedCircularProgressIndicator(),
+            ],
+          );
+        }
+        if (snapshot.connectionState == ConnectionState.active ||
+            snapshot.connectionState == ConnectionState.done) {
+          return ListView.builder(
+            itemCount: _events.length,
+            itemBuilder: (context, index) {
+              final event = _events[index];
+              final metadata = _metaDatas[event.pubkey];
+              final userRootComment = CommentModel(
+                  metadata?.displayName ??
+                      (metadata?.display_name ??
+                          Nip19().npubEncode(event.pubkey).substring(0, 11)),
+                  metadata?.picture,
+                  event.content,
+                  TimeAgo.format(event.created_at),
+                  '',
+                  event.id,
+                  false);
 
-                return CommentChild(userRootComment);
-              },
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('${snapshot.error}'),
-            );
-          } else {
-            return DelayedCircularProgressIndicator();
-          }
-        },
-      ),
+              return CommentChild(userRootComment);
+            },
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text('${snapshot.error}'),
+          );
+        } else {
+          return DelayedCircularProgressIndicator();
+        }
+      },
     );
   }
 }
