@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 import 'package:nostr_tools/nostr_tools.dart';
 
-import '../../entities/time_ago.dart';
 import '../widgets/delayed_progress_indicator.dart';
 
 class CommentRender extends StatefulWidget {
@@ -44,6 +43,7 @@ class _CommentRenderState extends State<CommentRender> {
   }
 
   CommentModel _formUserComment(Event event, Metadata metadata) {
+    print('npubKey ${Nip19().npubEncode(event.pubkey)}');
     return CommentModel(
       userName: metadata?.displayName ??
           (metadata?.display_name ??

@@ -1,5 +1,4 @@
 import 'package:anytime/bloc/comments/comments_state_event.dart';
-import 'package:anytime/entities/comments.dart';
 import 'package:anytime/entities/episode.dart';
 import 'package:anytime/ui/podcast/episode_comment_box.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +6,6 @@ import 'package:provider/provider.dart';
 
 import '../../bloc/comments/comments_bloc.dart';
 import 'comment_list.dart';
-import 'comment_child.dart';
 
 class EpisodeComments extends StatefulWidget {
   final Episode episode;
@@ -23,6 +21,7 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
   String hintText = "Add a comment...";
 
   final FocusNode _textFieldFocusNode = FocusNode();
+  String userImage;
 
   CommentBloc commentBloc;
 
@@ -34,10 +33,16 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
   }
 
   void init() {
-    // getting the pubkey is necessary because we need to create the key pair
-    // before we try to sign the events to be able to publish them to the relay
-    commentBloc.commentActionController.add(GetPubKeyEvent());
+    commentBloc.commentActionController.add(GetUserPubKey());
     commentBloc.commentActionController.add(ReloadConnection());
+
+    commentBloc.userMetaDataStream.listen((metadata) {
+      if (metadata != null) {
+        setState(() {
+          userImage = metadata.picture;
+        });
+      }
+    });
   }
 
   @override
@@ -51,21 +56,10 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
       commentBloc.commentActionController
           .add(CreateRootComment(commentController.text.trim()));
     } else {
-      // commentBloc.createComment(commentController.text.trim());
       commentBloc.commentActionController
           .add(CreateReplyComment(commentController.text.trim()));
     }
     setState(() {});
-  }
-
-  Widget rootComment(List<CommentModel> data) {
-    return ListView(
-      children: data.map(
-        (user) {
-          return CommentChild(user);
-        },
-      ).toList(),
-    );
   }
 
   @override
@@ -87,8 +81,8 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
             }
           },
           child: CommentBox(
+            userImage: userImage,
             hintText: hintText,
-            errorText: 'Comment cannot be blank',
             withBorder: _textFieldFocusNode.hasFocus ? true : false,
             sendButtonMethod: () {
               if (formKey.currentState.validate()) {

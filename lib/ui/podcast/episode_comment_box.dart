@@ -9,9 +9,7 @@ class CommentBox extends StatefulWidget {
   final Function() sendButtonMethod;
   final TextEditingController commentController;
   final String userImage;
-  String labelText;
   String hintText;
-  final String errorText;
   final Widget sendWidget;
   final Color backgroundColor;
   final Color textColor;
@@ -26,9 +24,7 @@ class CommentBox extends StatefulWidget {
     this.commentController,
     this.sendWidget,
     this.userImage,
-    this.labelText,
     this.focusNode,
-    this.errorText,
     this.withBorder = true,
     this.backgroundColor,
     this.textColor,
@@ -71,7 +67,6 @@ class _CommentBoxState extends State<CommentBox> {
                       height: 53,
                       width: double.infinity,
                       padding: EdgeInsets.fromLTRB(0, 2, 0, 2),
-                      // child: Card(
                       alignment: Alignment.centerLeft,
                       child: TextFormField(
                         textAlignVertical: TextAlignVertical.center,
@@ -131,8 +126,6 @@ class _CommentBoxState extends State<CommentBox> {
                             color: sendWidgetColor,
                           ),
                           onPressed: () {
-                            // print(
-                            //     "widget.commentController.text ${widget.commentController.text}");
                             if (widget.commentController.text != '') {
                               widget.sendButtonMethod();
                             }

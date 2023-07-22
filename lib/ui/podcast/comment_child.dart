@@ -14,9 +14,9 @@ class CommentChild extends StatefulWidget {
 class _CommentChildState extends State<CommentChild> {
   Widget userCommentTree = Container();
 
-  Widget rootCommentWidget(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     final themeData = Theme.of(context);
-
     return Theme(
       data: themeData,
       child: Padding(
@@ -45,10 +45,5 @@ class _CommentChildState extends State<CommentChild> {
         ),
       ),
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return rootCommentWidget(context);
   }
 }

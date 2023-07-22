@@ -1,7 +1,6 @@
 class CommentAction {}
 
 /// Events
-
 class CreateRootComment extends CommentAction {
   final String userComment;
   CreateRootComment(this.userComment);
@@ -16,8 +15,8 @@ class ReloadConnection extends CommentAction {
   ReloadConnection();
 }
 
-class GetPubKeyEvent extends CommentAction {
-  GetPubKeyEvent();
+class GetUserPubKey extends CommentAction {
+  GetUserPubKey();
 }
 
 /// State

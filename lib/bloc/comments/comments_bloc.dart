@@ -33,11 +33,11 @@ class CommentBloc extends Bloc {
   Episode currentEpisode;
   String replyToRoot;
 
+  String userPubKey;
+
   Map<String, Metadata> metaDatas;
 
   Map<String, bool> _eventMap;
-
-  bool _isNewEventPublishing;
 
   bool _isAddEventToController;
 
@@ -61,6 +61,11 @@ class CommentBloc extends Bloc {
   final StreamController<Map<String, dynamic>> _signEventController =
       StreamController<Map<String, dynamic>>.broadcast();
 
+  final StreamController<Metadata> _userMetaDataController =
+      StreamController<Metadata>.broadcast();
+
+  Stream<Metadata> get userMetaDataStream => _userMetaDataController.stream;
+
   Stream<bool> get isConnectedStream => _isConnectedController.stream;
   Stream<String> get pubKeyStream => _publicKeyController.stream;
   Stream<Map<String, dynamic>> get signEventStream =>
@@ -76,21 +81,19 @@ class CommentBloc extends Bloc {
   Stream<Event> get eventStream => _eventController.stream;
 
   void init() {
-    // need to get the metadata of user for the first time
     _relayPool = RelayPoolApi(relaysList: relaysList);
     metaDatas = {};
     _eventMap = {};
     sortedEvents = [];
-    _isNewEventPublishing = false;
     _isAddEventToController = false;
     _isAddEventToController = false;
     isRelayConnected = false;
-    _getUserMetaData();
+
+    // making sure keyPair is generated and fetching the pubKey
+    _getPubKey();
 
     _listenToEpisode();
     _listenToActions();
-
-    // get metadata of user
   }
 
   void _listenToActions() {
@@ -101,8 +104,8 @@ class CommentBloc extends Bloc {
         createComment(event.userComment);
       } else if (event is ReloadConnection) {
         reloadConnection();
-      } else if (event is GetPubKeyEvent) {
-        getPubKey();
+      } else if (event is GetUserPubKey) {
+        _getPubKey();
       }
     });
   }
@@ -110,10 +113,6 @@ class CommentBloc extends Bloc {
   // setting listener for episode
   void _listenToEpisode() {
     episodeStream.listen((episode) {
-      // for the first time necessary to set the
-      // relay connection to be able to call relayPool.close()
-      // during reloadConnection
-
       if (currentEpisode == null) {
         currentEpisode = episode;
         initRelayConnection();
@@ -126,9 +125,8 @@ class CommentBloc extends Bloc {
     });
   }
 
-  void _getUserMetaData() {
-    // get pubkey of user
-    getPubKey();
+  void _getUserMetaData(Metadata metadata) {
+    _userMetaDataController.add(metadata);
   }
 
   // create a comment
@@ -148,7 +146,6 @@ class CommentBloc extends Bloc {
     // setting each variable to its default value
     isRootEventPresent = false;
     _isAddEventToController = false;
-    _isNewEventPublishing = false;
     isRelayConnected = false;
     _rootId = null;
     sortedEvents.clear();
@@ -157,7 +154,6 @@ class CommentBloc extends Bloc {
     _connectedRelays.clear();
 
     // need to close the relay stream for a fresh connection
-    // find if any condition is necessary before calling _relayPool.close()
     _relayPool.close();
     _streamSubscription?.cancel();
 
@@ -201,6 +197,15 @@ class CommentBloc extends Bloc {
       throw Exception(e);
     }
 
+    // for fetching userMetaData
+    _relayPool.sub([
+      Filter(
+        kinds: [1],
+        authors: [userPubKey],
+      ),
+    ]);
+
+    // checking for root event to be present or not
     if (_rootId == null) {
       _relayPool.sub([
         Filter(
@@ -220,18 +225,13 @@ class CommentBloc extends Bloc {
       ]);
     }
 
-    // if no event received then will have to show that there are no comments present
-
     try {
       _streamSubscription = _streamConnect.listen(
         (message) {
           if (message.type == 'EVENT') {
             Event event = message.message as Event;
             if (event.kind == 1) {
-              // adding the event according its creation time
-
               // check for being the rootEvent
-              print(event.tags);
               if (event.tags[0][0] == "t" &&
                   event.tags[0][1] == currentEpisode.contentUrl) {
                 _rootId = event.id;
@@ -266,6 +266,9 @@ class CommentBloc extends Bloc {
             } else if (event.kind == 0) {
               Metadata metadata = Metadata.fromJson(
                   jsonDecode(event.content) as Map<String, dynamic>);
+              if (event.pubkey == userPubKey) {
+                _getUserMetaData(metadata);
+              }
               metaDatas[event.pubkey] = metadata;
             }
           }
@@ -310,6 +313,7 @@ class CommentBloc extends Bloc {
 
   void _addEvent(Event event) {
     if (_eventMap.containsKey(event.id) == false) {
+      // adding the event according its creation time
       _insertInDescendingOrder(event);
       _isAddEventToController = true;
       _eventMap[event.id] = true;
@@ -319,8 +323,8 @@ class CommentBloc extends Bloc {
   }
 
   // this method is to make sure keyPair is made before signing the sortedEvents
-  Future<void> getPubKey() async {
-    _publicKeyController.add('getPubKey');
+  Future<void> _getPubKey() async {
+    _publicKeyController.add('_getPubKey');
   }
 
   Future<void> signEvent(Map<String, dynamic> eventData) async {
@@ -329,13 +333,7 @@ class CommentBloc extends Bloc {
 
   void getPubKeyResult(String pubKey) {
     print('Received public key from Breez: $pubKey');
-    // we need to set the icon(user) for the commentBox
-
-    // get user meta data using this pub key
-    // set a relay connection
-    // put a filter with author as the pubkey
-    // limit = 1
-    // as soon as we get the pubkey break the process.
+    userPubKey = pubKey;
   }
 
   Future<void> signEventResult(Map<String, dynamic> signedEvent) async {
@@ -346,13 +344,7 @@ class CommentBloc extends Bloc {
 
   Future<void> _publishNewEvent(Event signedNostrEvent) async {
     try {
-      // call a loading state
-      _isNewEventPublishing = true;
-
-      // check if _relayPool is not closed
       _relayPool.publish(signedNostrEvent);
-      // end the loading state
-      _isNewEventPublishing = false;
     } catch (e) {
       throw Exception(e);
     }
