@@ -1,4 +1,5 @@
-import 'package:anytime/entities/comment_model.dart';
+import 'package:anytime/bloc/comments/comments_state_event.dart';
+import 'package:anytime/entities/comments.dart';
 import 'package:anytime/entities/episode.dart';
 import 'package:anytime/ui/podcast/episode_comment_box.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,6 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
   final formKey = GlobalKey<FormState>();
   final TextEditingController commentController = TextEditingController();
   String hintText = "Add a comment...";
-  List<CommentModel> rootUserdata = CommentModel.filedata;
 
   final FocusNode _textFieldFocusNode = FocusNode();
 
@@ -30,12 +30,14 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
   void initState() {
     super.initState();
     commentBloc = Provider.of<CommentBloc>(context, listen: false);
-    // commentBloc.init();
-    commentBloc.getPubKey();
-    commentBloc.reloadConnection();
+    init();
+  }
 
+  void init() {
     // getting the pubkey is necessary because we need to create the key pair
     // before we try to sign the events to be able to publish them to the relay
+    commentBloc.commentActionController.add(GetPubKeyEvent());
+    commentBloc.commentActionController.add(ReloadConnection());
   }
 
   @override
@@ -46,9 +48,13 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
 
   void _createComment() async {
     if (commentBloc.isRootEventPresent == false) {
-      await commentBloc.createRootEvent(commentController.text.trim());
+      // await commentBloc.createRootEvent(commentController.text.trim());
+      commentBloc.commentActionController
+          .add(CreateRootComment(commentController.text.trim()));
     } else {
-      commentBloc.createComment(commentController.text.trim());
+      // commentBloc.createComment(commentController.text.trim());
+      commentBloc.commentActionController
+          .add(CreateReplyComment(commentController.text.trim()));
     }
     setState(() {});
   }
@@ -82,10 +88,6 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
             }
           },
           child: CommentBox(
-            // userImage: Icon(Icons.person),
-            // // CommentBox.commentImageParser(
-            // //   imageURLorPath: "assets/icons/person.png",
-            // // ),
             hintText: hintText,
             errorText: 'Comment cannot be blank',
             withBorder: _textFieldFocusNode.hasFocus ? true : false,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/comment_user_image.dart';
+
 // ignore: must_be_immutable
 class CommentBox extends StatefulWidget {
   final Widget child;
@@ -35,49 +37,27 @@ class CommentBox extends StatefulWidget {
 
   @override
   State<CommentBox> createState() => _CommentBoxState();
-
-  /// This method is used to parse the image from the URL or the path.
-  /// `CommentBox.commentImageParser(imageURLorPath: 'url_or_path_to_image')`
-  static ImageProvider commentImageParser({String imageURLorPath}) {
-    try {
-      //check if imageURLorPath
-      if (imageURLorPath is String) {
-        if (imageURLorPath.startsWith('http')) {
-          return NetworkImage(imageURLorPath);
-        } else {
-          return AssetImage(imageURLorPath);
-        }
-      } else {
-        return imageURLorPath as ImageProvider;
-      }
-    } catch (e) {
-      //throw error
-      throw Exception('Error parsing image: $e');
-    }
-  }
 }
 
 class _CommentBoxState extends State<CommentBox> {
   int maxLines = 2;
   Color sendWidgetColor = Colors.grey;
 
-  Widget _placeholderImage(ThemeData themeData) {
-    if (widget.userImage != null) {
-      return CircleAvatar(
-        // radius: 30,
-        backgroundImage:
-            CommentBox.commentImageParser(imageURLorPath: widget.userImage),
-      );
-    }
+  // Widget _placeholderImage(ThemeData themeData) {
+  //   if (widget.userImage != null) {
+  //     return CircleAvatar(
+  //       backgroundImage:
+  //           CommentBox.commentImageParser(imageURLorPath: widget.userImage),
+  //     );
+  //   }
 
-    return CircleAvatar(
-      // radius: 30,
-      child: Icon(
-        Icons.person,
-        color: themeData.iconTheme.color,
-      ),
-    );
-  }
+  //   return CircleAvatar(
+  //     child: Icon(
+  //       Icons.person,
+  //       color: themeData.iconTheme.color,
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +74,7 @@ class _CommentBoxState extends State<CommentBox> {
               width: 35.0,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(30))),
-              child: _placeholderImage(themeData),
+              child: CommentUserImage(userImage: widget.userImage),
             ),
             title: Form(
               key: widget.formKey,
@@ -112,10 +92,7 @@ class _CommentBoxState extends State<CommentBox> {
                       child: TextFormField(
                         textAlignVertical: TextAlignVertical.center,
                         onChanged: (value) {
-                          // to make the necessary changes
-                          // print("commentController $value");
                           if (value == '') {
-                            // print("commentController hi");
                             setState(() {
                               sendWidgetColor = Colors.grey;
                             });
@@ -125,7 +102,6 @@ class _CommentBoxState extends State<CommentBox> {
                             });
                           }
                         },
-                        // textAlignVertical: TextAlignVertical.bottom,
                         keyboardType: TextInputType.multiline,
                         maxLines: 2,
                         focusNode: widget.focusNode,
@@ -159,7 +135,6 @@ class _CommentBoxState extends State<CommentBox> {
                           focusColor: widget.textColor,
                           labelStyle: TextStyle(color: widget.textColor),
                         ),
-                        // validator: (value) => value.isEmpty ? widget.errorText : null,
                       ),
                     ),
                   ),
@@ -182,11 +157,7 @@ class _CommentBoxState extends State<CommentBox> {
                       : SizedBox.shrink(),
                 ],
               ),
-              // ),
             ),
-            // the send icon needs to be active only when the textField has text
-            // if the text is null icon will be disabled
-            //
           ),
           Divider(
             thickness: 1,

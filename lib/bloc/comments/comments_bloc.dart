@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:anytime/bloc/bloc.dart';
+import 'package:anytime/bloc/comments/comments_state_event.dart';
+import 'package:anytime/entities/comments.dart';
 import 'package:nostr_tools/nostr_tools.dart';
 
 import '../../entities/episode.dart';
@@ -40,6 +42,13 @@ class CommentBloc extends Bloc {
   bool _isAddEventToController;
 
   bool isRelayConnected;
+
+  final StreamController<CommentAction> commentActionController =
+      StreamController<CommentAction>.broadcast();
+
+  Stream<CommentAction> get commentActionStream =>
+      commentActionController.stream;
+
   final StreamController<bool> _isConnectedController =
       StreamController<bool>.broadcast();
 
@@ -60,9 +69,7 @@ class CommentBloc extends Bloc {
   Map<String, dynamic> previousEvent;
 
   Stream<Event> stream = StreamController<Event>.broadcast().stream;
-  // final StreamController<Message> _streamConnectController =
-  //     StreamController<Message>.broadcast();
-  // Stream<Message> get _streamConnect => _streamConnectController.stream;
+
   Stream<Message> _streamConnect;
   StreamSubscription _streamSubscription;
 
@@ -81,8 +88,23 @@ class CommentBloc extends Bloc {
     _getUserMetaData();
 
     _listenToEpisode();
+    _listenToActions();
 
     // get metadata of user
+  }
+
+  void _listenToActions() {
+    commentActionStream.listen((event) {
+      if (event is CreateRootComment) {
+        createRootEvent(event.userComment);
+      } else if (event is CreateReplyComment) {
+        createComment(event.userComment);
+      } else if (event is ReloadConnection) {
+        reloadConnection();
+      } else if (event is GetPubKeyEvent) {
+        getPubKey();
+      }
+    });
   }
 
   // setting listener for episode
@@ -122,10 +144,8 @@ class CommentBloc extends Bloc {
     await signEvent(eventData);
   }
 
-  // reload relay connection via pull to refresh
   Future<void> reloadConnection() async {
     // setting each variable to its default value
-    // replyToRoot = null;
     isRootEventPresent = false;
     _isAddEventToController = false;
     _isNewEventPublishing = false;
@@ -140,8 +160,6 @@ class CommentBloc extends Bloc {
     // find if any condition is necessary before calling _relayPool.close()
     _relayPool.close();
     _streamSubscription?.cancel();
-    // _streamConnect.controller.close();
-    // await stream.drain<Event>();
 
     // calling relay connection again
     await initRelayConnection();
@@ -163,8 +181,6 @@ class CommentBloc extends Bloc {
   }
 
   Future<void> initRelayConnection() async {
-    // stream = await _connectRelayPool();
-
     // connecting to relays
     try {
       _streamConnect = await _relayPool.connect();
@@ -175,9 +191,7 @@ class CommentBloc extends Bloc {
           // if relay is connected add this to _isConnectedController
           _isConnectedController.add(true);
         } else if (event == RelayEvent.error ||
-            event == RelayEvent.disconnect) {
-          // reloadConnection();
-        }
+            event == RelayEvent.disconnect) {}
         _connectedRelays = _relayPool.connectedRelays;
         if (_connectedRelays.isEmpty) {
           isRelayConnected = false;
@@ -208,8 +222,6 @@ class CommentBloc extends Bloc {
 
     // if no event received then will have to show that there are no comments present
 
-    // a check to ensure that the listener is not called multiple times
-    // if (_isStreamListenerSet == false) {
     try {
       _streamSubscription = _streamConnect.listen(
         (message) {
@@ -236,6 +248,8 @@ class CommentBloc extends Bloc {
               } else if (event.tags[0][0] == "e" &&
                   event.tags[0][1] == _rootId) {
                 _addEvent(event);
+
+                // if event is already present in List then return to avoid duplication
                 if (_isAddEventToController == false) {
                   return;
                 }
@@ -244,7 +258,6 @@ class CommentBloc extends Bloc {
                 // setting _addEventController to false to check for the next event to be added
                 _isAddEventToController = false;
               }
-              // if event is already present in List then return to avoid duplication
 
               // to get the metadata of the user of the comment
               _relayPool.sub([
@@ -261,9 +274,6 @@ class CommentBloc extends Bloc {
     } catch (e) {
       throw Exception(e);
     }
-
-    //   _isStreamListenerSet = true;
-    // }
   }
 
   void _insertInDescendingOrder(Event event) {
@@ -301,7 +311,6 @@ class CommentBloc extends Bloc {
   void _addEvent(Event event) {
     if (_eventMap.containsKey(event.id) == false) {
       _insertInDescendingOrder(event);
-      // sortedEvents.add(event);
       _isAddEventToController = true;
       _eventMap[event.id] = true;
     } else {
@@ -330,14 +339,7 @@ class CommentBloc extends Bloc {
   }
 
   Future<void> signEventResult(Map<String, dynamic> signedEvent) async {
-    final signedNostrEvent = Event(
-        kind: signedEvent['kind'] as int,
-        tags: signedEvent['tags'] as List<List<String>>,
-        content: signedEvent['content'] as String,
-        created_at: signedEvent['created_at'] as int,
-        id: signedEvent['id'] as String,
-        sig: signedEvent['sig'] as String,
-        pubkey: signedEvent['pubkey'] as String);
+    final signedNostrEvent = CommentEvent.mapToEvent(signedEvent);
 
     await _publishNewEvent(signedNostrEvent);
   }
@@ -363,10 +365,6 @@ class CommentBloc extends Bloc {
       isRootEventPresent = true;
       await createComment(replyToRoot);
     }
-    // finding the necessity of reloading the connection after publishing
-    // if (_isNewEventPublishing == false) {
-    //   await reloadConnection();
-    // }
   }
 
   @override

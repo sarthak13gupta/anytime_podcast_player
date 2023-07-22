@@ -1,31 +1,24 @@
-import 'package:anytime/entities/comment_model.dart';
-
-class CommentEvent {}
+class CommentAction {}
 
 /// Events
-class CreateCommentEvent extends CommentEvent {
-  final CommentModel comment;
-  CreateCommentEvent(this.comment);
+
+class CreateRootComment extends CommentAction {
+  final String userComment;
+  CreateRootComment(this.userComment);
 }
 
-class ConnectRelayPoolEvent extends CommentEvent {
-  final List<String> relayList;
-  ConnectRelayPoolEvent(this.relayList);
+class CreateReplyComment extends CommentAction {
+  final String userComment;
+  CreateReplyComment(this.userComment);
 }
 
-class GetPubKeyEvent extends CommentEvent {
+class ReloadConnection extends CommentAction {
+  ReloadConnection();
+}
+
+class GetPubKeyEvent extends CommentAction {
   GetPubKeyEvent();
 }
 
-class SignCommentEvent extends CommentEvent {
-  final Map<String, dynamic> event;
-  SignCommentEvent(this.event);
-}
-
-class PublishCommentEvent extends CommentEvent {
-  final Map<String, dynamic> event;
-  PublishCommentEvent(this.event);
-}
-
 /// State
-class CommentLoadingState extends CommentEvent {}
+class CommentLoadingState extends CommentAction {}

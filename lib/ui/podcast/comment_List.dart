@@ -1,5 +1,5 @@
 import 'package:anytime/bloc/comments/comments_bloc.dart';
-import 'package:anytime/entities/comment_model.dart';
+import 'package:anytime/entities/comments.dart';
 import 'package:anytime/ui/podcast/comment_child.dart';
 import 'package:flutter/material.dart';
 
@@ -43,6 +43,18 @@ class _CommentRenderState extends State<CommentRender> {
     });
   }
 
+  CommentModel _formUserComment(Event event, Metadata metadata) {
+    return CommentModel(
+      userName: metadata?.displayName ??
+          (metadata?.display_name ??
+              Nip19().npubEncode(event.pubkey).substring(0, 11)),
+      userPic: metadata?.picture,
+      userMessage: event.content,
+      date: TimeAgo.format(event.created_at),
+      id: event.id,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<Event>(
@@ -60,18 +72,7 @@ class _CommentRenderState extends State<CommentRender> {
                     itemBuilder: (context, index) {
                       final event = _events[index];
                       final metadata = _metaDatas[event.pubkey];
-                      final userRootComment = CommentModel(
-                          metadata?.displayName ??
-                              (metadata?.display_name ??
-                                  Nip19()
-                                      .npubEncode(event.pubkey)
-                                      .substring(0, 11)),
-                          metadata?.picture,
-                          event.content,
-                          TimeAgo.format(event.created_at),
-                          '',
-                          event.id,
-                          false);
+                      final userRootComment = _formUserComment(event, metadata);
 
                       return CommentChild(userRootComment);
                     },
@@ -91,16 +92,7 @@ class _CommentRenderState extends State<CommentRender> {
             itemBuilder: (context, index) {
               final event = _events[index];
               final metadata = _metaDatas[event.pubkey];
-              final userRootComment = CommentModel(
-                  metadata?.displayName ??
-                      (metadata?.display_name ??
-                          Nip19().npubEncode(event.pubkey).substring(0, 11)),
-                  metadata?.picture,
-                  event.content,
-                  TimeAgo.format(event.created_at),
-                  '',
-                  event.id,
-                  false);
+              final userRootComment = _formUserComment(event, metadata);
 
               return CommentChild(userRootComment);
             },
