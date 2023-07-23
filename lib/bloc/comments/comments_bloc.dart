@@ -113,7 +113,7 @@ class CommentBloc extends Bloc {
   // setting listener for episode
   void _listenToEpisode() {
     episodeStream.listen((episode) {
-      if (currentEpisode == null) {
+      if (currentEpisode == null && episode != null) {
         currentEpisode = episode;
         initRelayConnection();
       }
