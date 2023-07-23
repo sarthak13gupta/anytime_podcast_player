@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:anytime/bloc/comments/comments_bloc.dart';
 import 'package:anytime/bloc/podcast/audio_bloc.dart';
 import 'package:anytime/entities/episode.dart';
 import 'package:anytime/l10n/L.dart';
@@ -46,11 +47,14 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
   double baseSize = 48.0;
   Future<bool> isLoaded;
   bool isEmbedded = false;
+  // bool _toggleComments = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    // _setToggleCommentListener();
 
     final audioBloc = Provider.of<AudioBloc>(context, listen: false);
     var popped = false;
@@ -70,6 +74,15 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
         .where((policy) => !policy.feedbackGiven)
         .listen((policy) => _policyChanged(policy));
   }
+
+  // void _setToggleCommentListener() {
+  //   // CommentBloc commentBloc = Provider.of<CommentBloc>(context);
+  //   // commentBloc.toggleCommentStream.listen((event) {
+  //   //   setState(() {
+  //   //     _toggleComments = event;
+  //   //   });
+  //   // });
+  // }
 
   @override
   void didChangeDependencies() {
@@ -121,6 +134,11 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
               children: [
                 DefaultTabController(
                     length: snapshot.data.hasChapters ? 4 : 3,
+                    // snapshot.data.hasChapters
+                    //     ? _toggleComments
+                    //         ? 4
+                    //         : 3
+                    //     : 2,
                     initialIndex: snapshot.data.hasChapters ? 1 : 0,
                     child: Scaffold(
                       appBar: AppBar(
@@ -151,6 +169,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: <Widget>[
                               EpisodeTabBar(
+                                // toggleComments: _toggleComments,
                                 chapters: snapshot.data.hasChapters,
                               ),
                             ],
@@ -247,10 +266,12 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
 /// two or three tabs depending upon whether the current episode supports (and contains) chapters.
 class EpisodeTabBar extends StatelessWidget {
   final bool chapters;
+  // final bool toggleComments;
 
   const EpisodeTabBar({
     Key key,
     this.chapters = false,
+    // this.toggleComments = false,
   }) : super(key: key);
 
   @override
@@ -279,6 +300,7 @@ class EpisodeTabBar extends StatelessWidget {
             child: Text(L.of(context).notes_label),
           ),
         ),
+        // if (toggleComments)
         Tab(
           child: Align(
             alignment: Alignment.center,
@@ -297,12 +319,14 @@ class EpisodeTabBarView extends StatelessWidget {
   final Episode episode;
   final AutoSizeGroup textGroup;
   final bool chapters;
+  // final bool toggleComments;
 
   EpisodeTabBarView({
     Key key,
     this.episode,
     this.textGroup,
     this.chapters = false,
+    // this.toggleComments = false,
   }) : super(key: key);
 
   @override
@@ -327,8 +351,11 @@ class EpisodeTabBarView extends StatelessWidget {
               );
             }),
         NowPlayingShowNotes(
-            title: episode.title, description: episode.description),
-        EpisodeComments(episode),
+          title: episode.title,
+          description: episode.description,
+        ),
+        // if (toggleComments)
+        EpisodeComments(episode: episode),
       ],
     );
   }

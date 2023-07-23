@@ -9,7 +9,7 @@ import 'comment_list.dart';
 
 class EpisodeComments extends StatefulWidget {
   final Episode episode;
-  EpisodeComments(this.episode, {Key key}) : super(key: key);
+  EpisodeComments({@required this.episode, Key key}) : super(key: key);
 
   @override
   State<EpisodeComments> createState() => _EpisodeCommentsState();

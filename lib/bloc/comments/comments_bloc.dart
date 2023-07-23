@@ -43,6 +43,11 @@ class CommentBloc extends Bloc {
 
   bool isRelayConnected;
 
+  // final StreamController<bool> toggleCommentController =
+  //     StreamController<bool>.broadcast();
+
+  // Stream<bool> get toggleCommentStream => toggleCommentController.stream;
+
   final StreamController<CommentAction> commentActionController =
       StreamController<CommentAction>.broadcast();
 
