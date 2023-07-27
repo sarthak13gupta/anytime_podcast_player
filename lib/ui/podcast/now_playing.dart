@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:anytime/bloc/comments/comments_bloc.dart';
 import 'package:anytime/bloc/podcast/audio_bloc.dart';
 import 'package:anytime/entities/episode.dart';
 import 'package:anytime/l10n/L.dart';
@@ -46,6 +47,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
   double baseSize = 48.0;
   Future<bool> isLoaded;
   bool isEmbedded = false;
+  bool _toggleComments = false;
 
   @override
   void initState() {
@@ -69,6 +71,13 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
     audioBloc.sleepPolicy
         .where((policy) => !policy.feedbackGiven)
         .listen((policy) => _policyChanged(policy));
+
+    _setToggleCommentListener();
+  }
+
+  void _setToggleCommentListener() async {
+    CommentBloc commentBloc = Provider.of<CommentBloc>(context, listen: false);
+    _toggleComments = commentBloc.nostrEnabled;
   }
 
   @override
@@ -120,7 +129,13 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
               fit: StackFit.expand,
               children: [
                 DefaultTabController(
-                    length: snapshot.data.hasChapters ? 4 : 3,
+                    length:
+                        // snapshot.data.hasChapters ? 4 : 3,
+                        (snapshot.data.hasChapters && _toggleComments)
+                            ? 4
+                            : (snapshot.data.hasChapters || _toggleComments)
+                                ? 3
+                                : 2,
                     initialIndex: snapshot.data.hasChapters ? 1 : 0,
                     child: Scaffold(
                       appBar: AppBar(
@@ -151,6 +166,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: <Widget>[
                               EpisodeTabBar(
+                                toggleComments: _toggleComments,
                                 chapters: snapshot.data.hasChapters,
                               ),
                             ],
@@ -161,6 +177,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
                         children: [
                           Expanded(
                             child: EpisodeTabBarView(
+                              toggleComments: _toggleComments,
                               episode: snapshot.data,
                               chapters: snapshot.data.hasChapters,
                             ),
@@ -247,10 +264,12 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
 /// two or three tabs depending upon whether the current episode supports (and contains) chapters.
 class EpisodeTabBar extends StatelessWidget {
   final bool chapters;
+  final bool toggleComments;
 
   const EpisodeTabBar({
     Key key,
     this.chapters = false,
+    this.toggleComments = false,
   }) : super(key: key);
 
   @override
@@ -279,12 +298,13 @@ class EpisodeTabBar extends StatelessWidget {
             child: Text(L.of(context).notes_label),
           ),
         ),
-        Tab(
-          child: Align(
-            alignment: Alignment.center,
-            child: Text("Comments"),
+        if (toggleComments)
+          Tab(
+            child: Align(
+              alignment: Alignment.center,
+              child: Text("Comments"),
+            ),
           ),
-        ),
       ],
     );
   }
@@ -297,12 +317,14 @@ class EpisodeTabBarView extends StatelessWidget {
   final Episode episode;
   final AutoSizeGroup textGroup;
   final bool chapters;
+  final bool toggleComments;
 
   EpisodeTabBarView({
     Key key,
     this.episode,
     this.textGroup,
     this.chapters = false,
+    this.toggleComments = false,
   }) : super(key: key);
 
   @override
@@ -327,8 +349,10 @@ class EpisodeTabBarView extends StatelessWidget {
               );
             }),
         NowPlayingShowNotes(
-            title: episode.title, description: episode.description),
-        EpisodeComments(episode),
+          title: episode.title,
+          description: episode.description,
+        ),
+        if (toggleComments) EpisodeComments(episode: episode),
       ],
     );
   }

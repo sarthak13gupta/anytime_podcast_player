@@ -43,6 +43,13 @@ class CommentBloc extends Bloc {
 
   bool isRelayConnected;
 
+  bool nostrEnabled = false;
+
+  final StreamController<bool> toggleCommentController =
+      StreamController<bool>.broadcast();
+
+  Stream<bool> get toggleCommentStream => toggleCommentController.stream;
+
   final StreamController<CommentAction> commentActionController =
       StreamController<CommentAction>.broadcast();
 
@@ -89,11 +96,19 @@ class CommentBloc extends Bloc {
     _isAddEventToController = false;
     isRelayConnected = false;
 
+    _listenToEnableNostr();
+
     // making sure keyPair is generated and fetching the pubKey
     _getPubKey();
 
     _listenToEpisode();
     _listenToActions();
+  }
+
+  void _listenToEnableNostr() {
+    toggleCommentStream.listen((event) {
+      nostrEnabled = event;
+    });
   }
 
   void _listenToActions() {
@@ -266,9 +281,9 @@ class CommentBloc extends Bloc {
             } else if (event.kind == 0) {
               Metadata metadata = Metadata.fromJson(
                   jsonDecode(event.content) as Map<String, dynamic>);
-              if (event.pubkey == userPubKey) {
-                _getUserMetaData(metadata);
-              }
+              // if (event.pubkey == userPubKey) {
+              //   _getUserMetaData(metadata);
+              // }
               metaDatas[event.pubkey] = metadata;
             }
           }
