@@ -29,13 +29,11 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
   void initState() {
     super.initState();
     commentBloc = Provider.of<CommentBloc>(context, listen: false);
-    init();
+    _init();
+    _setUserMetaDataListener();
   }
 
-  void init() {
-    commentBloc.commentActionController.add(GetUserPubKey());
-    commentBloc.commentActionController.add(ReloadConnection());
-
+  void _setUserMetaDataListener() {
     commentBloc.userMetaDataStream.listen((metadata) {
       if (metadata != null) {
         setState(() {
@@ -43,6 +41,11 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
         });
       }
     });
+  }
+
+  Future<void> _init() async {
+    commentBloc.commentActionController.add(GetUserPubKey());
+    commentBloc.commentActionController.add(ReloadConnection());
   }
 
   @override
@@ -70,7 +73,7 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
       data: themeData,
       child: RefreshIndicator(
         onRefresh: () async {
-          await commentBloc.reloadConnection();
+          await _init();
         },
         child: GestureDetector(
           onTap: () {

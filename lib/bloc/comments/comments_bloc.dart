@@ -45,6 +45,8 @@ class CommentBloc extends Bloc {
 
   bool nostrEnabled = false;
 
+  List<String> _userRelayList;
+
   final StreamController<bool> toggleCommentController =
       StreamController<bool>.broadcast();
 
@@ -55,9 +57,6 @@ class CommentBloc extends Bloc {
 
   Stream<CommentAction> get commentActionStream =>
       commentActionController.stream;
-
-  final StreamController<bool> _isConnectedController =
-      StreamController<bool>.broadcast();
 
   final StreamController<Event> _eventController =
       StreamController<Event>.broadcast();
@@ -73,7 +72,6 @@ class CommentBloc extends Bloc {
 
   Stream<Metadata> get userMetaDataStream => _userMetaDataController.stream;
 
-  Stream<bool> get isConnectedStream => _isConnectedController.stream;
   Stream<String> get pubKeyStream => _publicKeyController.stream;
   Stream<Map<String, dynamic>> get signEventStream =>
       _signEventController.stream;
@@ -140,7 +138,15 @@ class CommentBloc extends Bloc {
     });
   }
 
-  void _getUserMetaData(Metadata metadata) {
+  void _getUserMetaData(Metadata metadata) async {
+    String profile = metadata.nip05;
+    // fetching the nip05 identifier of the user to get their RelayList
+    ProfilePointer nostrProfile = await Nip05().queryProfile(profile);
+    _userRelayList = nostrProfile?.relays;
+    if (_userRelayList != null) {
+      _relayPool = RelayPoolApi(relaysList: _userRelayList);
+      reloadConnection();
+    }
     _userMetaDataController.add(metadata);
   }
 
@@ -200,7 +206,6 @@ class CommentBloc extends Bloc {
         if (event == RelayEvent.connect) {
           isRelayConnected = true;
           // if relay is connected add this to _isConnectedController
-          _isConnectedController.add(true);
         } else if (event == RelayEvent.error ||
             event == RelayEvent.disconnect) {}
         _connectedRelays = _relayPool.connectedRelays;
@@ -247,7 +252,8 @@ class CommentBloc extends Bloc {
             Event event = message.message as Event;
             if (event.kind == 1) {
               // check for being the rootEvent
-              if (event.tags[0][0] == "t" &&
+              if (event.tags.isNotEmpty &&
+                  event.tags[0][0] == "t" &&
                   event.tags[0][1] == currentEpisode.contentUrl) {
                 _rootId = event.id;
                 isRootEventPresent = true;
@@ -260,7 +266,8 @@ class CommentBloc extends Bloc {
                     e: [_rootId],
                   )
                 ]);
-              } else if (event.tags[0][0] == "e" &&
+              } else if (event.tags.isNotEmpty &&
+                  event.tags[0][0] == "e" &&
                   event.tags[0][1] == _rootId) {
                 _addEvent(event);
 
@@ -281,9 +288,9 @@ class CommentBloc extends Bloc {
             } else if (event.kind == 0) {
               Metadata metadata = Metadata.fromJson(
                   jsonDecode(event.content) as Map<String, dynamic>);
-              // if (event.pubkey == userPubKey) {
-              //   _getUserMetaData(metadata);
-              // }
+              if (event.pubkey == userPubKey) {
+                _getUserMetaData(metadata);
+              }
               metaDatas[event.pubkey] = metadata;
             }
           }
@@ -378,9 +385,11 @@ class CommentBloc extends Bloc {
   void dispose() {
     super.dispose();
     _relayPool.close();
-    _isConnectedController.close();
     _eventController.close();
     _publicKeyController.close();
     _signEventController.close();
+    toggleCommentController.close();
+    commentActionController.close();
+    _userMetaDataController.close();
   }
 }
