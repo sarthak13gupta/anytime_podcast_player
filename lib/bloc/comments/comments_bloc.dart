@@ -47,6 +47,10 @@ class CommentBloc extends Bloc {
 
   List<String> _userRelayList;
 
+  final StreamController<dynamic> _commentsLoginController =
+      StreamController<dynamic>.broadcast();
+  Stream<dynamic> get commentsLoginStream => _commentsLoginController.stream;
+
   final StreamController<bool> toggleCommentController =
       StreamController<bool>.broadcast();
 
@@ -119,8 +123,14 @@ class CommentBloc extends Bloc {
         reloadConnection();
       } else if (event is GetUserPubKey) {
         _getPubKey();
+      } else if (event is Login) {
+        _login();
       }
     });
+  }
+
+  void _login() {
+    _commentsLoginController.add("Login");
   }
 
   // setting listener for episode

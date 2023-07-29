@@ -19,5 +19,9 @@ class GetUserPubKey extends CommentAction {
   GetUserPubKey();
 }
 
+class Login extends CommentAction {
+  Login();
+}
+
 /// State
 class CommentLoadingState extends CommentAction {}

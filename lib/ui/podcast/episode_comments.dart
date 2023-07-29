@@ -29,8 +29,13 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
   void initState() {
     super.initState();
     commentBloc = Provider.of<CommentBloc>(context, listen: false);
+    _login();
     _init();
     _setUserMetaDataListener();
+  }
+
+  Future<void> _login() async {
+    commentBloc.commentActionController.add(Login());
   }
 
   void _setUserMetaDataListener() {
