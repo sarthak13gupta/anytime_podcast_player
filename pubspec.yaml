@@ -8,8 +8,7 @@ environment:
   flutter: ">=3.7.12"
 
 dependencies: 
-  nostr_tools: ^1.0.7
-  uuid: ^3.0.4
+  
   auto_size_text: ^3.0.0
   audio_service: ^0.18.9
   audio_session: ^0.1.14
@@ -53,6 +52,7 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  nostr_tools: ^1.0.7
 
 dev_dependencies:
   mockito: ^5.4.0

@@ -10,20 +10,15 @@ class CommentUserImage extends StatefulWidget {
 
 class _CommentUserImageState extends State<CommentUserImage> {
   ImageProvider commentImageParser({String imageURLorPath}) {
-    try {
-      //check if imageURLorPath
-      if (imageURLorPath is String) {
-        if (imageURLorPath.startsWith('http')) {
-          return NetworkImage(imageURLorPath);
-        } else {
-          return AssetImage(imageURLorPath);
-        }
+    //check if imageURLorPath
+    if (imageURLorPath is String) {
+      if (imageURLorPath.startsWith('http')) {
+        return NetworkImage(imageURLorPath);
       } else {
-        return imageURLorPath as ImageProvider;
+        return AssetImage(imageURLorPath);
       }
-    } catch (e) {
-      //throw error
-      throw Exception('Error parsing image: $e');
+    } else {
+      return imageURLorPath as ImageProvider;
     }
   }
 
@@ -33,7 +28,12 @@ class _CommentUserImageState extends State<CommentUserImage> {
 
     if (widget.userImage != null) {
       return CircleAvatar(
-        backgroundImage: commentImageParser(imageURLorPath: widget.userImage),
+        backgroundImage: commentImageParser(
+          imageURLorPath: widget.userImage,
+        ),
+        onBackgroundImageError: (exception, stackTrace) {
+          throw (exception);
+        },
       );
     }
 
