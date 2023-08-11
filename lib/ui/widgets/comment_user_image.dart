@@ -34,23 +34,18 @@ class _CommentUserImageState extends State<CommentUserImage> {
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
 
-    return widget.userImage != null
-        ? CircleAvatar(
-            child: _loadImageError
-                ? Icon(
-                    Icons.person,
-                    color: themeData.iconTheme.color,
-                  )
-                : null,
-            backgroundImage: commentImageParser(
-              imageURLorPath: widget.userImage,
-            ),
-          )
-        : CircleAvatar(
-            child: Icon(
+    return CircleAvatar(
+      child: widget.userImage == null || _loadImageError
+          ? Icon(
               Icons.person,
               color: themeData.iconTheme.color,
-            ),
-          );
+            )
+          : null,
+      backgroundImage: widget.userImage != null
+          ? commentImageParser(
+              imageURLorPath: widget.userImage,
+            )
+          : null,
+    );
   }
 }

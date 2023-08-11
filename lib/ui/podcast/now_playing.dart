@@ -4,7 +4,7 @@
 
 import 'dart:async';
 
-import 'package:anytime/bloc/comments/comments_bloc.dart';
+import 'package:anytime/bloc/nostr_comments/nostr_comments_bloc.dart';
 import 'package:anytime/bloc/podcast/audio_bloc.dart';
 import 'package:anytime/entities/episode.dart';
 import 'package:anytime/l10n/L.dart';
@@ -76,7 +76,8 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
   }
 
   void _setToggleCommentListener() async {
-    CommentBloc commentBloc = Provider.of<CommentBloc>(context, listen: false);
+    NostrCommentBloc commentBloc =
+        Provider.of<NostrCommentBloc>(context, listen: false);
     setState(() {
       _toggleComments = commentBloc.nostrEnabled;
     });

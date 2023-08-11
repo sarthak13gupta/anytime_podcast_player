@@ -1,10 +1,10 @@
-import 'package:anytime/bloc/comments/comments_state_event.dart';
+import 'package:anytime/bloc/nostr_comments/nostr_comments_state_event.dart';
 import 'package:anytime/entities/episode.dart';
 import 'package:anytime/ui/podcast/episode_comment_box.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../bloc/comments/comments_bloc.dart';
+import '../../bloc/nostr_comments/nostr_comments_bloc.dart';
 import 'comment_render.dart';
 
 class EpisodeComments extends StatefulWidget {
@@ -23,12 +23,12 @@ class _EpisodeCommentsState extends State<EpisodeComments> {
   final FocusNode _textFieldFocusNode = FocusNode();
   String userImage;
 
-  CommentBloc commentBloc;
+  NostrCommentBloc commentBloc;
 
   @override
   void initState() {
     super.initState();
-    commentBloc = Provider.of<CommentBloc>(context, listen: false);
+    commentBloc = Provider.of<NostrCommentBloc>(context, listen: false);
     _init();
     _setUserMetaDataListener();
   }
