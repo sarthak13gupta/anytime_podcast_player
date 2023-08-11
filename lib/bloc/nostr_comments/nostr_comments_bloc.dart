@@ -2,15 +2,15 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:anytime/bloc/bloc.dart';
-import 'package:anytime/bloc/comments/comments_state_event.dart';
+import 'package:anytime/bloc/nostr_comments/nostr_comments_state_event.dart';
 import 'package:anytime/entities/comments.dart';
 import 'package:nostr_tools/nostr_tools.dart';
 
 import '../../entities/episode.dart';
 
-class CommentBloc extends Bloc {
+class NostrCommentBloc extends Bloc {
   final Stream<Episode> episodeStream;
-  CommentBloc({this.episodeStream}) {
+  NostrCommentBloc({this.episodeStream}) {
     init();
   }
   final relaysList = [

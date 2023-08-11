@@ -1,4 +1,4 @@
-import 'package:anytime/bloc/comments/comments_bloc.dart';
+import 'package:anytime/bloc/nostr_comments/nostr_comments_bloc.dart';
 import 'package:anytime/entities/comments.dart';
 import 'package:anytime/ui/podcast/comment_child.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +8,7 @@ import 'package:nostr_tools/nostr_tools.dart';
 import '../widgets/delayed_progress_indicator.dart';
 
 class CommentRender extends StatefulWidget {
-  final CommentBloc commentBloc;
+  final NostrCommentBloc commentBloc;
   const CommentRender({Key key, this.commentBloc}) : super(key: key);
 
   @override

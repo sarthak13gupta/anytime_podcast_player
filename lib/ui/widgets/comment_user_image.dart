@@ -9,16 +9,24 @@ class CommentUserImage extends StatefulWidget {
 }
 
 class _CommentUserImageState extends State<CommentUserImage> {
+  bool _loadImageError = false;
   ImageProvider commentImageParser({String imageURLorPath}) {
     //check if imageURLorPath
-    if (imageURLorPath is String) {
-      if (imageURLorPath.startsWith('http')) {
-        return NetworkImage(imageURLorPath);
+    try {
+      if (imageURLorPath is String) {
+        if (imageURLorPath.startsWith('http')) {
+          return NetworkImage(imageURLorPath);
+        } else {
+          return AssetImage(imageURLorPath);
+        }
       } else {
-        return AssetImage(imageURLorPath);
+        return imageURLorPath as ImageProvider;
       }
-    } else {
-      return imageURLorPath as ImageProvider;
+    } catch (e) {
+      setState(() {
+        _loadImageError = true;
+      });
+      return null;
     }
   }
 
@@ -26,22 +34,18 @@ class _CommentUserImageState extends State<CommentUserImage> {
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
 
-    if (widget.userImage != null) {
-      return CircleAvatar(
-        backgroundImage: commentImageParser(
-          imageURLorPath: widget.userImage,
-        ),
-        onBackgroundImageError: (exception, stackTrace) {
-          throw (exception);
-        },
-      );
-    }
-
     return CircleAvatar(
-      child: Icon(
-        Icons.person,
-        color: themeData.iconTheme.color,
-      ),
+      child: widget.userImage == null || _loadImageError
+          ? Icon(
+              Icons.person,
+              color: themeData.iconTheme.color,
+            )
+          : null,
+      backgroundImage: widget.userImage != null
+          ? commentImageParser(
+              imageURLorPath: widget.userImage,
+            )
+          : null,
     );
   }
 }
