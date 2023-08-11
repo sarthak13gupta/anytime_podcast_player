@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../bloc/comments/comments_bloc.dart';
-import 'comment_list.dart';
+import 'comment_render.dart';
 
 class EpisodeComments extends StatefulWidget {
   final Episode episode;

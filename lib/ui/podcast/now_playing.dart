@@ -77,7 +77,9 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
 
   void _setToggleCommentListener() async {
     CommentBloc commentBloc = Provider.of<CommentBloc>(context, listen: false);
-    _toggleComments = commentBloc.nostrEnabled;
+    setState(() {
+      _toggleComments = commentBloc.nostrEnabled;
+    });
   }
 
   @override
@@ -129,13 +131,9 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
               fit: StackFit.expand,
               children: [
                 DefaultTabController(
-                    length:
-                        // snapshot.data.hasChapters ? 4 : 3,
-                        (snapshot.data.hasChapters && _toggleComments)
-                            ? 4
-                            : (snapshot.data.hasChapters || _toggleComments)
-                                ? 3
-                                : 2,
+                    length: 2 +
+                        (snapshot.data.hasChapters ? 1 : 0) +
+                        (_toggleComments ? 1 : 0),
                     initialIndex: snapshot.data.hasChapters ? 1 : 0,
                     child: Scaffold(
                       appBar: AppBar(
