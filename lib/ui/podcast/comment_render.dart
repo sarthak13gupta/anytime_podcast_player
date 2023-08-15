@@ -43,7 +43,6 @@ class _CommentRenderState extends State<CommentRender> {
   }
 
   CommentModel _formUserComment(Event event, Metadata metadata) {
-    print('npubKey ${Nip19().npubEncode(event.pubkey)}');
     return CommentModel(
       userName: metadata?.displayName ??
           (metadata?.display_name ??
