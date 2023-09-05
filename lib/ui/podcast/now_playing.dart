@@ -4,7 +4,6 @@
 
 import 'dart:async';
 
-import 'package:anytime/bloc/nostr_comments/nostr_comments_bloc.dart';
 import 'package:anytime/bloc/podcast/audio_bloc.dart';
 import 'package:anytime/entities/episode.dart';
 import 'package:anytime/l10n/L.dart';
@@ -27,8 +26,6 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'episode_comments.dart';
-
 /// This is the full-screen player Widget which is invoked by touching the mini player.
 /// This displays the podcast image, episode notes and standard playback controls.
 ///
@@ -47,7 +44,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
   double baseSize = 48.0;
   Future<bool> isLoaded;
   bool isEmbedded = false;
-  bool _toggleComments = false;
+  bool _toggleComments = true;
 
   @override
   void initState() {
@@ -71,16 +68,6 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
     audioBloc.sleepPolicy
         .where((policy) => !policy.feedbackGiven)
         .listen((policy) => _policyChanged(policy));
-
-    _setToggleCommentListener();
-  }
-
-  void _setToggleCommentListener() async {
-    NostrCommentBloc commentBloc =
-        Provider.of<NostrCommentBloc>(context, listen: false);
-    setState(() {
-      _toggleComments = commentBloc.nostrEnabled;
-    });
   }
 
   @override
@@ -103,6 +90,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final audioBloc = Provider.of<AudioBloc>(context, listen: false);
     final playerBuilder = PlayerControlsBuilder.of(context);
+    final nostrcommentsBuilder = NostrCommentsBuilder.of(context);
     final isLight = Theme.of(context).brightness == Brightness.light;
     final double bottomPadding = MediaQuery.of(context).viewPadding.bottom;
 
@@ -114,6 +102,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
           }
 
           var duration = snapshot.data == null ? 0 : snapshot.data.duration;
+          final commentsBuilder = nostrcommentsBuilder?.builder(snapshot.data);
           final transportBuilder = playerBuilder?.builder(duration);
           isEmbedded = transportBuilder != null;
           baseSize = isEmbedded ? 24.0 : 48.0;
@@ -179,6 +168,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
                               toggleComments: _toggleComments,
                               episode: snapshot.data,
                               chapters: snapshot.data.hasChapters,
+                              nostrComments: commentsBuilder(context),
                             ),
                           ),
                           if (isEmbedded) ...[
@@ -317,14 +307,16 @@ class EpisodeTabBarView extends StatelessWidget {
   final AutoSizeGroup textGroup;
   final bool chapters;
   final bool toggleComments;
+  final Widget nostrComments;
 
-  EpisodeTabBarView({
-    Key key,
-    this.episode,
-    this.textGroup,
-    this.chapters = false,
-    this.toggleComments = false,
-  }) : super(key: key);
+  EpisodeTabBarView(
+      {Key key,
+      this.episode,
+      this.textGroup,
+      this.chapters = false,
+      this.toggleComments = false,
+      this.nostrComments})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -351,7 +343,7 @@ class EpisodeTabBarView extends StatelessWidget {
           title: episode.title,
           description: episode.description,
         ),
-        if (toggleComments) EpisodeComments(episode: episode),
+        if (toggleComments) nostrComments,
       ],
     );
   }
@@ -592,6 +584,27 @@ class PlayerControlsBuilder extends InheritedWidget {
 
   @override
   bool updateShouldNotify(PlayerControlsBuilder oldWidget) {
+    return builder != oldWidget.builder;
+  }
+}
+
+class NostrCommentsBuilder extends InheritedWidget {
+  final WidgetBuilder Function(Episode episode) builder;
+
+  NostrCommentsBuilder({
+    Key key,
+    @required this.builder,
+    @required Widget child,
+  })  : assert(builder != null),
+        assert(child != null),
+        super(key: key, child: child);
+
+  static NostrCommentsBuilder of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<NostrCommentsBuilder>();
+  }
+
+  @override
+  bool updateShouldNotify(NostrCommentsBuilder oldWidget) {
     return builder != oldWidget.builder;
   }
 }
