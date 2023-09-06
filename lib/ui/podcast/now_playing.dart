@@ -44,7 +44,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
   double baseSize = 48.0;
   Future<bool> isLoaded;
   bool isEmbedded = false;
-  bool _toggleComments = true;
+  bool showComments;
 
   @override
   void initState() {
@@ -102,7 +102,10 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
           }
 
           var duration = snapshot.data == null ? 0 : snapshot.data.duration;
-          final commentsBuilder = nostrcommentsBuilder?.builder(snapshot.data);
+          final commentsBuilder = nostrcommentsBuilder.builder != null
+              ? nostrcommentsBuilder.builder(snapshot.data)
+              : null;
+          bool showComments = commentsBuilder(context) == null ? false : true;
           final transportBuilder = playerBuilder?.builder(duration);
           isEmbedded = transportBuilder != null;
           baseSize = isEmbedded ? 24.0 : 48.0;
@@ -123,7 +126,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
                 DefaultTabController(
                     length: 2 +
                         (snapshot.data.hasChapters ? 1 : 0) +
-                        (_toggleComments ? 1 : 0),
+                        (showComments ? 1 : 0),
                     initialIndex: snapshot.data.hasChapters ? 1 : 0,
                     child: Scaffold(
                       appBar: AppBar(
@@ -154,7 +157,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: <Widget>[
                               EpisodeTabBar(
-                                toggleComments: _toggleComments,
+                                showComments: showComments,
                                 chapters: snapshot.data.hasChapters,
                               ),
                             ],
@@ -165,7 +168,7 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
                         children: [
                           Expanded(
                             child: EpisodeTabBarView(
-                              toggleComments: _toggleComments,
+                              showComments: showComments,
                               episode: snapshot.data,
                               chapters: snapshot.data.hasChapters,
                               nostrComments: commentsBuilder(context),
@@ -253,12 +256,12 @@ class _NowPlayingState extends State<NowPlaying> with WidgetsBindingObserver {
 /// two or three tabs depending upon whether the current episode supports (and contains) chapters.
 class EpisodeTabBar extends StatelessWidget {
   final bool chapters;
-  final bool toggleComments;
+  final bool showComments;
 
   const EpisodeTabBar({
     Key key,
     this.chapters = false,
-    this.toggleComments = false,
+    this.showComments = false,
   }) : super(key: key);
 
   @override
@@ -287,7 +290,7 @@ class EpisodeTabBar extends StatelessWidget {
             child: Text(L.of(context).notes_label),
           ),
         ),
-        if (toggleComments)
+        if (showComments)
           Tab(
             child: Align(
               alignment: Alignment.center,
@@ -306,7 +309,7 @@ class EpisodeTabBarView extends StatelessWidget {
   final Episode episode;
   final AutoSizeGroup textGroup;
   final bool chapters;
-  final bool toggleComments;
+  final bool showComments;
   final Widget nostrComments;
 
   EpisodeTabBarView(
@@ -314,7 +317,7 @@ class EpisodeTabBarView extends StatelessWidget {
       this.episode,
       this.textGroup,
       this.chapters = false,
-      this.toggleComments = false,
+      this.showComments = false,
       this.nostrComments})
       : super(key: key);
 
@@ -343,7 +346,7 @@ class EpisodeTabBarView extends StatelessWidget {
           title: episode.title,
           description: episode.description,
         ),
-        if (toggleComments) nostrComments,
+        if (showComments) nostrComments,
       ],
     );
   }
